@@ -53,6 +53,18 @@
       ]
     },
     {
+      "name": "Tijdlijn",
+      "short_name": "Tijdlijn",
+      "url": "./?tile=tl",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "Radar",
       "short_name": "Radar",
       "url": "./?tile=map",

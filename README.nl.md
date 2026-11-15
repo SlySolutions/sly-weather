@@ -8,7 +8,7 @@ Open `sly-weather.html` in een browser (ook rechtstreeks vanaf schijf, of via ee
 
 Zodra er een plek is bewaard staat naast "Nieuwe plek" de knop "Mijn locatie" (alleen via https): één tik toont het weer voor waar je nu bent als tijdelijke plek, afgerond zoals een tik op de kaart. Er wordt niets opgeslagen tot je op "Bewaar als plek" tikt; na herladen zie je weer je laatste bewaarde plek. Rechtsonder verschijnt na scrollen een oranje knop "Naar boven", en dezelfde pijl staat dan ook in de bovenbalk.
 
-Experiment op `/weather/test/`: één tijdlijn (3 u tot 7 d) met neerslag, temperatuur (hoogste van de dag in rood, laagste van de nacht in blauw) en wind; sleep erover en de kaart en de uitgeschreven verwachting volgen dat moment. Gebruikt de plek die je in de app hebt bewaard en één extra verzoek voor een vast modelraster over Nederland (voor iedereen gelijk).
+Tegel Tijdlijn: uren en week in één (3 u tot 7 d) met neerslagstaven, temperatuur (hoogste van de dag in rood, laagste van de nacht in blauw), wind en bewolking; sleep erover en de kaart en een uitgeschreven verwachting volgen dat moment. Binnen de radaruren toont de kaart het radarbeeld, daarna een grof modelraster over Nederland (±40 km). Menu Delen (≡): tik om een deel aan of uit te zetten (bewaard), lang indrukken om even alleen dat deel te zien.
 
 Tegelmodus: zet `?tile=strip` achter het adres (of `?tile=now,strip`; ook `map`, `chart`, `days`) en je ziet alleen die tegel(s) met de plaatsnaam erbij, als link naar de hele app. Handig als snelkoppeling op het beginscherm: open die URL in de browser en kies "Toevoegen aan startscherm"; is de app geïnstalleerd, dan opent hij daarin. Lang indrukken van het app-icoon geeft kant-en-klare snelkoppelingen (Buien, Nu, Radar). Een echte Android-widget is vanuit een webapp niet mogelijk; dat zou een app-schil vragen.
 
@@ -18,10 +18,11 @@ Thema's: Auto, Licht, Donker en Nerd (knoppen rechtsboven). Nerd mode toont onde
 
 ## Wat verlaat je toestel
 
-Per verversing precies twee verzoeken:
+Per verversing precies drie verzoeken:
 
 1. `api.open-meteo.com`: een op 0,01° (≈1 km) afgerond coördinaat, model `knmi_seamless` (KNMI HARMONIE via Open-Meteo). Levert actueel weer, kwartierneerslag 24 u, uurwaarden 7 dagen, dagwaarden.
-2. `image.buienradar.nl`: het landelijke radarbeeld (24 beelden van 5 minuten: afgelopen uur en komend uur) als één sprite. Dit verzoek is voor iedereen identiek. De buienverwachting voor jouw plek wordt uit de pixels op je eigen toestel afgelezen.
+2. `api.open-meteo.com`: een vast raster van 10 x 10 modelpunten over heel Nederland (uurneerslag, 7 dagen) voor het kaartje na de radaruren. Voor iedereen identiek, zegt niets over jou.
+3. `image.buienradar.nl`: het landelijke radarbeeld (24 beelden van 5 minuten: afgelopen uur en komend uur) als één sprite. Dit verzoek is voor iedereen identiek. De buienverwachting voor jouw plek wordt uit de pixels op je eigen toestel afgelezen.
 
 De GPS-knop (in de kiesmodus) en de knop "Mijn locatie" vragen de positie aan het toestel en ronden die meteen af; de ruwe positie wordt niet bewaard en verlaat het toestel niet. Een Content-Security-Policy in de pagina dwingt dit af: de browser staat alleen `api.open-meteo.com` en het radarbeeld van Buienradar (`image.buienradar.nl`, dat doorverwijst naar `image-cdn.buienradar.nl`) toe, en alleen de ingebakken scripts mogen draaien. Browsers staan locatie alleen toe via https of een app-schil; bij een lokaal geopend bestand legt de app uit waarom het niet werkt. De knop "Mijn plek" zoomt naar je opgeslagen plek.
 

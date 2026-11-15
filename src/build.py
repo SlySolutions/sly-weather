@@ -7,9 +7,7 @@ fonts, Leaflet, map data and the logo are inlined so the app is one self-contain
 The Content-Security-Policy meta tag gets a sha256 hash per inline script, so the browser
 enforces "nothing but Open-Meteo and the Buienradar image" instead of the app just promising it.
 Blocks between <!-- site-only --> and <!-- /site-only --> (manifest, icons, service worker,
-share preview) are left out of the standalone file, which is meant to be opened from disk.
-The experiment test_template.html (timeline with map per moment) is built the same way
-into ../site/weather/test/index.html; it is site-only and has no standalone file."""
+share preview) are left out of the standalone file, which is meant to be opened from disk."""
 import base64, hashlib, json, os, re
 H = os.path.dirname(os.path.abspath(__file__))
 S = lambda p: open(os.path.join(H, p), encoding='utf-8').read()
@@ -62,8 +60,3 @@ standalone = re.sub(r'<!-- site-only -->.*?<!-- /site-only -->\n?', '', t, flags
 assert 'site-only' not in standalone
 write(os.path.join(H, '..', 'sly-weather.html'), standalone)
 print('CSP:', csp)
-
-if os.path.isdir(site):
-    os.makedirs(os.path.join(site, 'test'), exist_ok=True)
-    tt, _ = assemble('test_template.html', 1)
-    write(os.path.join(site, 'test', 'index.html'), tt)

@@ -18,15 +18,17 @@ Live: **https://slysolutions.nl/weather/** (open on your phone and choose *Add t
 - Built-in offline map of the Netherlands (municipalities, places, districts, motorways, rivers) to pick a spot by tapping, by place name or by four-digit postcode.
 - Optional "My location" button (https only): one tap shows the weather for where you are now as a temporary place, rounded on the device, saved only if you choose to.
 - Three themes in the Sly Solutions style (light, dark, nerd), reorderable and collapsible tiles.
-- Experiment at `/weather/test/`: one timeline (3 h to 7 d) with rain, temperature (day high in red, night low in blue) and wind; drag along it and the map and the written forecast follow that moment. Uses the place saved in the app and one extra request for a fixed model grid over the Netherlands (identical for everyone).
-- Tile mode: add `?tile=strip` (or `?tile=now,strip`, `map`, `chart`, `days`) to the URL to show only those tiles with the place name, handy as a home-screen shortcut. Long-press the installed app icon for ready-made shortcuts (Showers, Now, Radar).
+- Timeline tile: hours and week in one (3 h to 7 d) with rain bars, temperature (day high in red, night low in blue), wind and cloud cover; drag along it and the map and a written forecast follow that moment. Within the radar hours the map shows the radar frame, beyond that a coarse model grid over the Netherlands (about 40 km).
+- Sections menu (≡): tap a section to switch it on or off (saved), press and hold to show only that one while the menu is open.
+- Tile mode: add `?tile=strip` (or `?tile=now,strip`, `tl`, `map`, `chart`, `days`) to the URL to show only those tiles with the place name, handy as a home-screen shortcut. Long-press the installed app icon for ready-made shortcuts (Showers, Now, Radar, Timeline).
 
 ## Privacy by design
 
-Exactly two requests leave your device per refresh:
+Exactly three requests leave your device per refresh:
 
 1. One request to **Open-Meteo** (KNMI HARMONIE model) with your coordinate **rounded to about 1 km**.
-2. One request for the **national Buienradar radar image**, which is identical for everyone. The local rain nowcast is read from that image on your device.
+2. One request to **Open-Meteo** for a **fixed grid of 10 x 10 model points over the whole Netherlands** (hourly precipitation, 7 days), used for the map beyond the radar hours. The grid is identical for everyone and says nothing about you.
+3. One request for the **national Buienradar radar image**, which is identical for everyone. The local rain nowcast is read from that image on your device.
 
 No geocoding, no map tiles, no third-party fonts or scripts: the map, fonts and Leaflet are embedded in the file. Saved places and settings live in your browser's local storage. "Nerd mode" shows a log of every outgoing request. Location is used only when you press a button: the raw position is rounded at once, never stored and never leaves the device. A Content-Security-Policy in the page makes the browser enforce all of this: only Open-Meteo and the Buienradar image host are allowed, nothing else can load or run.
 
