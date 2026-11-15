@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Security-Policy" content="{{CSP}}">
 <meta name="robots" content="noindex">
 <meta name="description" content="Sly Weather experiment: one timeline for the coming hours and the week, with the rain map and the forecast for any moment you touch.">
-<meta name="version" content="test-3">
+<meta name="version" content="test-4">
 <meta name="theme-color" content="#F4F5F7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#14171B" media="(prefers-color-scheme: dark)">
 <title>Sly Weather test: tijdlijn</title>
@@ -28,7 +28,7 @@
   --rain-1:#BFE3FF; --rain-2:#5FB4F2; --rain-3:#1F6FEB; --rain-4:#8B3FD9; --rain-5:#D23B6B;
   --temp:#E0702A; --temp-cold:#2F7FD6; --wind:#2E8B57;
   --map-land:#E3E6EA; --map-prov:#8A939E; --map-sea:#F4F5F7;
-  --night:rgba(34,40,47,.11);
+  --night:rgba(34,40,47,.17); --day:rgba(246,135,18,.06);
   --radius:14px;
   --font-body:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --font-mono:"Space Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
@@ -41,7 +41,7 @@
     --accent:#F68712; --accent-ink:#FFB066; --accent-soft:#3A2A18;
     --rain-1:#3B7DB8; --rain-2:#5FB4F2; --rain-3:#9CD3FF; --rain-4:#C79BFF; --rain-5:#FF7AA2;
     --temp:#FFB066; --temp-cold:#7FB6FF; --wind:#5BD08A;
-    --map-land:#2A3038; --map-prov:#6B7684; --map-sea:#14171B; --night:rgba(0,0,0,.34);
+    --map-land:#2A3038; --map-prov:#6B7684; --map-sea:#14171B; --night:rgba(0,0,0,.5); --day:rgba(255,255,255,.05);
     --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7); color-scheme:dark;
   }
 }
@@ -50,7 +50,7 @@
   --accent:#F68712; --accent-ink:#FFB066; --accent-soft:#3A2A18;
   --rain-1:#3B7DB8; --rain-2:#5FB4F2; --rain-3:#9CD3FF; --rain-4:#C79BFF; --rain-5:#FF7AA2;
   --temp:#FFB066; --temp-cold:#7FB6FF; --wind:#5BD08A;
-  --map-land:#2A3038; --map-prov:#6B7684; --map-sea:#14171B; --night:rgba(0,0,0,.34);
+  --map-land:#2A3038; --map-prov:#6B7684; --map-sea:#14171B; --night:rgba(0,0,0,.5); --day:rgba(255,255,255,.05);
   --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7); color-scheme:dark;
 }
 :root[data-theme="nerd"]{
@@ -58,7 +58,7 @@
   --accent:#F68712; --accent-ink:#FFB066; --accent-soft:#1E2A14;
   --rain-1:#2F6B4A; --rain-2:#3FA66A; --rain-3:#5BF07A; --rain-4:#C8FF5B; --rain-5:#F68712;
   --temp:#F68712; --temp-cold:#5FB4F2; --wind:#9FE8A8;
-  --map-land:#101A14; --map-prov:#5FAA6A; --map-sea:#0A0E0C; --night:rgba(0,0,0,.42);
+  --map-land:#101A14; --map-prov:#5FAA6A; --map-sea:#0A0E0C; --night:rgba(0,0,0,.55); --day:rgba(159,232,168,.06);
   --font-body:var(--font-mono); --radius:2px; --shadow:none; color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -78,6 +78,11 @@ header.top .tag{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-trans
 :root[data-theme="nerd"] .card{border-color:var(--text-2)}
 .status{font-size:.82rem;color:var(--text-2);margin:0 2px 10px}
 .status.err{color:#D23B6B}
+/* Welke delen de pagina toont: eerste keer alles, daarna de keuze (op dit toestel bewaard) */
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 2px 10px;font-size:.78rem;color:var(--text-2)}
+.chips button{border:1px solid var(--line);background:var(--bg-2);color:var(--text-2);font:inherit;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:999px;cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
+:root[data-theme="nerd"] .chips button{border-radius:2px}
 /* Uitlezing van het gekozen moment */
 .readout .when{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:.9rem;color:var(--text-2)}
 .readout .when b{color:var(--text);font-size:1.05rem}
@@ -145,19 +150,20 @@ footer.foot svg{width:22px;height:22px;vertical-align:middle;margin-right:4px}
     <a class="btn primary" href="../" id="emptybtn"></a>
   </div>
   <div id="content" hidden>
+    <div class="chips" id="chips"></div>
     <section class="card readout" id="readout">
       <div class="when"><b id="r-day"></b><span id="r-time"></span><span class="src" id="r-src"></span></div>
       <div class="big"><span class="ico" id="r-ico"></span><span class="temp" id="r-temp"></span><span class="txt" id="r-txt"></span></div>
       <div class="kv" id="r-kv"></div>
     </section>
-    <section class="card">
+    <section class="card" id="tlcard">
       <div class="tlhead"><h2 id="tltitle"></h2><button class="btn" id="nowbtn" type="button" style="padding:3px 10px;font-size:.82rem"></button><div class="zoom" id="zoom"><button type="button" data-z="3">3 u</button><button type="button" data-z="12">12 u</button><button type="button" data-z="24">24 u</button><button type="button" data-z="72">3 d</button><button type="button" data-z="168">7 d</button></div></div>
       <canvas id="tl" aria-label="Tijdlijn" role="img"></canvas>
       <div class="legend" id="tllegend"></div>
       <p class="hint" id="hint"></p>
     </section>
     <div class="grid">
-      <section class="card">
+      <section class="card" id="mapcard">
         <div class="mapwrap"><canvas id="map" role="img" aria-label="Neerslagkaart"></canvas><div class="maplbl" id="maplbl"></div></div>
         <div class="legend" id="legend"></div>
       </section>
@@ -185,6 +191,7 @@ const I18N = {
   nl: {
     title: 'Tijdlijn', pick_first: 'Deze testpagina gebruikt de plek die je in Sly Weather hebt bewaard. Kies daar eerst een plek.', open_app: 'Open Sly Weather', refresh: 'Vernieuwen',
     now: 'Nu', radar: 'radar', model: 'model', hint: 'Sleep of tik op de tijdlijn: de kaart en de tekst volgen dat moment. Donker is nacht.',
+    show: 'Toon', sec_now: 'Nu', sec_tl: 'Tijdlijn', sec_map: 'Kaart', sec_txt: 'Tekst', sec_ex: 'Uitleg',
     tl_temp: 'temperatuur', tl_wind: 'wind (zonder schaal)', tl_cloud: 'bewolking per uur, donkerder is meer', tl_rain: 'neerslag', tl_now: 'nu', tl_hi: 'hoogste overdag', tl_lo: 'laagste in de nacht',
     feels: 'voelt als', rain: 'neerslag', chance: 'kans', wind: 'wind', gust: 'stoten', cloud: 'bewolking', mmh: 'mm/u', kmh: 'km/u',
     days: ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'], days_s: ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'],
@@ -207,6 +214,7 @@ const I18N = {
   en: {
     title: 'Timeline', pick_first: 'This test page uses the place you saved in Sly Weather. Pick a place there first.', open_app: 'Open Sly Weather', refresh: 'Refresh',
     now: 'Now', radar: 'radar', model: 'model', hint: 'Drag or tap the timeline: the map and the text follow that moment. Dark is night.',
+    show: 'Show', sec_now: 'Now', sec_tl: 'Timeline', sec_map: 'Map', sec_txt: 'Text', sec_ex: 'About',
     tl_temp: 'temperature', tl_wind: 'wind (no scale)', tl_cloud: 'cloud cover per hour, darker is more', tl_rain: 'precipitation', tl_now: 'now', tl_hi: 'day high', tl_lo: 'night low',
     feels: 'feels like', rain: 'rain', chance: 'chance', wind: 'wind', gust: 'gusts', cloud: 'cloud', mmh: 'mm/h', kmh: 'km/h',
     days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], days_s: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
@@ -411,7 +419,7 @@ function drawTL() {
     if (i === dl.time.length - 1) periods.push({a: set, b: set + 14 * 3600000, night: true});
   }
   const vis = periods.map(p => ({a: Math.max(p.a, tStart), b: Math.min(p.b, tEnd), night: p.night})).filter(p => p.b > p.a);
-  g.fillStyle = col('--night'); vis.forEach(p => { if (p.night) g.fillRect(x(p.a), top, x(p.b) - x(p.a), bottom - top); });
+  vis.forEach(p => { g.fillStyle = col(p.night ? '--night' : '--day'); g.fillRect(x(p.a), top, x(p.b) - x(p.a), bottom - top); });
   /* Dagen: scheidslijn om middernacht, naam onderaan */
   g.strokeStyle = col('--line'); g.lineWidth = 1; g.fillStyle = col('--text-2'); g.textAlign = 'left'; g.textBaseline = 'alphabetic';
   const firstMid = (dayOf(tStart) + 1) * 86400000, dayLbl = [];
@@ -568,7 +576,16 @@ function drawReadout() {
   $('story').innerHTML = ps.map(p => '<p>' + p + '</p>').join('');
 }
 let raf = 0;
-function drawAll() { if (raf) return; raf = requestAnimationFrame(() => { raf = 0; drawTL(); drawMap(); drawReadout(); }); }
+function drawAll() { if (raf) return; raf = requestAnimationFrame(() => { raf = 0; if (!$('tlcard').hidden) drawTL(); if (!$('mapcard').hidden) drawMap(); drawReadout(); }); }
+/* Welke delen open: eerste keer alles, daarna de keuze uit bbt_tiles */
+const SECTIONS = ['now', 'tl', 'map', 'txt', 'ex'], SEC_EL = {now: 'readout', tl: 'tlcard', map: 'mapcard', txt: 'story', ex: 'explain'};
+let shown = LS.get('bbt_tiles', SECTIONS).filter(k => SECTIONS.includes(k));
+function applySections() {
+  SECTIONS.forEach(k => { $(SEC_EL[k]).hidden = !shown.includes(k); });
+  $('chips').innerHTML = `<span>${t('show')}</span>` + SECTIONS.map(k => `<button type="button" data-sec="${k}" aria-pressed="${shown.includes(k)}">${t('sec_' + k)}</button>`).join('');
+  if (meteo) { modelCanvas = null; drawAll(); }
+}
+$('chips').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const k = b.dataset.sec; shown = shown.includes(k) ? shown.filter(x => x !== k) : SECTIONS.filter(x => shown.includes(x) || x === k); LS.set('bbt_tiles', shown); applySections(); });
 
 /* ============ Start ============ */
 function applyText() {
@@ -577,7 +594,7 @@ function applyText() {
   document.querySelectorAll('#zoom button').forEach(b => { b.setAttribute('aria-pressed', String(+b.dataset.z === zoomH)); b.textContent = {3: lang === 'nl' ? '3 u' : '3 h', 12: lang === 'nl' ? '12 u' : '12 h', 24: lang === 'nl' ? '24 u' : '24 h', 72: '3 d', 168: '7 d'}[b.dataset.z]; });
   $('tllegend').innerHTML = `<span><i class="ln"></i>${t('tl_temp')}</span><span><i class="dot"></i>${t('tl_hi')}</span><span><i class="dot lo"></i>${t('tl_lo')}</span><span><i class="ln wind"></i>${t('tl_wind')}</span><span><i class="band"></i>${t('tl_cloud')}</span><span><i class="bar"></i>${t('tl_rain')}</span><span><i class="now"></i>${t('tl_now')}</span>`;
   $('legend').innerHTML = `<span><i style="background:${col('--rain-1')}"></i><i style="background:${col('--rain-3')}"></i><i style="background:${col('--rain-4')}"></i>${t('leg_radar')}</span><span><i style="background:${col('--rain-1')}"></i><i style="background:${col('--rain-2')}"></i><i style="background:${col('--rain-3')}"></i><i style="background:${col('--rain-4')}"></i><i style="background:${col('--rain-5')}"></i>${t('leg_model')}</span><span><i style="background:${col('--accent')};border-radius:999px"></i>${t('leg_place')}</span>`;
-  renderLog();
+  renderLog(); applySections();
 }
 applyText();
 $('zoom').addEventListener('click', applyText);
