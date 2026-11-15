@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ilY2LPAPp+nZsaarSHm81jF/aQddxxcBwayB9E2silI='; style-src 'unsafe-inline'; img-src 'self' data: https://image.buienradar.nl https://image-cdn.buienradar.nl; connect-src https://api.open-meteo.com; font-src data:; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-rrlEeIHoGpnRG9JN7vT3xp9bJeJRLesCyJgaaXt35O0='; style-src 'unsafe-inline'; img-src 'self' data: https://image.buienradar.nl https://image-cdn.buienradar.nl; connect-src https://api.open-meteo.com; font-src data:; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="robots" content="noindex">
 <meta name="description" content="Sly Weather experiment: one timeline for the coming hours and the week, with the rain map and the forecast for any moment you touch.">
-<meta name="version" content="test-2">
+<meta name="version" content="test-3">
 <meta name="theme-color" content="#F4F5F7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#14171B" media="(prefers-color-scheme: dark)">
 <title>Sly Weather test: tijdlijn</title>
@@ -103,6 +103,14 @@ canvas#map{display:block;width:100%;height:auto;border-radius:10px;background:va
 .maplbl{position:absolute;left:10px;top:10px;font-size:.78rem;font-weight:700;background:var(--bg-2);border:1px solid var(--line);padding:2px 8px;border-radius:999px}
 .legend{display:flex;gap:10px;flex-wrap:wrap;font-size:.74rem;color:var(--text-2);margin-top:8px}
 .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:4px}
+/* Legenda tijdlijn: lijn, stippellijn, band, staaf, streep en stip */
+.legend .ln{display:inline-block;width:16px;height:0;border-top:2px solid var(--temp);vertical-align:middle;margin-right:4px}
+.legend .ln.wind{border-top:2px dashed var(--wind)}
+.legend .band{display:inline-block;width:16px;height:7px;vertical-align:middle;margin-right:4px;background:linear-gradient(90deg,color-mix(in srgb,var(--text-2) 10%,transparent),color-mix(in srgb,var(--text-2) 70%,transparent))}
+.legend .bar{display:inline-block;width:6px;height:12px;vertical-align:-2px;margin-right:4px;background:var(--rain-3)}
+.legend .now{display:inline-block;width:2px;height:12px;vertical-align:-2px;margin-right:4px;background:#D23B6B}
+.legend .dot{display:inline-block;width:8px;height:8px;border-radius:999px;vertical-align:0;margin-right:4px;background:var(--temp)}
+.legend .dot.lo{background:var(--temp-cold)}
 /* Tekst */
 .story p{margin:0 0 8px}
 .story p:last-child{margin:0}
@@ -145,6 +153,7 @@ footer.foot svg{width:22px;height:22px;vertical-align:middle;margin-right:4px}
     <section class="card">
       <div class="tlhead"><h2 id="tltitle"></h2><button class="btn" id="nowbtn" type="button" style="padding:3px 10px;font-size:.82rem"></button><div class="zoom" id="zoom"><button type="button" data-z="3">3 u</button><button type="button" data-z="12">12 u</button><button type="button" data-z="24">24 u</button><button type="button" data-z="72">3 d</button><button type="button" data-z="168">7 d</button></div></div>
       <canvas id="tl" aria-label="Tijdlijn" role="img"></canvas>
+      <div class="legend" id="tllegend"></div>
       <p class="hint" id="hint"></p>
     </section>
     <div class="grid">
@@ -175,7 +184,8 @@ const ZOOMS = [3, 12, 24, 72, 168];
 const I18N = {
   nl: {
     title: 'Tijdlijn', pick_first: 'Deze testpagina gebruikt de plek die je in Sly Weather hebt bewaard. Kies daar eerst een plek.', open_app: 'Open Sly Weather', refresh: 'Vernieuwen',
-    now: 'Nu', radar: 'radar', model: 'model', hint: 'Sleep of tik op de tijdlijn: de kaart en de tekst volgen dat moment. Rood is nu. Donker is nacht; de hoogste temperatuur van de dag staat in rood op de lijn, de laagste van de nacht in blauw.',
+    now: 'Nu', radar: 'radar', model: 'model', hint: 'Sleep of tik op de tijdlijn: de kaart en de tekst volgen dat moment. Donker is nacht.',
+    tl_temp: 'temperatuur', tl_wind: 'wind (zonder schaal)', tl_cloud: 'bewolking per uur, donkerder is meer', tl_rain: 'neerslag', tl_now: 'nu', tl_hi: 'hoogste overdag', tl_lo: 'laagste in de nacht',
     feels: 'voelt als', rain: 'neerslag', chance: 'kans', wind: 'wind', gust: 'stoten', cloud: 'bewolking', mmh: 'mm/u', kmh: 'km/u',
     days: ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'], days_s: ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'],
     dirs: ['noorden', 'noordoosten', 'oosten', 'zuidoosten', 'zuiden', 'zuidwesten', 'westen', 'noordwesten'], dirs_s: ['N', 'NO', 'O', 'ZO', 'Z', 'ZW', 'W', 'NW'],
@@ -196,7 +206,8 @@ const I18N = {
   },
   en: {
     title: 'Timeline', pick_first: 'This test page uses the place you saved in Sly Weather. Pick a place there first.', open_app: 'Open Sly Weather', refresh: 'Refresh',
-    now: 'Now', radar: 'radar', model: 'model', hint: 'Drag or tap the timeline: the map and the text follow that moment. Red is now. Dark is night; the day high sits on the line in red, the night low in blue.',
+    now: 'Now', radar: 'radar', model: 'model', hint: 'Drag or tap the timeline: the map and the text follow that moment. Dark is night.',
+    tl_temp: 'temperature', tl_wind: 'wind (no scale)', tl_cloud: 'cloud cover per hour, darker is more', tl_rain: 'precipitation', tl_now: 'now', tl_hi: 'day high', tl_lo: 'night low',
     feels: 'feels like', rain: 'rain', chance: 'chance', wind: 'wind', gust: 'gusts', cloud: 'cloud', mmh: 'mm/h', kmh: 'km/h',
     days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], days_s: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
     dirs: ['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest'], dirs_s: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'],
@@ -564,6 +575,7 @@ function applyText() {
   $('tltitle').textContent = t('title'); $('nowbtn').textContent = t('now'); $('hint').textContent = t('hint'); $('refresh').title = t('refresh');
   $('emptytxt').textContent = t('pick_first'); $('emptybtn').textContent = t('open_app'); $('foot').textContent = t('foot');
   document.querySelectorAll('#zoom button').forEach(b => { b.setAttribute('aria-pressed', String(+b.dataset.z === zoomH)); b.textContent = {3: lang === 'nl' ? '3 u' : '3 h', 12: lang === 'nl' ? '12 u' : '12 h', 24: lang === 'nl' ? '24 u' : '24 h', 72: '3 d', 168: '7 d'}[b.dataset.z]; });
+  $('tllegend').innerHTML = `<span><i class="ln"></i>${t('tl_temp')}</span><span><i class="dot"></i>${t('tl_hi')}</span><span><i class="dot lo"></i>${t('tl_lo')}</span><span><i class="ln wind"></i>${t('tl_wind')}</span><span><i class="band"></i>${t('tl_cloud')}</span><span><i class="bar"></i>${t('tl_rain')}</span><span><i class="now"></i>${t('tl_now')}</span>`;
   $('legend').innerHTML = `<span><i style="background:${col('--rain-1')}"></i><i style="background:${col('--rain-3')}"></i><i style="background:${col('--rain-4')}"></i>${t('leg_radar')}</span><span><i style="background:${col('--rain-1')}"></i><i style="background:${col('--rain-2')}"></i><i style="background:${col('--rain-3')}"></i><i style="background:${col('--rain-4')}"></i><i style="background:${col('--rain-5')}"></i>${t('leg_model')}</span><span><i style="background:${col('--accent')};border-radius:999px"></i>${t('leg_place')}</span>`;
   renderLog();
 }
