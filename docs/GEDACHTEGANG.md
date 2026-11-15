@@ -95,6 +95,8 @@ Na een dag live kwam feedback uit de review van de website. De wijzigingen, in v
 
 Les: een CSP is niet alleen beveiliging, het is ook een meetinstrument. Zet hem aan en de browser vertelt je precies wat er werkelijk wordt opgehaald.
 
+**Versie 1.2, dezelfde dag.** Na de eerste test op de telefoon: de "Naar boven"-knop kwam te laat en viel niet op, dus nu oranje, na 240 px, en ook als pijl in de bovenbalk. En de vraag "kan dit een widget worden?" Een echte Android-widget niet zonder native schil, maar een tegelmodus wel: `?tile=strip` toont alleen de buienstrip met de plaatsnaam, als snelkoppeling op het beginscherm of via lang indrukken van het app-icoon (manifest-shortcuts). Les: vraag na elke release wat de gebruiker als eerste miste; dat is bijna altijd klein en snel te doen.
+
 ## 8. Wat dit project leert voor een volgend project
 
 - **Begin met de harde eis**, niet met de functielijst. Hier was dat "geen data delen"; daaruit volgden bijna alle keuzes vanzelf.

@@ -15,9 +15,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>Sly Weather</title>
 <meta name="application-name" content="Sly Weather">
-<meta name="version" content="1.1">
+<meta name="version" content="1.2">
 <!--
-  Sly Weather v1.1: weather and rain for your own spot in the Netherlands, without sharing your location.
+  Sly Weather v1.2: weather and rain for your own spot in the Netherlands, without sharing your location.
   A Sly Solutions project · https://slysolutions.nl
   Live app      https://slysolutions.nl/weather/
   Source, issues and ideas: https://github.com/SlySolutions/sly-weather
@@ -305,9 +305,15 @@ footer a{color:inherit}
 .welcome .eyebrow{margin-bottom:6px;display:block}
 .welcome h1{margin-bottom:0}
 /* Naar boven: zwevend rechtsonder (duimbereik), pas na een schermhoogte scrollen */
-.totop{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:35;width:42px;height:42px;border-radius:999px;border:1px solid var(--line);background:var(--bg-2);color:var(--text);box-shadow:var(--shadow);display:grid;place-items:center;cursor:pointer;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .2s,transform .2s}
+.totop{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:35;width:44px;height:44px;border-radius:999px;border:1px solid transparent;background:var(--accent);color:#1B1208;box-shadow:var(--shadow);display:grid;place-items:center;cursor:pointer;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .2s,transform .2s}
 .totop.show{opacity:1;transform:none;pointer-events:auto}
-:root[data-theme="nerd"] .totop{border-radius:2px}
+:root[data-theme="nerd"] .totop{border-radius:2px;background:var(--text);color:var(--bg)}
+.iconbtn.ghost{visibility:hidden}
+/* Tegelmodus (?tile=strip,now): alleen de gekozen tegels met de plaatsnaam, voor een snelkoppeling op het beginscherm */
+body.widget header.top,body.widget .locbar,body.widget #welcome,body.widget .nerd,body.widget .privacy,body.widget footer,body.widget .totop,body.widget .cardctl{display:none!important}
+body.widget .app{padding-top:10px}body.widget .cards{margin-top:0;columns:auto}
+.wplace{display:none}body.widget .wplace{display:inline-flex;align-items:center;gap:4px;margin-right:auto;font-weight:700;font-size:.9rem;color:var(--accent-ink);text-decoration:none;white-space:nowrap}
+body.widget .card .head h2{margin-right:0}
 .locbar .actions .btn svg{width:14px;height:14px}
 
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}#rain{display:none!important}}
@@ -331,6 +337,9 @@ footer a{color:inherit}
         <button type="button" data-theme-set="dark" aria-pressed="false" data-i18n-title="th_dark">☾</button>
         <button type="button" data-theme-set="nerd" aria-pressed="false" data-i18n-title="th_nerd">⌨</button>
       </div>
+      <button class="iconbtn ghost" id="totophdr" type="button" data-i18n-title="totop" aria-label="Naar boven">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      </button>
       <button class="iconbtn" id="refresh" type="button" data-i18n-title="refresh" aria-label="Vernieuwen">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
       </button>
@@ -459,7 +468,7 @@ footer a{color:inherit}
 <script>{{LEAFLET_JS}}</script>
 <script>
 /* ============ Data ============ */
-const APP_VERSION = '1.1';
+const APP_VERSION = '1.2';
 const GEMEENTEN = {{GEMEENTEN}};
 const PROVINCIES = {{PROVINCIES}};
 const LIJNEN = {{LIJNEN}};
@@ -479,7 +488,7 @@ const I18N = {
     th_auto: 'Volg systeem', th_light: 'Licht', th_dark: 'Donker', th_nerd: 'Nerd', refresh: 'Vernieuwen',
     newplace: 'Nieuwe plek', delplace: 'Deze plek verwijderen', sure: 'Zeker? ✕',
     geo: 'Mijn locatie', geo_title: 'Weer voor waar ik nu ben (afgerond, blijft op het toestel)', geo_save: 'Bewaar als plek', geo_temp: 'Mijn locatie', geo_unsaved: 'tijdelijk, niet bewaard',
-    geo_abroad: 'buiten Nederland: kaart en radar dekken alleen Nederland, de verwachting werkt wel', totop: 'Naar boven',
+    geo_abroad: 'buiten Nederland: kaart en radar dekken alleen Nederland, de verwachting werkt wel', totop: 'Naar boven', open_app: 'Open de hele app',
     w_eyebrow: 'Eerste keer', w_h1: 'Kies je plek op de kaart. Verder hoef je niets te delen.',
     w_p1: 'Zoom in en tik op de kaart. De app rondt je keuze af op ongeveer een kilometer, bewaart hem alleen op dit toestel en vraagt daarna de verwachting op. Geen account, geen cookies. Je kunt ook zoeken op plaatsnaam of postcode; die lijst zit in de app zelf.',
     w_p2: 'Wat je toestel verlaat: één verzoek met een afgerond coördinaat naar Open-Meteo, en één verzoek om het landelijke radarbeeld van Buienradar dat voor iedereen gelijk is.',
@@ -516,7 +525,7 @@ const I18N = {
     th_auto: 'Follow system', th_light: 'Light', th_dark: 'Dark', th_nerd: 'Nerd', refresh: 'Refresh',
     newplace: 'New place', delplace: 'Remove this place', sure: 'Sure? ✕',
     geo: 'My location', geo_title: 'Weather for where I am now (rounded, stays on the device)', geo_save: 'Save as place', geo_temp: 'My location', geo_unsaved: 'temporary, not saved',
-    geo_abroad: 'outside the Netherlands: the map and radar cover NL only, the forecast still works', totop: 'Back to top',
+    geo_abroad: 'outside the Netherlands: the map and radar cover NL only, the forecast still works', totop: 'Back to top', open_app: 'Open the full app',
     w_eyebrow: 'First time', w_h1: 'Pick your spot on the map. Nothing else needs sharing.',
     w_p1: 'Zoom in and tap the map. The app rounds your choice to about a kilometre, keeps it only on this device and then fetches the forecast. No account, no cookies. You can also search by place name or postcode; that list is built into the app.',
     w_p2: 'What leaves your device: one request with a rounded coordinate to Open-Meteo, and one request for the national Buienradar radar image, which is identical for everyone.',
@@ -641,6 +650,10 @@ function startRain() {
 
 /* ============ Tegels: volgorde en inklappen ============ */
 const DEFAULT_ORDER = ['now', 'strip', 'chart', 'map', 'days'];
+/* Tegelmodus: ?tile=strip (of meerdere, met komma's) toont alleen die tegels met de plaatsnaam erbij; zonder bewaarde plek of tijdens het kiezen gewoon de hele app */
+const widgetTiles = (new URLSearchParams(location.search).get('tile') || '').split(',').filter(k => DEFAULT_ORDER.includes(k));
+const widgetOn = () => widgetTiles.length > 0 && !!currentPlace() && !picking;
+function applyWidget() { document.body.classList.toggle('widget', widgetOn()); }
 let order = LS.get('bb_order', DEFAULT_ORDER).filter(k => DEFAULT_ORDER.includes(k));
 DEFAULT_ORDER.forEach(k => { if (!order.includes(k)) order.push(k); });
 let folded = LS.get('bb_folded', {});
@@ -649,7 +662,7 @@ function layoutCards() {
   const host = $('cards');
   order.forEach(k => host.appendChild(cardEl(k)));
   order.forEach((k, i) => {
-    const el = cardEl(k); el.classList.toggle('folded', !!folded[k]);
+    const el = cardEl(k); el.classList.toggle('folded', !!folded[k] && !widgetOn());
     const c = el.querySelector('.cardctl'); c.querySelector('[data-mv="-1"]').disabled = i === 0; c.querySelector('[data-mv="1"]').disabled = i === order.length - 1;
     c.querySelector('.fold').setAttribute('aria-expanded', String(!folded[k]));
   });
@@ -660,6 +673,7 @@ DEFAULT_ORDER.forEach(k => {
   const el = cardEl(k); const ctl = document.createElement('span'); ctl.className = 'cardctl';
   ctl.innerHTML = `<button type="button" data-mv="-1" data-i18n-title="mv_up">▲</button><button type="button" data-mv="1" data-i18n-title="mv_down">▼</button><button type="button" class="fold" data-i18n-title="fold"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>`;
   el.querySelector('.head').appendChild(ctl);
+  const wp = document.createElement('a'); wp.className = 'wplace'; wp.href = location.pathname || './'; wp.setAttribute('data-i18n-title', 'open_app'); el.querySelector('.head h2').after(wp);
   ctl.querySelectorAll('[data-mv]').forEach(b => b.addEventListener('click', () => { const i = order.indexOf(k), j = i + (+b.dataset.mv); if (j < 0 || j >= order.length) return; [order[i], order[j]] = [order[j], order[i]]; layoutCards(); el.scrollIntoView({behavior: 'smooth', block: 'nearest'}); }));
   ctl.querySelector('.fold').addEventListener('click', () => { folded[k] = !folded[k]; layoutCards(); });
   el.querySelector('.head h2').addEventListener('click', () => { folded[k] = !folded[k]; layoutCards(); });
@@ -687,8 +701,9 @@ function currentPlace() { return tempPlace || places[cur] || null; }
 function renderPlaces() {
   const p = currentPlace();
   $('locbar').hidden = !p; $('welcome').hidden = !!p; $('cards').classList.toggle('first', !p);
+  applyWidget();
   if (!p) return;
-  $('placename').textContent = p.name;
+  $('placename').textContent = p.name; document.querySelectorAll('.wplace').forEach(a => a.textContent = '\u2316 ' + p.name);
   const sel = $('placesel'); sel.innerHTML = '';
   places.forEach((q, i) => { const o = document.createElement('option'); o.value = i; o.textContent = q.name; o.selected = !tempPlace && i === cur; sel.appendChild(o); });
   if (tempPlace) { const o = document.createElement('option'); o.value = 'tmp'; o.textContent = tempPlace.name; o.selected = true; sel.appendChild(o); }
@@ -791,7 +806,7 @@ function startPick() {
   $('maptitle').textContent = t('pick_title'); $('mapsub').textContent = t('pick_sub');
   if (radarLayer) radarLayer.setOpacity(.3);
   $('picksearch').value = ''; $('sugg').hidden = true;
-  folded.map = false; layoutCards();
+  folded.map = false; applyWidget(); layoutCards();
   const p = currentPlace(); if (p) map.setView([p.lat, p.lon], Math.max(map.getZoom(), 10)); else map.fitBounds(NL_BOUNDS, {padding: [6, 6]});
   if (p) $('mapcard').scrollIntoView({behavior: 'smooth', block: 'start'});
 }
@@ -810,6 +825,7 @@ function stopPick() {
   $('gpsbtn').hidden = true; $('homebtn').hidden = !currentPlace();
   $('maptitle').textContent = t('map_title'); $('mapsub').textContent = t('map_sub');
   if (radarLayer) { radarLayer.setOpacity(radarOpacity()); $('mapctl').hidden = false; $('maptime').hidden = false; }
+  applyWidget();
 }
 $('pickbtn').addEventListener('click', startPick);
 $('pickcancel').addEventListener('click', () => { if (currentPlace()) stopPick(); else $('pickhint').hidden = false; });
@@ -1057,7 +1073,7 @@ function dryWindow() {
 /* ============ Weergave ============ */
 function render(lat, lon) {
   const c = meteo.current; const now = nowLocal();
-  DEFAULT_ORDER.forEach(k => cardEl(k).hidden = false);
+  const wOn = widgetOn(); DEFAULT_ORDER.forEach(k => cardEl(k).hidden = wOn && !widgetTiles.includes(k));
   const w = wmo(c.weather_code, c.is_day);
   $('temp').innerHTML = Math.round(c.temperature_2m) + '<sup>°C</sup>';
   $('nowico').textContent = w.ico; $('nowdesc').textContent = w.txt;
@@ -1176,8 +1192,9 @@ if (currentPlace()) { refreshAll(); } else { startPick(); }
 document.addEventListener('visibilitychange', () => { if (!document.hidden && currentPlace()) { const c = LS.get('bb_cache', null); if (!c || Date.now() - c.ts > 10 * 60000) refreshAll(); } });
 const noMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 $('brandlink').addEventListener('click', e => { e.preventDefault(); scrollTo({top: 0, behavior: noMotion() ? 'auto' : 'smooth'}); });
-addEventListener('scroll', () => $('totop').classList.toggle('show', scrollY > innerHeight), {passive: true});
-$('totop').addEventListener('click', () => scrollTo({top: 0, behavior: noMotion() ? 'auto' : 'smooth'}));
+const onScroll = () => { const far = scrollY > 240; $('totop').classList.toggle('show', far); $('totophdr').classList.toggle('ghost', !far); };
+addEventListener('scroll', onScroll, {passive: true}); onScroll();
+[$('totop'), $('totophdr')].forEach(b => b.addEventListener('click', () => scrollTo({top: 0, behavior: noMotion() ? 'auto' : 'smooth'})));
 </script>
 <!-- site-only -->
 <script>if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});</script>
