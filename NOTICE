@@ -1,0 +1,11 @@
+Sly Weather — Copyright (c) 2026 Sly Solutions (https://slysolutions.nl)
+Licensed under CC BY-NC-SA 4.0, see LICENSE. The name "Sly Weather" and the Sly Solutions logo are not covered by that license.
+
+Third-party components keep their own licenses:
+- Leaflet 1.9.4 (BSD-2-Clause), inlined in the build.
+- Manrope and Space Mono fonts (SIL Open Font License 1.1), inlined in the build.
+- Map data: municipality and province boundaries by CBS/Kadaster via cartomap.github.io (CC BY 4.0);
+  roads, rivers and districts © OpenStreetMap contributors (ODbL);
+  place names from GeoNames (CC BY 4.0); postcode centroids from the 4pp table (github.com/bobdenotter/4pp).
+- Weather data at runtime: Open-Meteo (CC BY 4.0, KNMI model) and the national Buienradar radar image
+  (used under Buienradar's terms with attribution; not redistributed).

@@ -43,7 +43,7 @@ python3 src/build.py
 
 Weather: [Open-Meteo](https://open-meteo.com) (CC BY 4.0) · radar: [Buienradar](https://www.buienradar.nl) · map: CBS/Kadaster, © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors (ODbL), [GeoNames](https://www.geonames.org) (CC BY 4.0), [4pp](https://github.com/bobdenotter/4pp) · Leaflet (BSD-2) · Manrope and Space Mono (OFL).
 
-App: CC BY-NC-SA 4.0, see [LICENSE](LICENSE). A [Sly Solutions](https://slysolutions.nl) project.
+App: CC BY-NC-SA 4.0, see [LICENSE](LICENSE) and [NOTICE](NOTICE) (name and logo excluded). A [Sly Solutions](https://slysolutions.nl) project.
 
 ## Feedback welcome
 
