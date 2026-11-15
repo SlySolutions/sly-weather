@@ -15,9 +15,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>Sly Weather</title>
 <meta name="application-name" content="Sly Weather">
-<meta name="version" content="1.5">
+<meta name="version" content="1.6">
 <!--
-  Sly Weather v1.5: weather and rain for your own spot in the Netherlands, without sharing your location.
+  Sly Weather v1.6: weather and rain for your own spot in the Netherlands, without sharing your location.
   A Sly Solutions project · https://slysolutions.nl
   Live app      https://slysolutions.nl/weather/
   Source, issues and ideas: https://github.com/SlySolutions/sly-weather
@@ -332,7 +332,9 @@ footer a{color:inherit}
 .tl .story{margin-top:10px;font-size:.9rem}.tl .story p{margin:0 0 6px}.tl .story p:last-child{margin:0}
 /* Klein kaartje onder de tijdlijn: volgt de cursor; 0,54x tot 8x, slepen, ⌖ terug naar je plek */
 .tl .mapwrap{position:relative;margin-top:12px}
-.tl canvas.tlmap{display:block;width:100%;height:auto;border-radius:10px;background:var(--map-sea);cursor:grab;touch-action:pan-y}
+.tl canvas.tlmap{display:block;width:100%;height:auto;border-radius:10px;background:var(--map-sea);cursor:grab;touch-action:none}
+.tl .maprow{display:flex;align-items:center;gap:8px;margin-top:12px}.tl .maprow .btn{padding:4px 10px;font-size:.78rem}
+.tl .mapwrap.min,.tl .legend.min{display:none}
 .tl .maplbl{position:absolute;left:10px;top:10px;font-size:.78rem;font-weight:700;background:var(--bg-2);border:1px solid var(--line);padding:2px 8px;border-radius:999px;max-width:calc(100% - 60px)}
 .tl .mapzoom{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:4px}
 .tl .mapzoom button{appearance:none;width:32px;height:32px;border-radius:999px;border:1px solid var(--line);background:var(--bg-2);color:var(--text);font:inherit;font-size:1.1rem;font-weight:700;line-height:1;cursor:pointer;padding:0}
@@ -454,9 +456,12 @@ footer a{color:inherit}
       <div class="head"><h2 data-i18n="tl_title">Tijdlijn</h2><span class="eyebrow" data-i18n="tl_sub">sleep voor kaart en tekst</span></div>
       <div class="body">
         <div class="readout"><div class="when"><b id="r-day"></b><span id="r-time"></span><span class="src" id="r-src"></span></div><div class="big"><span class="ico" id="r-ico" aria-hidden="true"></span><span class="temp" id="r-temp"></span><span class="txt" id="r-txt"></span></div><div class="kv" id="r-kv"></div></div>
+        <div class="rainline" id="tlrain" hidden><div><div class="t" id="tlraint"></div><div class="s" id="tlrains"></div></div></div>
+        <div class="kpis" id="tlkpis" hidden><div class="kpi"><div class="k" data-i18n="next1h">Komend uur</div><div class="v" id="tlmm1"></div></div><div class="kpi"><div class="k" data-i18n="next12h">Komende 12 uur</div><div class="v" id="tlmm12"></div></div><div class="kpi"><div class="k" data-i18n="drywin">Droog venster</div><div class="v" id="tldry" style="font-size:1rem"></div></div></div>
         <div class="tlhead"><button class="btn small" id="nowbtn" type="button" data-i18n="now">Nu</button><div class="seg" id="zoom" role="group"><button type="button" data-z="3">3 u</button><button type="button" data-z="12">12 u</button><button type="button" data-z="24">24 u</button><button type="button" data-z="72">3 d</button><button type="button" data-z="168">7 d</button></div></div>
         <canvas id="tl" role="img" aria-label="Tijdlijn"></canvas>
         <div class="legend" id="tllegend"></div>
+        <div class="maprow"><button class="btn small" id="tlmaptoggle" type="button" aria-expanded="true"></button></div>
         <div class="mapwrap"><canvas class="tlmap" id="tlmap" role="img" aria-label="Neerslagkaart"></canvas><div class="maplbl" id="tlmaplbl"></div><div class="mapzoom"><button type="button" id="mzin" aria-label="+">+</button><button type="button" id="mzout" aria-label="-">−</button><button type="button" id="mzhome" data-i18n-title="home_title">⌖</button></div></div>
         <div class="legend" id="tlmaplegend"></div>
         <div class="story" id="tlstory"></div>
@@ -533,7 +538,7 @@ footer a{color:inherit}
 <script>{{LEAFLET_JS}}</script>
 <script>
 /* ============ Data ============ */
-const APP_VERSION = '1.5';
+const APP_VERSION = '1.6';
 const GEMEENTEN = {{GEMEENTEN}};
 const PROVINCIES = {{PROVINCIES}};
 const LIJNEN = {{LIJNEN}};
@@ -594,7 +599,7 @@ const I18N = {
     tl_temp: 'temperatuur', tl_wind: 'wind (zonder schaal)', tl_cloud: 'bewolking per uur, donkerder is meer', tl_rain: 'neerslag', tl_now: 'nu', tl_hi: 'hoogste overdag', tl_lo: 'laagste in de nacht',
     model_lbl: 'model', map_model_sub: '±40 km', map_radar_lbl: 'Radar {t}', map_radar_fut: 'Radar {t}, verwacht', map_model_lbl: 'Model {d} {t} · ±40 km',
     leg_radar: 'Radar: licht, matig, zwaar', leg_model: 'Model mm per uur: 0,2 / 0,5 / 1 / 2,5 / 5+', leg_place: 'je plek',
-    m_menu: 'Delen', chip_hint: 'Tik: aan of uit (bewaard). Lang indrukken: even alleen dit deel, tot je het menu sluit.', all: 'Alles',
+    map_hide: 'Kaartje verbergen', map_show: 'Kaartje tonen', m_menu: 'Delen', chip_hint: 'Tik: aan of uit (bewaard). Lang indrukken: even alleen dit deel, tot je het menu sluit.', all: 'Alles',
     sec_now: 'Nu', sec_strip: 'Buien', sec_tl: 'Tijdlijn', sec_chart: 'Grafiek', sec_map: 'Kaart', sec_days: 'Dagen'
   },
   en: {
@@ -642,7 +647,7 @@ const I18N = {
     tl_temp: 'temperature', tl_wind: 'wind (no scale)', tl_cloud: 'cloud cover per hour, darker is more', tl_rain: 'precipitation', tl_now: 'now', tl_hi: 'day high', tl_lo: 'night low',
     model_lbl: 'model', map_model_sub: '±40 km', map_radar_lbl: 'Radar {t}', map_radar_fut: 'Radar {t}, expected', map_model_lbl: 'Model {d} {t} · ±40 km',
     leg_radar: 'Radar: light, moderate, heavy', leg_model: 'Model mm per hour: 0.2 / 0.5 / 1 / 2.5 / 5+', leg_place: 'your place',
-    m_menu: 'Sections', chip_hint: 'Tap: on or off (saved). Press and hold: only this section for now, until you close the menu.', all: 'All',
+    map_hide: 'Hide map', map_show: 'Show map', m_menu: 'Sections', chip_hint: 'Tap: on or off (saved). Press and hold: only this section for now, until you close the menu.', all: 'All',
     sec_now: 'Now', sec_strip: 'Showers', sec_tl: 'Timeline', sec_chart: 'Chart', sec_map: 'Map', sec_days: 'Days'
   }
 };
@@ -692,7 +697,7 @@ function applyLang(l) {
   $('maptitle').textContent = picking ? t('pick_title') : t('map_title'); $('mapsub').textContent = picking ? t('pick_sub') : t('map_sub');
   if (tempPlace) { tempPlace.name = t('geo_temp'); renderPlaces(); }
   if (!currentPlace()) setStatus(t('st_none'));
-  renderChips();
+  renderChips(); applyTLMap();
   if (meteo && currentPlace()) render(lastLat, lastLon); else if (map) drawLabels();
 }
 document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => applyLang(b.dataset.lang)));
@@ -1454,11 +1459,18 @@ function drawReadout() {
   const hv = hourAt(sel), b = barAt(sel), inRadar = b && b.src === 'radar', w = wmo(hv.code, hv.day), names = ['', t('l1'), t('l2'), t('l3'), t('l4')];
   $('r-day').textContent = relDay(sel) + (relDay(sel) !== dayName(sel) ? ', ' + dayName(sel) : ''); $('r-time').textContent = clock(sel);
   $('r-src').textContent = inRadar ? t('radar') : t('model'); $('r-src').className = 'src' + (inRadar ? ' radar' : '');
-  $('r-ico').textContent = inRadar && b.l ? '🌧️' : w.ico; $('r-temp').textContent = Math.round(hv.temp) + '°';
-  $('r-txt').textContent = inRadar && b.l ? uc(names[b.l]) : w.txt;
-  const kv = [[lc(t('feels')), Math.round(hv.feels) + '°'], [t('r_rain'), (inRadar ? names[b.l] || '0' : fmt1(b ? b.v : 0)) + (inRadar && b.l ? '' : ' ' + t('mmh'))], [t('chance'), Math.round(hv.prob) + '%'],
+  /* Staat de cursor op nu, dan toont de uitlezing het actuele weer en de buienregel en kerngetallen van de tegel Nu */
+  const cur = meteo.current, nearNow = Math.abs(sel - nowLocal()) <= 5 * 60000, cw = wmo(cur.weather_code, cur.is_day);
+  if (nearNow) { $('r-src').textContent = t('nowlbl'); $('r-src').className = 'src radar'; }
+  $('r-ico').textContent = nearNow ? cw.ico : inRadar && b.l ? '🌧️' : w.ico; $('r-temp').textContent = Math.round(nearNow ? cur.temperature_2m : hv.temp) + '°';
+  $('r-txt').textContent = nearNow ? cw.txt : inRadar && b.l ? uc(names[b.l]) : w.txt;
+  const kv = nearNow
+    ? [[lc(t('feels')), Math.round(cur.apparent_temperature) + '°'], [t('wind'), Math.round(cur.wind_speed_10m) + ' ' + t('km_h') + ' ' + windDir(cur.wind_direction_10m) + ' (' + bft(cur.wind_speed_10m) + ' Bft)'], [t('humidity'), cur.relative_humidity_2m + '%'], [t('chance'), Math.round(hv.prob) + '%'], [t('gust'), Math.round(hv.gust) + ' ' + t('km_h')], [t('cloud'), Math.round(hv.cloud) + '%']]
+    : [[lc(t('feels')), Math.round(hv.feels) + '°'], [t('r_rain'), (inRadar ? names[b.l] || '0' : fmt1(b ? b.v : 0)) + (inRadar && b.l ? '' : ' ' + t('mmh'))], [t('chance'), Math.round(hv.prob) + '%'],
     [t('wind'), Math.round(hv.ws) + ' ' + t('km_h') + ' ' + t('dirs')[Math.round(hv.wd / 45) % 8]], [t('gust'), Math.round(hv.gust) + ' ' + t('km_h')], [t('cloud'), Math.round(hv.cloud) + '%']];
   $('r-kv').innerHTML = kv.map(([k, v]) => `<span>${k} <b>${v}</b></span>`).join('');
+  $('tlrain').hidden = !nearNow; $('tlkpis').hidden = !nearNow;
+  if (nearNow) { $('tlrain').className = 'rainline' + ($('rainline').classList.contains('wet') ? ' wet' : ''); $('tlraint').textContent = $('raintitle').textContent; $('tlrains').textContent = $('rainsub').textContent; $('tlmm1').innerHTML = $('mm1').innerHTML; $('tlmm12').innerHTML = $('mm12').innerHTML; $('tldry').textContent = $('dry').textContent; }
   const ps = [];
   ps.push(t('moment', {d: uc(relDay(sel)), t: clock(sel), w: lc(w.txt), temp: Math.round(hv.temp), feels: Math.round(hv.feels), ws: Math.round(hv.ws), dir: t('dirsL')[Math.round(hv.wd / 45) % 8], bft: bft(hv.ws), gust: Math.round(hv.gust), cloud: Math.round(hv.cloud)})
     + ' ' + (hv.mm > 0 ? t('rain_some', {mm: fmt1(hv.mm), p: Math.round(hv.prob)}) : t('rain_none')));
@@ -1507,7 +1519,7 @@ function mapFollow() {
   } else modelOff();
 }
 /* Het kaartje in de tegel: provincies, radarbeeld of modellaag voor het gekozen moment, je plek; zoom 0,54x (hele radarbeeld) tot 8x rond je plek, slepen, ⌖ terug */
-const MAPZ = [0.54, 1, 2, 4, 8]; let mapZ = LS.get('bb_mapzoom', 1); if (!MAPZ.includes(mapZ)) mapZ = 1; let VB = BOX, pan = {dx: 0, dy: 0};
+const MAPZ = [0.54, 1, 2, 4, 8], ZMIN = 0.54, ZMAX = 8; let mapZ = Math.max(ZMIN, Math.min(ZMAX, +LS.get('bb_mapzoom', 1) || 1)), VB = BOX, pan = {dx: 0, dy: 0};
 const tlMapGeom = () => { const W = $('tlmap').clientWidth; const kx = (BOX.east - BOX.west) * Math.PI / 180, ky = mercY(BOX.north) - mercY(BOX.south); return {W, H: Math.round(W * ky / kx)}; };
 const mpx = (lon, W) => (lon - VB.west) / (VB.east - VB.west) * W;
 const mpy = (lat, H) => (mercY(VB.north) - mercY(lat)) / (mercY(VB.north) - mercY(VB.south)) * H;
@@ -1523,7 +1535,7 @@ function viewBox() {
 function drawTLMap() {
   const c = $('tlmap'); if (!tlReady || !c.clientWidth) return;
   const dpr = devicePixelRatio || 1, {W, H} = tlMapGeom();
-  VB = viewBox(); $('mzin').disabled = mapZ === MAPZ[MAPZ.length - 1]; $('mzout').disabled = mapZ === MAPZ[0]; c.style.touchAction = mapZ > 1 ? 'none' : 'pan-y';
+  VB = viewBox(); $('mzin').disabled = mapZ >= ZMAX; $('mzout').disabled = mapZ <= ZMIN;
   c.style.height = H + 'px'; c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); const g = c.getContext('2d'); g.scale(dpr, dpr);
   g.fillStyle = col('--map-sea'); g.fillRect(0, 0, W, H);
   g.fillStyle = col('--map-land'); g.strokeStyle = col('--map-prov'); g.lineWidth = 1; g.lineJoin = 'round';
@@ -1547,16 +1559,34 @@ function drawTLMap() {
   if (p) { const d = roundDigits(), ppx = mpx(+p.lon.toFixed(d), W), ppy = mpy(+p.lat.toFixed(d), H); g.fillStyle = col('--accent'); g.strokeStyle = col('--bg-2'); g.lineWidth = 2; g.beginPath(); g.arc(ppx, ppy, 6, 0, Math.PI * 2); g.fill(); g.stroke(); }
   $('tlmaplbl').textContent = lbl;
 }
-[['mzin', 1], ['mzout', -1]].forEach(([id, d]) => $(id).addEventListener('click', () => { const i = MAPZ.indexOf(mapZ) + d; if (i < 0 || i >= MAPZ.length) return; mapZ = MAPZ[i]; LS.set('bb_mapzoom', mapZ); if (tlReady) drawTLMap(); }));
-$('mzhome').addEventListener('click', () => { pan = {dx: 0, dy: 0}; if (mapZ < 2) { mapZ = 2; LS.set('bb_mapzoom', mapZ); } if (tlReady) drawTLMap(); });
-let mapDrag = null, mapRaf = 0;
-$('tlmap').addEventListener('pointerdown', e => { mapDrag = {x: e.clientX, y: e.clientY, dx: pan.dx, dy: pan.dy}; try { $('tlmap').setPointerCapture(e.pointerId); } catch (x) {} });
-$('tlmap').addEventListener('pointermove', e => {
-  if (!mapDrag || !tlReady) return; const W = $('tlmap').clientWidth, H = $('tlmap').clientHeight;
-  pan = {dx: mapDrag.dx - (e.clientX - mapDrag.x) * (VB.east - VB.west) / W, dy: mapDrag.dy + (e.clientY - mapDrag.y) * (mercY(VB.north) - mercY(VB.south)) / H};
-  if (!mapRaf) mapRaf = requestAnimationFrame(() => { mapRaf = 0; drawTLMap(); });
+/* Zoomen: knoppen springen naar de volgende vaste stand, twee vingers (pinch) en het muiswiel zoomen doorlopend rond het punt onder de vingers */
+const setZoom = z => { mapZ = Math.max(ZMIN, Math.min(ZMAX, z)); LS.set('bb_mapzoom', Math.round(mapZ * 100) / 100); };
+const geoAt = (x, y) => { const W = $('tlmap').clientWidth, H = $('tlmap').clientHeight; return {lon: VB.west + x / W * (VB.east - VB.west), my: mercY(VB.north) - y / H * (mercY(VB.north) - mercY(VB.south))}; };
+function zoomAround(z, x, y) { const g1 = geoAt(x, y); setZoom(z); VB = viewBox(); const g2 = geoAt(x, y); pan = {dx: pan.dx + g1.lon - g2.lon, dy: pan.dy + g1.my - g2.my}; if (tlReady) drawTLMap(); }
+$('mzin').addEventListener('click', () => { const z = MAPZ.find(v => v > mapZ + .001); if (z) { setZoom(z); if (tlReady) drawTLMap(); } });
+$('mzout').addEventListener('click', () => { const z = [...MAPZ].reverse().find(v => v < mapZ - .001); if (z) { setZoom(z); if (tlReady) drawTLMap(); } });
+$('mzhome').addEventListener('click', () => { pan = {dx: 0, dy: 0}; if (mapZ < 2) setZoom(2); if (tlReady) drawTLMap(); });
+let mapDrag = null, mapRaf = 0, pinch = null; const ptrs = new Map();
+const redrawMap = () => { if (!mapRaf) mapRaf = requestAnimationFrame(() => { mapRaf = 0; drawTLMap(); }); };
+$('tlmap').addEventListener('pointerdown', e => {
+  ptrs.set(e.pointerId, {x: e.clientX, y: e.clientY}); try { $('tlmap').setPointerCapture(e.pointerId); } catch (x) {}
+  if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = {d: Math.hypot(a.x - b.x, a.y - b.y), z: mapZ}; mapDrag = null; }
+  else { pinch = null; mapDrag = {x: e.clientX, y: e.clientY, dx: pan.dx, dy: pan.dy}; }
 });
-['pointerup', 'pointercancel'].forEach(k => $('tlmap').addEventListener(k, () => { mapDrag = null; }));
+$('tlmap').addEventListener('pointermove', e => {
+  if (!tlReady || !ptrs.has(e.pointerId)) return; ptrs.set(e.pointerId, {x: e.clientX, y: e.clientY});
+  const r = $('tlmap').getBoundingClientRect();
+  if (pinch && ptrs.size === 2) { const [a, b] = [...ptrs.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y); if (d > 0) zoomAround(pinch.z * d / pinch.d, (a.x + b.x) / 2 - r.left, (a.y + b.y) / 2 - r.top); return; }
+  if (!mapDrag) return; const W = r.width, H = r.height;
+  pan = {dx: mapDrag.dx - (e.clientX - mapDrag.x) * (VB.east - VB.west) / W, dy: mapDrag.dy + (e.clientY - mapDrag.y) * (mercY(VB.north) - mercY(VB.south)) / H};
+  redrawMap();
+});
+['pointerup', 'pointercancel'].forEach(k => $('tlmap').addEventListener(k, e => { ptrs.delete(e.pointerId); pinch = null; mapDrag = null; }));
+$('tlmap').addEventListener('wheel', e => { if (!tlReady) return; e.preventDefault(); const r = $('tlmap').getBoundingClientRect(); zoomAround(mapZ * (e.deltaY < 0 ? 1.2 : 1 / 1.2), e.clientX - r.left, e.clientY - r.top); }, {passive: false});
+/* Kaartje minimaliseren: de keuze blijft bewaard */
+let tlMapOpen = LS.get('bb_tlmap', true) !== false;
+function applyTLMap() { $('tlmaptoggle').textContent = (tlMapOpen ? '\u25BE ' : '\u25B8 ') + t(tlMapOpen ? 'map_hide' : 'map_show'); $('tlmaptoggle').setAttribute('aria-expanded', String(tlMapOpen)); document.querySelector('.tl .mapwrap').classList.toggle('min', !tlMapOpen); $('tlmaplegend').classList.toggle('min', !tlMapOpen); if (tlMapOpen && tlReady) setTimeout(drawTLMap, 0); }
+$('tlmaptoggle').addEventListener('click', () => { tlMapOpen = !tlMapOpen; LS.set('bb_tlmap', tlMapOpen); applyTLMap(); });
 let tlRaf = 0;
 function drawAll() { if (tlRaf) return; tlRaf = requestAnimationFrame(() => { tlRaf = 0; drawTL(); drawTLMap(); drawReadout(); mapFollow(); }); }
 function renderTL(lat, lon) {
