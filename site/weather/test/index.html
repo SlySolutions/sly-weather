@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-cb4t+QCg2XZkxpvDCB/O4DPrX/UHBj+W3LN8zML9c3o='; style-src 'unsafe-inline'; img-src 'self' data: https://image.buienradar.nl https://image-cdn.buienradar.nl; connect-src https://api.open-meteo.com; font-src data:; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fqOcRd3tOF0r2pd4n2DVr3GqNZTi5n5ZEwET/+48IGw='; style-src 'unsafe-inline'; img-src 'self' data: https://image.buienradar.nl https://image-cdn.buienradar.nl; connect-src https://api.open-meteo.com; font-src data:; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="robots" content="noindex">
 <meta name="description" content="Sly Weather experiment: one timeline for the coming hours and the week, with the rain map and the forecast for any moment you touch.">
-<meta name="version" content="test-6">
+<meta name="version" content="test-7">
 <meta name="theme-color" content="#F4F5F7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#14171B" media="(prefers-color-scheme: dark)">
 <title>Sly Weather test: tijdlijn</title>
@@ -79,16 +79,20 @@ header.top .tag{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-trans
 .status{font-size:.82rem;color:var(--text-2);margin:0 2px 10px}
 .status.err{color:#D23B6B}
 /* Welke delen de pagina toont: eerste keer alles, daarna de keuze (op dit toestel bewaard) */
-/* Menupaneel: open en dicht met de knop; zolang het open staat is de inhoud weg, bij Klaar komt alles terug zoals gekozen */
-.menu h3{font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-2);margin:12px 0 6px}
-.menu h3:first-child{margin-top:0}
-.menu .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.menu select{font:inherit;color:var(--text);background:var(--bg-2);border:1px solid var(--line);border-radius:999px;padding:5px 10px;font-weight:700;max-width:100%}
-.menu .row .btn{padding:5px 12px;font-size:.85rem}
-.menu .done{margin-top:14px}
-:root[data-theme="nerd"] .menu select{border-radius:2px}
-body.menuopen #content,body.menuopen #empty{display:none}
-.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0;font-size:.78rem;color:var(--text-2)}
+/* Menu onder de hamburger: alleen de delen; open en dicht met de knop. Tik is aan of uit, lang indrukken toont alleen dat deel */
+.menu{position:absolute;right:12px;top:calc(100% + 6px);max-width:calc(100% - 24px);background:var(--bg-2);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px 12px;z-index:31}
+.menu .hint2{font-size:.72rem;color:var(--text-2);margin:8px 0 0}
+:root[data-theme="nerd"] .menu{border-color:var(--text-2)}
+/* Balk onder de bovenbalk, zoals in de hoofdapp: plek, Mijn locatie, nieuwe plek; weergave en taal */
+.bar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;margin:0 2px 10px}
+.bar .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.bar select{font:inherit;color:var(--text);background:var(--bg-2);border:1px solid var(--line);border-radius:999px;padding:5px 10px;font-weight:700;max-width:11rem}
+.bar .btn{padding:5px 12px;font-size:.85rem}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--bg-2)}
+.seg button{border:0;background:transparent;color:var(--text-2);font:inherit;font-size:.85rem;font-weight:700;padding:4px 10px;cursor:pointer;line-height:1.3}
+.seg button[aria-pressed="true"]{background:var(--text);color:var(--bg)}
+:root[data-theme="nerd"] .bar select,:root[data-theme="nerd"] .seg,:root[data-theme="nerd"] .seg button{border-radius:2px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0;font-size:.78rem;color:var(--text-2);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .chips button{border:1px solid var(--line);background:var(--bg-2);color:var(--text-2);font:inherit;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:999px;cursor:pointer}
 .chips button[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
 :root[data-theme="nerd"] .chips button{border-radius:2px}
@@ -157,16 +161,14 @@ footer.foot svg{width:22px;height:22px;vertical-align:middle;margin-right:4px}
   <span class="tag" id="tag">test</span>
   <button class="iconbtn" id="menubtn" type="button" aria-label="Toon" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   <button class="iconbtn" id="refresh" type="button" aria-label="Vernieuwen"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg></button>
+  <div class="menu" id="menu" hidden><div class="chips" id="chips"></div><p class="hint2" id="chiphint"></p></div>
 </header>
 <main class="app">
-  <p class="status" id="status"></p>
-  <div class="card menu" id="menu" hidden>
-    <h3 id="m-sec"></h3><div class="chips" id="chips"></div>
-    <h3 id="m-place"></h3><div class="row"><select id="placesel" aria-label="Plek"></select><button class="btn" id="geobtn" type="button"></button><a class="btn" id="newplace" href="../"></a></div>
-    <h3 id="m-theme"></h3><div class="chips" id="themes"></div>
-    <h3 id="m-lang"></h3><div class="chips" id="langs"></div>
-    <div class="done"><button class="btn primary" id="menudone" type="button"></button></div>
+  <div class="bar" id="bar">
+    <div class="row"><select id="placesel" aria-label="Plek"></select><button class="btn" id="geobtn" type="button"></button><a class="btn" id="newplace" href="../"></a></div>
+    <div class="row"><div class="seg" id="themes" role="group"></div><div class="seg" id="langs" role="group"></div></div>
   </div>
+  <p class="status" id="status"></p>
   <div id="empty" class="card empty" hidden>
     <p id="emptytxt"></p>
     <a class="btn primary" href="../" id="emptybtn"></a>
@@ -229,8 +231,8 @@ const I18N = {
     ex_p: 'Een experiment: één tijdlijn voor de komende uren én de hele week, met voor elk moment het kaartje en de verwachting. Idee van een vriend (zoals Flowx). De eerste twee uur komen van de Buienradar-radar (per 5 minuten), daarna van het KNMI-model via Open-Meteo: per kwartier voor de eerste 24 uur, per uur daarna. Het kaartje na de radar is een modelraster van 10 x 10 punten over Nederland, dus grof (±40 km) maar wel voor de hele week.',
     ex_req: 'Wat je toestel verlaat: een verzoek met je afgeronde coördinaat naar Open-Meteo, een verzoek om het vaste raster (voor iedereen gelijk, zegt niets over jou) en het Buienradar-beeld. Niets wordt bewaard buiten dit toestel.',
     ex_log: 'Verzoeken deze keer',
-    m_menu: 'Menu', m_sec: 'Delen', m_place: 'Plek', m_theme: 'Weergave', m_lang: 'Taal', done: 'Klaar', geo: 'Mijn locatie', geo_temp: 'Mijn locatie', newplace: 'Nieuwe plek kiezen in Sly Weather',
-    gps_busy: 'Positie opvragen...', gps_denied: 'Locatie geweigerd door de browser', gps_timeout: 'Locatie duurde te lang', gps_unavail: 'Locatie niet beschikbaar', th: ['Auto', 'Licht', 'Donker', 'Nerd'], home: 'Terug naar je plek',
+    m_menu: 'Delen', chip_hint: 'Tik: aan of uit. Lang indrukken: alleen dit deel.', all: 'Alles', geo: 'Mijn locatie', geo_temp: 'Mijn locatie', newplace: 'Nieuwe plek', th_t: ['Volgt het toestel', 'Licht', 'Donker', 'Nerd'],
+    gps_busy: 'Positie opvragen...', gps_denied: 'Locatie geweigerd door de browser', gps_timeout: 'Locatie duurde te lang', gps_unavail: 'Locatie niet beschikbaar', home: 'Terug naar je plek',
     foot: 'Sly Weather test · een Sly Solutions-experiment · gegevens KNMI via Open-Meteo en Buienradar'
   },
   en: {
@@ -254,8 +256,8 @@ const I18N = {
     ex_p: 'An experiment: one timeline for the coming hours and the whole week, with the map and the forecast for any moment. A friend suggested it (think Flowx). The first two hours come from the Buienradar radar (5-minute steps), after that from the KNMI model via Open-Meteo: 15-minute steps for the first 24 hours, hourly beyond. After the radar window the map is a model grid of 10 x 10 points over the Netherlands, so coarse (about 40 km) but available for the whole week.',
     ex_req: 'What leaves your device: one request with your rounded coordinate to Open-Meteo, one request for the fixed grid (identical for everyone, says nothing about you) and the Buienradar image. Nothing is stored outside this device.',
     ex_log: 'Requests this time',
-    m_menu: 'Menu', m_sec: 'Sections', m_place: 'Place', m_theme: 'Theme', m_lang: 'Language', done: 'Done', geo: 'My location', geo_temp: 'My location', newplace: 'Pick a new place in Sly Weather',
-    gps_busy: 'Getting position...', gps_denied: 'Location denied by the browser', gps_timeout: 'Location took too long', gps_unavail: 'Location unavailable', th: ['Auto', 'Light', 'Dark', 'Nerd'], home: 'Back to your place',
+    m_menu: 'Sections', chip_hint: 'Tap: on or off. Press and hold: only this section.', all: 'All', geo: 'My location', geo_temp: 'My location', newplace: 'New place', th_t: ['Follows the device', 'Light', 'Dark', 'Nerd'],
+    gps_busy: 'Getting position...', gps_denied: 'Location denied by the browser', gps_timeout: 'Location took too long', gps_unavail: 'Location unavailable', home: 'Back to your place',
     foot: 'Sly Weather test · a Sly Solutions experiment · data KNMI via Open-Meteo and Buienradar'
   }
 };
@@ -526,7 +528,7 @@ function pick(ev) {
   sel = Math.round((tStart + Math.max(0, Math.min(1, f)) * (tEnd - tStart)) / st) * st; drawAll();
 }
 let dragging = false;
-$('tl').addEventListener('pointerdown', e => { dragging = true; $('tl').setPointerCapture(e.pointerId); pick(e); });
+$('tl').addEventListener('pointerdown', e => { dragging = true; try { $('tl').setPointerCapture(e.pointerId); } catch (x) {} pick(e); });
 $('tl').addEventListener('pointermove', e => { if (dragging) pick(e); });
 ['pointerup', 'pointercancel'].forEach(k => $('tl').addEventListener(k, () => { dragging = false; }));
 $('tl').addEventListener('keydown', e => { const st = zoomH <= 24 ? 300000 : zoomH <= 72 ? 900000 : 3600000; if (e.key === 'ArrowLeft') sel -= st; else if (e.key === 'ArrowRight') sel += st; else return; sel = Math.max(tStart, Math.min(tEnd, sel)); drawAll(); e.preventDefault(); });
@@ -625,22 +627,21 @@ const SECTIONS = ['now', 'tl', 'map', 'txt', 'ex'], SEC_EL = {now: 'readout', tl
 let shown = LS.get('bbt_tiles', SECTIONS).filter(k => SECTIONS.includes(k));
 function applySections() {
   SECTIONS.forEach(k => { $(SEC_EL[k]).hidden = !shown.includes(k); });
-  $('chips').innerHTML = SECTIONS.map(k => `<button type="button" data-sec="${k}" aria-pressed="${shown.includes(k)}">${t('sec_' + k)}</button>`).join('');
+  $('chips').innerHTML = SECTIONS.map(k => `<button type="button" data-sec="${k}" aria-pressed="${shown.includes(k)}">${t('sec_' + k)}</button>`).join('') + `<button type="button" data-sec="all" aria-pressed="${shown.length === SECTIONS.length}">${t('all')}</button>`;
   if (meteo) { modelCanvas = null; drawAll(); }
 }
 /* Menupaneel: open en dicht met de knop (of Klaar); zolang het open staat is de inhoud weg, daarna komt alles terug zoals gekozen */
-function setMenu(open) { $('menu').hidden = !open; document.body.classList.toggle('menuopen', open); $('menubtn').setAttribute('aria-expanded', String(open)); if (!open && meteo) { modelCanvas = null; drawAll(); } }
+function setMenu(open) { $('menu').hidden = !open; $('menubtn').setAttribute('aria-expanded', String(open)); }
 $('menubtn').addEventListener('click', () => setMenu($('menu').hidden));
-$('menudone').addEventListener('click', () => setMenu(false));
 function renderMenu() {
-  $('m-sec').textContent = t('m_sec'); $('m-place').textContent = t('m_place'); $('m-theme').textContent = t('m_theme'); $('m-lang').textContent = t('m_lang'); $('menudone').textContent = t('done');
+  $('chiphint').textContent = t('chip_hint');
   const sl = $('placesel'); sl.innerHTML = '';
   places.forEach((q, i) => { const o = document.createElement('option'); o.value = i; o.textContent = q.name; o.selected = place === q; sl.appendChild(o); });
   if (tempPlace) { const o = document.createElement('option'); o.value = 'tmp'; o.textContent = tempPlace.name; o.selected = place === tempPlace; sl.appendChild(o); }
   sl.hidden = !places.length && !tempPlace;
   $('geobtn').textContent = '\u25CE ' + t('geo'); $('geobtn').hidden = !geoAvail; $('newplace').textContent = t('newplace');
   const th = LS.get('bb_theme', 'auto');
-  $('themes').innerHTML = ['auto', 'light', 'dark', 'nerd'].map((k, i) => `<button type="button" data-th="${k}" aria-pressed="${th === k}">${t('th')[i]}</button>`).join('');
+  $('themes').innerHTML = ['auto', 'light', 'dark', 'nerd'].map((k, i) => `<button type="button" data-th="${k}" aria-pressed="${th === k}" title="${t('th_t')[i]}">${['\u25D0', '\u2600', '\u263E', '\u2328'][i]}</button>`).join('');
   $('langs').innerHTML = ['nl', 'en'].map(k => `<button type="button" data-lang="${k}" aria-pressed="${lang === k}">${k.toUpperCase()}</button>`).join('');
 }
 $('placesel').addEventListener('change', e => { const v = e.target.value; if (v === 'tmp') setPlace(tempPlace); else { cur = +v; LS.set('bb_cur', cur); setPlace(places[cur]); } renderMenu(); });
@@ -660,14 +661,21 @@ $('langs').addEventListener('click', e => { const b = e.target.closest('button')
 [['mzin', 1], ['mzout', -1]].forEach(([id, d]) => $(id).addEventListener('click', () => { const i = MAPZ.indexOf(mapZ) + d; if (i < 0 || i >= MAPZ.length) return; mapZ = MAPZ[i]; LS.set('bbt_mapzoom', mapZ); modelCanvas = null; if (meteo) drawAll(); }));
 $('mzhome').addEventListener('click', () => { pan = {dx: 0, dy: 0}; if (mapZ < 2) { mapZ = 2; LS.set('bbt_mapzoom', mapZ); } modelCanvas = null; if (meteo) drawAll(); });
 let mapDrag = null, mapRaf = 0;
-$('map').addEventListener('pointerdown', e => { mapDrag = {x: e.clientX, y: e.clientY, dx: pan.dx, dy: pan.dy}; $('map').setPointerCapture(e.pointerId); });
+$('map').addEventListener('pointerdown', e => { mapDrag = {x: e.clientX, y: e.clientY, dx: pan.dx, dy: pan.dy}; try { $('map').setPointerCapture(e.pointerId); } catch (x) {} });
 $('map').addEventListener('pointermove', e => {
   if (!mapDrag || !meteo) return; const W = $('map').clientWidth, H = $('map').clientHeight;
   pan = {dx: mapDrag.dx - (e.clientX - mapDrag.x) * (VB.east - VB.west) / W, dy: mapDrag.dy + (e.clientY - mapDrag.y) * (mercY(VB.north) - mercY(VB.south)) / H};
   modelCanvas = null; if (!mapRaf) mapRaf = requestAnimationFrame(() => { mapRaf = 0; drawMap(); });
 });
 ['pointerup', 'pointercancel'].forEach(k => $('map').addEventListener(k, () => { mapDrag = null; }));
-$('chips').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const k = b.dataset.sec; shown = shown.includes(k) ? shown.filter(x => x !== k) : SECTIONS.filter(x => shown.includes(x) || x === k); LS.set('bbt_tiles', shown); applySections(); });
+/* Tik: aan of uit (Alles: alles aan). Lang indrukken (450 ms): alleen dit deel; de tik die daarop volgt wordt genegeerd */
+function setShown(list) { shown = list; LS.set('bbt_tiles', shown); applySections(); }
+let holdT = 0, held = false;
+$('chips').addEventListener('pointerdown', e => { const b = e.target.closest('button'); if (!b || b.dataset.sec === 'all') return; held = false; clearTimeout(holdT); holdT = setTimeout(() => { held = true; setShown([b.dataset.sec]); }, 450); });
+['pointerup', 'pointercancel', 'pointerleave'].forEach(k => $('chips').addEventListener(k, () => clearTimeout(holdT)));
+$('chips').addEventListener('contextmenu', e => e.preventDefault());
+$('chips').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (held) { held = false; return; } const k = b.dataset.sec;
+  setShown(k === 'all' ? SECTIONS.slice() : shown.includes(k) ? shown.filter(x => x !== k) : SECTIONS.filter(x => shown.includes(x) || x === k)); });
 
 /* ============ Start ============ */
 function applyText() {
