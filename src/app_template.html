@@ -15,9 +15,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>Sly Weather</title>
 <meta name="application-name" content="Sly Weather">
-<meta name="version" content="1.6">
+<meta name="version" content="1.7">
 <!--
-  Sly Weather v1.6: weather and rain for your own spot in the Netherlands, without sharing your location.
+  Sly Weather v1.7: weather and rain for your own spot in the Netherlands, without sharing your location.
   A Sly Solutions project · https://slysolutions.nl
   Live app      https://slysolutions.nl/weather/
   Source, issues and ideas: https://github.com/SlySolutions/sly-weather
@@ -538,7 +538,7 @@ footer a{color:inherit}
 <script>{{LEAFLET_JS}}</script>
 <script>
 /* ============ Data ============ */
-const APP_VERSION = '1.6';
+const APP_VERSION = '1.7';
 const GEMEENTEN = {{GEMEENTEN}};
 const PROVINCIES = {{PROVINCIES}};
 const LIJNEN = {{LIJNEN}};
@@ -1046,8 +1046,9 @@ async function refreshAll(force) {
     if (cache && cache.data) { meteo = cache.data; grid = cache.grid || null; tzOffset = meteo.utc_offset_seconds || 0; setStatus(t('st_off', {t: clock(cache.ts + tzOffset * 1000)}), true); }
     else { setStatus(t('st_fail', {e: e.message}), true); busy = false; $('refresh').classList.remove('spin'); return; }
   }
-  radar = null;
-  if ($('radaron').checked) { try { radar = await loadRadar(); } catch (e) { addLog('buienradar', RADAR_URL, null, null, 'failed: ' + e.message); } }
+  /* Eerst tekenen met wat er al is (cache of verse verwachting, radar van de vorige keer), dan het radarbeeld ophalen en nog eens tekenen; zo staat de pagina meteen en komt alleen de radar na */
+  render(lat, lon);
+  if ($('radaron').checked) { try { radar = await loadRadar(); } catch (e) { addLog('buienradar', RADAR_URL, null, null, 'failed: ' + e.message); } } else radar = null;
   render(lat, lon);
   busy = false; $('refresh').classList.remove('spin');
 }
