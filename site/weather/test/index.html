@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-QBt9yqmnTcdCvKw8q5vNMP2m5PmDo4bouE7UIwHX69E='; style-src 'unsafe-inline'; img-src 'self' data: https://image.buienradar.nl https://image-cdn.buienradar.nl; connect-src https://api.open-meteo.com; font-src data:; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ilY2LPAPp+nZsaarSHm81jF/aQddxxcBwayB9E2silI='; style-src 'unsafe-inline'; img-src 'self' data: https://image.buienradar.nl https://image-cdn.buienradar.nl; connect-src https://api.open-meteo.com; font-src data:; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
 <meta name="robots" content="noindex">
 <meta name="description" content="Sly Weather experiment: one timeline for the coming hours and the week, with the rain map and the forecast for any moment you touch.">
-<meta name="version" content="test-1">
+<meta name="version" content="test-2">
 <meta name="theme-color" content="#F4F5F7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#14171B" media="(prefers-color-scheme: dark)">
 <title>Sly Weather test: tijdlijn</title>
@@ -28,7 +28,7 @@
   --rain-1:#BFE3FF; --rain-2:#5FB4F2; --rain-3:#1F6FEB; --rain-4:#8B3FD9; --rain-5:#D23B6B;
   --temp:#E0702A; --temp-cold:#2F7FD6; --wind:#2E8B57;
   --map-land:#E3E6EA; --map-prov:#8A939E; --map-sea:#F4F5F7;
-  --night:rgba(34,40,47,.07);
+  --night:rgba(34,40,47,.11);
   --radius:14px;
   --font-body:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --font-mono:"Space Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
@@ -41,7 +41,7 @@
     --accent:#F68712; --accent-ink:#FFB066; --accent-soft:#3A2A18;
     --rain-1:#3B7DB8; --rain-2:#5FB4F2; --rain-3:#9CD3FF; --rain-4:#C79BFF; --rain-5:#FF7AA2;
     --temp:#FFB066; --temp-cold:#7FB6FF; --wind:#5BD08A;
-    --map-land:#2A3038; --map-prov:#6B7684; --map-sea:#14171B; --night:rgba(0,0,0,.28);
+    --map-land:#2A3038; --map-prov:#6B7684; --map-sea:#14171B; --night:rgba(0,0,0,.34);
     --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7); color-scheme:dark;
   }
 }
@@ -50,7 +50,7 @@
   --accent:#F68712; --accent-ink:#FFB066; --accent-soft:#3A2A18;
   --rain-1:#3B7DB8; --rain-2:#5FB4F2; --rain-3:#9CD3FF; --rain-4:#C79BFF; --rain-5:#FF7AA2;
   --temp:#FFB066; --temp-cold:#7FB6FF; --wind:#5BD08A;
-  --map-land:#2A3038; --map-prov:#6B7684; --map-sea:#14171B; --night:rgba(0,0,0,.28);
+  --map-land:#2A3038; --map-prov:#6B7684; --map-sea:#14171B; --night:rgba(0,0,0,.34);
   --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7); color-scheme:dark;
 }
 :root[data-theme="nerd"]{
@@ -58,7 +58,7 @@
   --accent:#F68712; --accent-ink:#FFB066; --accent-soft:#1E2A14;
   --rain-1:#2F6B4A; --rain-2:#3FA66A; --rain-3:#5BF07A; --rain-4:#C8FF5B; --rain-5:#F68712;
   --temp:#F68712; --temp-cold:#5FB4F2; --wind:#9FE8A8;
-  --map-land:#101A14; --map-prov:#5FAA6A; --map-sea:#0A0E0C; --night:rgba(0,0,0,.35);
+  --map-land:#101A14; --map-prov:#5FAA6A; --map-sea:#0A0E0C; --night:rgba(0,0,0,.42);
   --font-body:var(--font-mono); --radius:2px; --shadow:none; color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -90,10 +90,10 @@ header.top .tag{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-trans
 .readout .kv{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.88rem;color:var(--text-2)}
 .readout .kv b{color:var(--text);font-weight:700}
 /* Tijdlijn */
-.tlhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.tlhead h2{font-size:.95rem;margin:0;flex:1}
+.tlhead{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.tlhead h2{font-size:.95rem;margin:0;flex:1;min-width:0}
 .zoom{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
-.zoom button{border:0;background:transparent;color:var(--text-2);font:inherit;font-size:.82rem;font-weight:700;padding:4px 11px;cursor:pointer}
+.zoom button{border:0;background:transparent;color:var(--text-2);font:inherit;font-size:.82rem;font-weight:700;padding:4px 8px;cursor:pointer}
 .zoom button[aria-pressed="true"]{background:var(--text);color:var(--bg)}
 canvas#tl{display:block;width:100%;height:216px;touch-action:pan-y;cursor:crosshair;border-radius:8px}
 .hint{font-size:.78rem;color:var(--text-2);margin:6px 0 0}
@@ -143,7 +143,7 @@ footer.foot svg{width:22px;height:22px;vertical-align:middle;margin-right:4px}
       <div class="kv" id="r-kv"></div>
     </section>
     <section class="card">
-      <div class="tlhead"><h2 id="tltitle"></h2><button class="btn" id="nowbtn" type="button" style="padding:3px 10px;font-size:.82rem"></button><div class="zoom" id="zoom"><button type="button" data-z="24">24 u</button><button type="button" data-z="72">3 d</button><button type="button" data-z="168">7 d</button></div></div>
+      <div class="tlhead"><h2 id="tltitle"></h2><button class="btn" id="nowbtn" type="button" style="padding:3px 10px;font-size:.82rem"></button><div class="zoom" id="zoom"><button type="button" data-z="3">3 u</button><button type="button" data-z="12">12 u</button><button type="button" data-z="24">24 u</button><button type="button" data-z="72">3 d</button><button type="button" data-z="168">7 d</button></div></div>
       <canvas id="tl" aria-label="Tijdlijn" role="img"></canvas>
       <p class="hint" id="hint"></p>
     </section>
@@ -170,12 +170,12 @@ const RADAR_URL = 'https://image.buienradar.nl/2.0/image/sprite/RadarMapRainNL?h
 /* Kaartuitsnede (Mercator) en het vaste modelraster: 10 x 10 punten over Nederland, voor iedereen gelijk */
 const BOX = {west: 3.2, east: 7.3, south: 50.7, north: 53.6};
 const GRID = {lat0: 50.75, lat1: 53.55, lon0: 3.25, lon1: 7.25, n: 10};
-const ZOOMS = [24, 72, 168];
+const ZOOMS = [3, 12, 24, 72, 168];
 
 const I18N = {
   nl: {
     title: 'Tijdlijn', pick_first: 'Deze testpagina gebruikt de plek die je in Sly Weather hebt bewaard. Kies daar eerst een plek.', open_app: 'Open Sly Weather', refresh: 'Vernieuwen',
-    now: 'Nu', radar: 'radar', model: 'model', hint: 'Sleep of tik op de tijdlijn: de kaart en de tekst volgen dat moment. Rood is nu.',
+    now: 'Nu', radar: 'radar', model: 'model', hint: 'Sleep of tik op de tijdlijn: de kaart en de tekst volgen dat moment. Rood is nu. Donker is nacht; de hoogste temperatuur van de dag staat in rood op de lijn, de laagste van de nacht in blauw.',
     feels: 'voelt als', rain: 'neerslag', chance: 'kans', wind: 'wind', gust: 'stoten', cloud: 'bewolking', mmh: 'mm/u', kmh: 'km/u',
     days: ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'], days_s: ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'],
     dirs: ['noorden', 'noordoosten', 'oosten', 'zuidoosten', 'zuiden', 'zuidwesten', 'westen', 'noordwesten'], dirs_s: ['N', 'NO', 'O', 'ZO', 'Z', 'ZW', 'W', 'NW'],
@@ -196,7 +196,7 @@ const I18N = {
   },
   en: {
     title: 'Timeline', pick_first: 'This test page uses the place you saved in Sly Weather. Pick a place there first.', open_app: 'Open Sly Weather', refresh: 'Refresh',
-    now: 'Now', radar: 'radar', model: 'model', hint: 'Drag or tap the timeline: the map and the text follow that moment. Red is now.',
+    now: 'Now', radar: 'radar', model: 'model', hint: 'Drag or tap the timeline: the map and the text follow that moment. Red is now. Dark is night; the day high sits on the line in red, the night low in blue.',
     feels: 'feels like', rain: 'rain', chance: 'chance', wind: 'wind', gust: 'gusts', cloud: 'cloud', mmh: 'mm/h', kmh: 'km/h',
     days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], days_s: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
     dirs: ['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest'], dirs_s: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'],
@@ -392,14 +392,15 @@ function drawTL() {
   const top = 32, cloudH = 10, bottom = H - 36, plotTop = top + cloudH + 10, plotH = bottom - plotTop, lblY = bottom + 14;
   const x = ms => xOf(ms, W);
   g.fillStyle = col('--bg-2'); g.fillRect(0, 0, W, H);
-  /* Nacht: van zonsondergang tot zonsopkomst */
-  const dl = meteo.daily; g.fillStyle = col('--night');
+  /* Dag en nacht als perioden: nacht van zonsondergang tot zonsopkomst (schaduw), dag ertussen */
+  const dl = meteo.daily, periods = [];
   for (let i = 0; i < dl.time.length; i++) {
-    const rise = parseLocal(dl.sunrise[i]), set = parseLocal(dl.sunset[i]);
-    const prevSet = i > 0 ? parseLocal(dl.sunset[i - 1]) : rise - 14 * 3600000;
-    const a = Math.max(prevSet, tStart), b = Math.min(rise, tEnd); if (b > a) g.fillRect(x(a), top, x(b) - x(a), bottom - top);
-    if (i === dl.time.length - 1) { const a2 = Math.max(set, tStart); if (tEnd > a2) g.fillRect(x(a2), top, x(tEnd) - x(a2), bottom - top); }
+    const rise = parseLocal(dl.sunrise[i]), set = parseLocal(dl.sunset[i]), prevSet = i > 0 ? parseLocal(dl.sunset[i - 1]) : rise - 14 * 3600000;
+    periods.push({a: prevSet, b: rise, night: true}, {a: rise, b: set, night: false});
+    if (i === dl.time.length - 1) periods.push({a: set, b: set + 14 * 3600000, night: true});
   }
+  const vis = periods.map(p => ({a: Math.max(p.a, tStart), b: Math.min(p.b, tEnd), night: p.night})).filter(p => p.b > p.a);
+  g.fillStyle = col('--night'); vis.forEach(p => { if (p.night) g.fillRect(x(p.a), top, x(p.b) - x(p.a), bottom - top); });
   /* Dagen: scheidslijn om middernacht, naam onderaan */
   g.strokeStyle = col('--line'); g.lineWidth = 1; g.fillStyle = col('--text-2'); g.textAlign = 'left'; g.textBaseline = 'alphabetic';
   const firstMid = (dayOf(tStart) + 1) * 86400000, dayLbl = [];
@@ -408,9 +409,23 @@ function drawTL() {
     const a = Math.max(d * 86400000, tStart), b = Math.min((d + 1) * 86400000, tEnd); if (b - a < (tEnd - tStart) * .04) continue;
     g.fillText(dayName(a, true), x(a) + 4, lblY); dayLbl.push(x(a) + 12);
   }
-  /* Uurlabels bij 24 u, elke 3 uur */
-  if (zoomH <= 24) { g.textAlign = 'center'; for (let m = Math.ceil(tStart / 3600000) * 3600000; m < tEnd; m += 3600000) { const hr = new Date(m).getUTCHours(); if (hr % 3 === 0 && hr !== 0 && !dayLbl.some(dx => Math.abs(dx - x(m)) < 24)) { g.fillText(pad(hr), x(m), lblY); } } }
-  if (zoomH <= 24) { g.textAlign = 'left'; }
+  /* Uurlabels: de kleinste stap die nog ruimte laat (40 px), niet om middernacht (daar staat de dag) */
+  const pxh = (W - 16) / ((tEnd - tStart) / 3600000), step = [.5, 1, 2, 3, 6, 12].find(st => st * pxh >= 40);
+  if (step) {
+    g.textAlign = 'center'; const sm = step * 3600000;
+    for (let m = Math.ceil(tStart / sm) * sm; m < tEnd; m += sm) { const d = new Date(m), hr = d.getUTCHours(), mi = d.getUTCMinutes(); if ((hr === 0 && mi === 0) || dayLbl.some(dx => Math.abs(dx - x(m)) < 26)) continue; g.fillText(step < 1 ? pad(hr) + ':' + pad(mi) : pad(hr), x(m), lblY); }
+    g.textAlign = 'left';
+  }
+  /* Zon en maan bovenin per periode; bij 24 u of minder ook de tijd van zonsopkomst en -ondergang */
+  g.textAlign = 'center'; g.fillStyle = col('--text-2');
+  vis.forEach(p => { if (x(p.b) - x(p.a) >= 16) g.fillText(p.night ? '\u263E' : '\u2600', (x(p.a) + x(p.b)) / 2, 22); });
+  if (zoomH <= 24) {
+    g.font = (nerd ? '10px ' + col('--font-mono') : '600 10px ' + col('--font-body'));
+    vis.forEach(p => { if (p.night || x(p.b) - x(p.a) < 110) return;
+      if (p.a > tStart) { g.textAlign = 'left'; g.fillText(clock(p.a), x(p.a) + 4, 22); }
+      if (p.b < tEnd) { g.textAlign = 'right'; g.fillText(clock(p.b), x(p.b) - 4, 22); } });
+    g.font = (nerd ? '11px ' + col('--font-mono') : '600 11px ' + col('--font-body')); g.textAlign = 'left';
+  }
   /* Wolkenband */
   const h = meteo.hourly, h0 = parseLocal(h.time[0]);
   for (let i = 0; i < h.time.length; i++) { const ts = h0 + i * 3600000; if (ts + 3600000 < tStart || ts > tEnd) continue; g.fillStyle = col('--text-2'); g.globalAlpha = .08 + .6 * (h.cloud_cover[i] || 0) / 100; g.fillRect(x(Math.max(ts, tStart)), top, x(Math.min(ts + 3600000, tEnd)) - x(Math.max(ts, tStart)) + .5, cloudH); }
@@ -435,14 +450,18 @@ function drawTL() {
   idx.forEach((i, k) => { const px = x(h0 + i * 3600000), py = yW(h.wind_speed_10m[i] || 0); k ? g.lineTo(px, py) : g.moveTo(px, py); }); g.stroke(); g.setLineDash([]);
   g.lineWidth = 2.2; g.strokeStyle = col('--temp'); g.lineJoin = 'round'; g.beginPath();
   idx.forEach((i, k) => { const px = x(h0 + i * 3600000), py = yT(h.temperature_2m[i]); k ? g.lineTo(px, py) : g.moveTo(px, py); }); g.stroke();
-  /* Per dag: hoogste en laagste temperatuur bovenaan, zoals Flowx */
-  g.textAlign = 'center'; g.font = (nerd ? 'bold 11px ' + col('--font-mono') : '800 11px ' + col('--font-body')); let lastHi = -99, lastLo = -99;
-  for (let d = dayOf(tStart); d <= dayOf(tEnd); d++) {
-    const ids = idx.filter(i => dayOf(h0 + i * 3600000) === d && h0 + i * 3600000 >= tStart && h0 + i * 3600000 <= tEnd); if (ids.length < 3) continue;
-    let hi = ids[0], lo = ids[0]; ids.forEach(i => { if (h.temperature_2m[i] > h.temperature_2m[hi]) hi = i; if (h.temperature_2m[i] < h.temperature_2m[lo]) lo = i; });
-    const cl = v => Math.max(12, Math.min(W - 12, v)); const hx = cl(x(h0 + hi * 3600000)), lx2 = cl(x(h0 + lo * 3600000));
-    if (hx - lastHi >= 22) { g.fillStyle = col('--temp'); g.fillText(Math.round(h.temperature_2m[hi]) + '°', hx, 12); lastHi = hx; }
-    if (lx2 - lastLo >= 22) { g.fillStyle = col('--temp-cold'); g.fillText(Math.round(h.temperature_2m[lo]) + '°', lx2, 25); lastLo = lx2; }
+  /* Per dag het hoogste punt (rood, boven de lijn) en per nacht het laagste (blauw, onder de lijn), op het uur waarop het valt */
+  g.textAlign = 'center'; g.font = (nerd ? 'bold 11px ' + col('--font-mono') : '800 11px ' + col('--font-body'));
+  const boxes = [], free = b => !boxes.some(o => b.x < o.x + o.w && b.x + b.w > o.x && b.y < o.y + o.h && b.y + b.h > o.y);
+  for (const p of vis) {
+    if (p.b - p.a < 2 * 3600000) continue;
+    const ids = idx.filter(i => { const ts = h0 + i * 3600000; return ts >= p.a && ts <= p.b; }); if (ids.length < 2) continue;
+    let k = ids[0]; ids.forEach(i => { if (p.night ? h.temperature_2m[i] < h.temperature_2m[k] : h.temperature_2m[i] > h.temperature_2m[k]) k = i; });
+    const v = h.temperature_2m[k], kx = x(h0 + k * 3600000), ky = yT(v), txt = Math.round(v) + '°', tw = g.measureText(txt).width;
+    const lx = Math.max(2 + tw / 2, Math.min(W - 2 - tw / 2, kx)), ly = p.night ? ky + 16 : ky - 7, box = {x: lx - tw / 2 - 2, y: ly - 11, w: tw + 4, h: 13};
+    if (!free(box)) continue; boxes.push(box);
+    g.fillStyle = p.night ? col('--temp-cold') : col('--temp'); g.beginPath(); g.arc(kx, ky, 3, 0, Math.PI * 2); g.fill();
+    g.lineWidth = 3; g.strokeStyle = col('--bg-2'); g.lineJoin = 'round'; g.strokeText(txt, lx, ly); g.fillText(txt, lx, ly);
   }
   /* Nu en de cursor */
   const now = nowLocal();
@@ -544,7 +563,7 @@ function drawAll() { if (raf) return; raf = requestAnimationFrame(() => { raf = 
 function applyText() {
   $('tltitle').textContent = t('title'); $('nowbtn').textContent = t('now'); $('hint').textContent = t('hint'); $('refresh').title = t('refresh');
   $('emptytxt').textContent = t('pick_first'); $('emptybtn').textContent = t('open_app'); $('foot').textContent = t('foot');
-  document.querySelectorAll('#zoom button').forEach(b => { b.setAttribute('aria-pressed', String(+b.dataset.z === zoomH)); b.textContent = {24: lang === 'nl' ? '24 u' : '24 h', 72: lang === 'nl' ? '3 d' : '3 d', 168: lang === 'nl' ? '7 d' : '7 d'}[b.dataset.z]; });
+  document.querySelectorAll('#zoom button').forEach(b => { b.setAttribute('aria-pressed', String(+b.dataset.z === zoomH)); b.textContent = {3: lang === 'nl' ? '3 u' : '3 h', 12: lang === 'nl' ? '12 u' : '12 h', 24: lang === 'nl' ? '24 u' : '24 h', 72: '3 d', 168: '7 d'}[b.dataset.z]; });
   $('legend').innerHTML = `<span><i style="background:${col('--rain-1')}"></i><i style="background:${col('--rain-3')}"></i><i style="background:${col('--rain-4')}"></i>${t('leg_radar')}</span><span><i style="background:${col('--rain-1')}"></i><i style="background:${col('--rain-2')}"></i><i style="background:${col('--rain-3')}"></i><i style="background:${col('--rain-4')}"></i><i style="background:${col('--rain-5')}"></i>${t('leg_model')}</span><span><i style="background:${col('--accent')};border-radius:999px"></i>${t('leg_place')}</span>`;
   renderLog();
 }

@@ -55,7 +55,7 @@ def write(path, text):
     open(path, 'w', encoding='utf-8').write(text); print('geschreven', os.path.relpath(path, os.path.join(H, '..')), round(len(text.encode()) / 1024), 'KB')
 
 site = os.path.join(H, '..', 'site', 'weather')
-t, csp = assemble('app_template.html', 3)   # Leaflet, app, service worker
+t, csp = assemble('app_template.html', 4)   # early theme/tile script, Leaflet, app, service worker
 if os.path.isdir(site):
     write(os.path.join(site, 'index.html'), t)
 standalone = re.sub(r'<!-- site-only -->.*?<!-- /site-only -->\n?', '', t, flags=re.S)

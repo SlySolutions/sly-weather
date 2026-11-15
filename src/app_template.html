@@ -15,9 +15,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>Sly Weather</title>
 <meta name="application-name" content="Sly Weather">
-<meta name="version" content="1.2">
+<meta name="version" content="1.3">
 <!--
-  Sly Weather v1.2: weather and rain for your own spot in the Netherlands, without sharing your location.
+  Sly Weather v1.3: weather and rain for your own spot in the Netherlands, without sharing your location.
   A Sly Solutions project · https://slysolutions.nl
   Live app      https://slysolutions.nl/weather/
   Source, issues and ideas: https://github.com/SlySolutions/sly-weather
@@ -310,14 +310,25 @@ footer a{color:inherit}
 :root[data-theme="nerd"] .totop{border-radius:2px;background:var(--text);color:var(--bg)}
 .iconbtn.ghost{visibility:hidden}
 /* Tegelmodus (?tile=strip,now): alleen de gekozen tegels met de plaatsnaam, voor een snelkoppeling op het beginscherm */
-body.widget header.top,body.widget .locbar,body.widget #welcome,body.widget .nerd,body.widget .privacy,body.widget footer,body.widget .totop,body.widget .cardctl{display:none!important}
-body.widget .app{padding-top:10px}body.widget .cards{margin-top:0;columns:auto}
-.wplace{display:none}body.widget .wplace{display:inline-flex;align-items:center;gap:4px;margin-right:auto;font-weight:700;font-size:.9rem;color:var(--accent-ink);text-decoration:none;white-space:nowrap}
-body.widget .card .head h2{margin-right:0}
+:root.widget header.top,:root.widget .locbar,:root.widget #welcome,:root.widget .nerd,:root.widget .privacy,:root.widget footer,:root.widget .totop,:root.widget .cardctl{display:none!important}
+:root.widget .app{padding-top:10px}:root.widget .cards{margin-top:0;columns:auto}
+/* Met een bewaarde plek: welkomstblok meteen weg en de plekbalk alvast met zijn hoogte (onzichtbaar) tot de app hem vult */
+:root.haspl #welcome{display:none}:root.haspl:not(.widget) #locbar[hidden]{display:flex!important;visibility:hidden}
+.wplace{display:none}:root.widget .wplace{display:inline-flex;align-items:center;gap:4px;margin-right:auto;font-weight:700;font-size:.9rem;color:var(--accent-ink);text-decoration:none;white-space:nowrap}
+:root.widget .card .head h2{margin-right:0}
 .locbar .actions .btn svg{width:14px;height:14px}
 
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}#rain{display:none!important}}
 </style>
+<script>
+/* Vroeg, vóór de eerste weergave: thema, bewaarde plek en tegelmodus uit localStorage op <html> zetten,
+   zodat de pagina niet eerst in de verkeerde kleur of met het welkomstblok verschijnt en dan verspringt. Leest alleen; de app zelf houdt het daarna bij. */
+(function () { try {
+  var r = document.documentElement, th = JSON.parse(localStorage.getItem('bb_theme') || '"auto"');
+  if (th !== 'auto') r.setAttribute('data-theme', th);
+  if (JSON.parse(localStorage.getItem('bb_places') || '[]').length) { r.classList.add('haspl'); if (/[?&]tile=/.test(location.search)) r.classList.add('widget'); }
+} catch (e) {} })();
+</script>
 </head>
 <body>
 <canvas id="rain" aria-hidden="true"></canvas>
@@ -468,7 +479,7 @@ body.widget .card .head h2{margin-right:0}
 <script>{{LEAFLET_JS}}</script>
 <script>
 /* ============ Data ============ */
-const APP_VERSION = '1.2';
+const APP_VERSION = '1.3';
 const GEMEENTEN = {{GEMEENTEN}};
 const PROVINCIES = {{PROVINCIES}};
 const LIJNEN = {{LIJNEN}};
@@ -653,7 +664,7 @@ const DEFAULT_ORDER = ['now', 'strip', 'chart', 'map', 'days'];
 /* Tegelmodus: ?tile=strip (of meerdere, met komma's) toont alleen die tegels met de plaatsnaam erbij; zonder bewaarde plek of tijdens het kiezen gewoon de hele app */
 const widgetTiles = (new URLSearchParams(location.search).get('tile') || '').split(',').filter(k => DEFAULT_ORDER.includes(k));
 const widgetOn = () => widgetTiles.length > 0 && !!currentPlace() && !picking;
-function applyWidget() { document.body.classList.toggle('widget', widgetOn()); }
+function applyWidget() { document.documentElement.classList.toggle('widget', widgetOn()); }
 let order = LS.get('bb_order', DEFAULT_ORDER).filter(k => DEFAULT_ORDER.includes(k));
 DEFAULT_ORDER.forEach(k => { if (!order.includes(k)) order.push(k); });
 let folded = LS.get('bb_folded', {});
@@ -700,7 +711,7 @@ const geoAvail = window.isSecureContext && 'geolocation' in navigator;
 function currentPlace() { return tempPlace || places[cur] || null; }
 function renderPlaces() {
   const p = currentPlace();
-  $('locbar').hidden = !p; $('welcome').hidden = !!p; $('cards').classList.toggle('first', !p);
+  $('locbar').hidden = !p; $('welcome').hidden = !!p; $('cards').classList.toggle('first', !p); document.documentElement.classList.toggle('haspl', !!p);
   applyWidget();
   if (!p) return;
   $('placename').textContent = p.name; document.querySelectorAll('.wplace').forEach(a => a.textContent = '\u2316 ' + p.name);

@@ -8,7 +8,7 @@ Open `sly-weather.html` in een browser (ook rechtstreeks vanaf schijf, of via ee
 
 Zodra er een plek is bewaard staat naast "Nieuwe plek" de knop "Mijn locatie" (alleen via https): één tik toont het weer voor waar je nu bent als tijdelijke plek, afgerond zoals een tik op de kaart. Er wordt niets opgeslagen tot je op "Bewaar als plek" tikt; na herladen zie je weer je laatste bewaarde plek. Rechtsonder verschijnt na scrollen een oranje knop "Naar boven", en dezelfde pijl staat dan ook in de bovenbalk.
 
-Experiment op `/weather/test/`: één tijdlijn (24 u, 3 d, 7 d) met neerslag, temperatuur en wind; sleep erover en de kaart en de uitgeschreven verwachting volgen dat moment. Gebruikt de plek die je in de app hebt bewaard en één extra verzoek voor een vast modelraster over Nederland (voor iedereen gelijk).
+Experiment op `/weather/test/`: één tijdlijn (3 u tot 7 d) met neerslag, temperatuur (hoogste van de dag in rood, laagste van de nacht in blauw) en wind; sleep erover en de kaart en de uitgeschreven verwachting volgen dat moment. Gebruikt de plek die je in de app hebt bewaard en één extra verzoek voor een vast modelraster over Nederland (voor iedereen gelijk).
 
 Tegelmodus: zet `?tile=strip` achter het adres (of `?tile=now,strip`; ook `map`, `chart`, `days`) en je ziet alleen die tegel(s) met de plaatsnaam erbij, als link naar de hele app. Handig als snelkoppeling op het beginscherm: open die URL in de browser en kies "Toevoegen aan startscherm"; is de app geïnstalleerd, dan opent hij daarin. Lang indrukken van het app-icoon geeft kant-en-klare snelkoppelingen (Buien, Nu, Radar). Een echte Android-widget is vanuit een webapp niet mogelijk; dat zou een app-schil vragen.
 
