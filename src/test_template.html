@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Security-Policy" content="{{CSP}}">
 <meta name="robots" content="noindex">
 <meta name="description" content="Sly Weather experiment: one timeline for the coming hours and the week, with the rain map and the forecast for any moment you touch.">
-<meta name="version" content="test-7">
+<meta name="version" content="test-8">
 <meta name="theme-color" content="#F4F5F7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#14171B" media="(prefers-color-scheme: dark)">
 <title>Sly Weather test: tijdlijn</title>
@@ -26,7 +26,7 @@
   --accent:#F68712; --accent-ink:#B85E00; --accent-soft:#FDEBD8;
   --focus:#1F6FEB;
   --rain-1:#BFE3FF; --rain-2:#5FB4F2; --rain-3:#1F6FEB; --rain-4:#8B3FD9; --rain-5:#D23B6B;
-  --temp:#E0702A; --temp-cold:#2F7FD6; --wind:#2E8B57;
+  --temp:#E0702A; --temp-cold:#2F7FD6; --wind:#2E8B57; --ok:#2E8B57;
   --map-land:#E3E6EA; --map-prov:#8A939E; --map-sea:#F4F5F7;
   --night:rgba(34,40,47,.17); --day:rgba(246,135,18,.06);
   --radius:14px;
@@ -40,7 +40,7 @@
     --bg:#14171B; --bg-2:#1C2026; --bg-3:#242930; --text:#E7E9EC; --text-2:#A6AEB8; --line:#30363E;
     --accent:#F68712; --accent-ink:#FFB066; --accent-soft:#3A2A18;
     --rain-1:#3B7DB8; --rain-2:#5FB4F2; --rain-3:#9CD3FF; --rain-4:#C79BFF; --rain-5:#FF7AA2;
-    --temp:#FFB066; --temp-cold:#7FB6FF; --wind:#5BD08A;
+    --temp:#FFB066; --temp-cold:#7FB6FF; --wind:#5BD08A; --ok:#5BD08A;
     --map-land:#2A3038; --map-prov:#6B7684; --map-sea:#14171B; --night:rgba(0,0,0,.5); --day:rgba(255,255,255,.05);
     --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7); color-scheme:dark;
   }
@@ -49,7 +49,7 @@
   --bg:#14171B; --bg-2:#1C2026; --bg-3:#242930; --text:#E7E9EC; --text-2:#A6AEB8; --line:#30363E;
   --accent:#F68712; --accent-ink:#FFB066; --accent-soft:#3A2A18;
   --rain-1:#3B7DB8; --rain-2:#5FB4F2; --rain-3:#9CD3FF; --rain-4:#C79BFF; --rain-5:#FF7AA2;
-  --temp:#FFB066; --temp-cold:#7FB6FF; --wind:#5BD08A;
+  --temp:#FFB066; --temp-cold:#7FB6FF; --wind:#5BD08A; --ok:#5BD08A;
   --map-land:#2A3038; --map-prov:#6B7684; --map-sea:#14171B; --night:rgba(0,0,0,.5); --day:rgba(255,255,255,.05);
   --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7); color-scheme:dark;
 }
@@ -57,44 +57,52 @@
   --bg:#0A0E0C; --bg-2:#0F1512; --bg-3:#152019; --text:#9FE8A8; --text-2:#5FAA6A; --line:#1F3A27;
   --accent:#F68712; --accent-ink:#FFB066; --accent-soft:#1E2A14;
   --rain-1:#2F6B4A; --rain-2:#3FA66A; --rain-3:#5BF07A; --rain-4:#C8FF5B; --rain-5:#F68712;
-  --temp:#F68712; --temp-cold:#5FB4F2; --wind:#9FE8A8;
+  --temp:#F68712; --temp-cold:#5FB4F2; --wind:#9FE8A8; --ok:#5BF07A;
   --map-land:#101A14; --map-prov:#5FAA6A; --map-sea:#0A0E0C; --night:rgba(0,0,0,.55); --day:rgba(159,232,168,.06);
   --font-body:var(--font-mono); --radius:2px; --shadow:none; color-scheme:dark;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.5;-webkit-text-size-adjust:100%}
 a{color:var(--accent-ink)}
-header.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-2);border-bottom:1px solid var(--line)}
-header.top .back{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--text-2);font-weight:600;font-size:.9rem;white-space:nowrap}
-header.top .back svg{width:20px;height:20px}
-header.top .name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:800}
-header.top .tag{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent-soft);padding:2px 7px;border-radius:999px}
-.iconbtn{width:36px;height:36px;border-radius:999px;border:1px solid var(--line);background:var(--bg-2);color:var(--text);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
-.iconbtn:hover{border-color:var(--text-2)}
+/* Bovenbalk en plekbalk: dezelfde opbouw en stijl als de hoofdapp */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:10px;padding-block:10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;min-width:0}
+.brand .name{font-weight:800;font-size:1.2rem;letter-spacing:-.01em;white-space:nowrap}
+.brand .name b{color:var(--accent);font-weight:800}
+.tag{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent-soft);padding:2px 7px;border-radius:999px}
+:root[data-theme="nerd"] .brand .name::after{content:"_";color:var(--accent);animation:blink 1s steps(1) infinite}@keyframes blink{50%{opacity:0}}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--bg-2)}
+.seg button{appearance:none;border:0;background:transparent;color:var(--text-2);font:inherit;font-size:.8rem;font-weight:700;padding:6px 9px;cursor:pointer;line-height:1;min-height:30px;min-width:30px}
+.seg button[aria-pressed="true"]{background:var(--text);color:var(--bg)}
+.seg button+button{border-left:1px solid var(--line)}
+.iconbtn{appearance:none;border:1px solid var(--line);background:var(--bg-2);color:var(--text);width:34px;height:34px;border-radius:999px;cursor:pointer;display:inline-grid;place-items:center;font:inherit;flex:none;padding:0}
+.iconbtn:hover,.seg button:hover{color:var(--text)}
 .iconbtn.spin svg{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
-:root[data-theme="nerd"] .iconbtn,:root[data-theme="nerd"] .tag,:root[data-theme="nerd"] .zoom button{border-radius:2px}
-.app{max-width:1180px;margin:0 auto;padding:12px 12px 40px}
+.locbar{display:flex;align-items:center;justify-content:space-between;gap:10px 12px;flex-wrap:wrap;margin-top:16px}
+.locbar .place{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap}
+.locbar .place .n{font-weight:800;font-size:1.2rem;letter-spacing:-.01em}
+.locbar select{font:inherit;color:var(--text);background:var(--bg-2);border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-weight:700;max-width:11rem}
+.locbar .actions{display:flex;gap:6px;align-items:center}
+.locbar .actions .btn svg{width:14px;height:14px}
+.btn.small{padding:6px 12px;font-size:.8rem}
+:root[data-theme="nerd"] .iconbtn,:root[data-theme="nerd"] .tag,:root[data-theme="nerd"] .seg,:root[data-theme="nerd"] .seg button,:root[data-theme="nerd"] .locbar select,:root[data-theme="nerd"] .zoom button{border-radius:2px}
+.app{max-width:1180px;margin:0 auto;padding-block:0 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#content,#empty{margin-top:14px}
 .card{background:var(--bg-2);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 14px;margin-bottom:12px}
 :root[data-theme="nerd"] .card{border-color:var(--text-2)}
-.status{font-size:.82rem;color:var(--text-2);margin:0 2px 10px}
-.status.err{color:#D23B6B}
+.status{font-size:.8rem;color:var(--text-2)}
+.status .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px;vertical-align:1px}
+.status.err .dot{background:var(--rain-5)}
 /* Welke delen de pagina toont: eerste keer alles, daarna de keuze (op dit toestel bewaard) */
 /* Menu onder de hamburger: alleen de delen; open en dicht met de knop. Tik is aan of uit, lang indrukken toont alleen dat deel */
-.menu{position:absolute;right:12px;top:calc(100% + 6px);max-width:calc(100% - 24px);background:var(--bg-2);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px 12px;z-index:31}
+.menu{position:absolute;right:0;top:calc(100% + 6px);max-width:calc(100% - 24px);background:var(--bg-2);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px 12px;z-index:31}
 .menu .hint2{font-size:.72rem;color:var(--text-2);margin:8px 0 0}
 :root[data-theme="nerd"] .menu{border-color:var(--text-2)}
-/* Balk onder de bovenbalk, zoals in de hoofdapp: plek, Mijn locatie, nieuwe plek; weergave en taal */
-.bar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;margin:0 2px 10px}
-.bar .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.bar select{font:inherit;color:var(--text);background:var(--bg-2);border:1px solid var(--line);border-radius:999px;padding:5px 10px;font-weight:700;max-width:11rem}
-.bar .btn{padding:5px 12px;font-size:.85rem}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--bg-2)}
-.seg button{border:0;background:transparent;color:var(--text-2);font:inherit;font-size:.85rem;font-weight:700;padding:4px 10px;cursor:pointer;line-height:1.3}
-.seg button[aria-pressed="true"]{background:var(--text);color:var(--bg)}
-:root[data-theme="nerd"] .bar select,:root[data-theme="nerd"] .seg,:root[data-theme="nerd"] .seg button{border-radius:2px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0;font-size:.78rem;color:var(--text-2);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .chips button{border:1px solid var(--line);background:var(--bg-2);color:var(--text-2);font:inherit;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:999px;cursor:pointer}
 .chips button[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
+.chips button.solo{box-shadow:0 0 0 2px var(--accent)}
 :root[data-theme="nerd"] .chips button{border-radius:2px}
 /* Uitlezing van het gekozen moment */
 .readout .when{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:.9rem;color:var(--text-2)}
@@ -143,7 +151,7 @@ canvas#map{display:block;width:100%;height:auto;border-radius:10px;background:va
 .explain code{font-family:var(--font-mono);font-size:.8em}
 .explain li{overflow-wrap:anywhere}
 .empty{text-align:center;padding:30px 10px}
-.btn{display:inline-block;border:1px solid var(--line);background:var(--bg-2);color:var(--text);font:inherit;font-weight:700;padding:8px 14px;border-radius:999px;text-decoration:none;cursor:pointer}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;font-weight:700;text-decoration:none;border:1px solid var(--line);font-size:.9rem;cursor:pointer;font-family:inherit;background:var(--bg-2);color:var(--text);line-height:1.2}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#1B1208}
 :root[data-theme="nerd"] .btn{border-radius:2px}:root[data-theme="nerd"] .btn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
 footer.foot{font-size:.78rem;color:var(--text-2);text-align:center;margin-top:18px}
@@ -155,20 +163,25 @@ footer.foot svg{width:22px;height:22px;vertical-align:middle;margin-right:4px}
 </style>
 </head>
 <body>
+<main class="app">
 <header class="top">
-  <a class="back" href="../" id="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg><span>Sly Weather</span></a>
-  <div class="name" id="placename"></div>
-  <span class="tag" id="tag">test</span>
-  <button class="iconbtn" id="menubtn" type="button" aria-label="Toon" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-  <button class="iconbtn" id="refresh" type="button" aria-label="Vernieuwen"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg></button>
+  <a class="brand" href="../" aria-label="Sly Weather"><span class="name">Sly <b>Weather</b></span><span class="tag">test</span></a>
+  <div class="controls">
+    <div class="seg lang" id="langs" role="group" aria-label="Taal / Language"></div>
+    <div class="seg theme" id="themes" role="group" aria-label="Thema"></div>
+    <button class="iconbtn" id="menubtn" type="button" aria-label="Delen" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <button class="iconbtn" id="refresh" type="button" aria-label="Vernieuwen"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg></button>
+  </div>
   <div class="menu" id="menu" hidden><div class="chips" id="chips"></div><p class="hint2" id="chiphint"></p></div>
 </header>
-<main class="app">
-  <div class="bar" id="bar">
-    <div class="row"><select id="placesel" aria-label="Plek"></select><button class="btn" id="geobtn" type="button"></button><a class="btn" id="newplace" href="../"></a></div>
-    <div class="row"><div class="seg" id="themes" role="group"></div><div class="seg" id="langs" role="group"></div></div>
+  <div class="locbar" id="locbar">
+    <div class="place">
+      <span class="n" id="placename">–</span>
+      <select id="placesel" aria-label="Plek"></select>
+      <span class="actions"><a class="btn small" id="newplace" href="../"></a><button class="btn small" id="geobtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg><span id="geotxt"></span></button><button class="btn small" id="delbtn" type="button">✕</button></span>
+    </div>
+    <div class="status" id="status"><span class="dot"></span><span id="statustext"></span></div>
   </div>
-  <p class="status" id="status"></p>
   <div id="empty" class="card empty" hidden>
     <p id="emptytxt"></p>
     <a class="btn primary" href="../" id="emptybtn"></a>
@@ -231,7 +244,7 @@ const I18N = {
     ex_p: 'Een experiment: één tijdlijn voor de komende uren én de hele week, met voor elk moment het kaartje en de verwachting. Idee van een vriend (zoals Flowx). De eerste twee uur komen van de Buienradar-radar (per 5 minuten), daarna van het KNMI-model via Open-Meteo: per kwartier voor de eerste 24 uur, per uur daarna. Het kaartje na de radar is een modelraster van 10 x 10 punten over Nederland, dus grof (±40 km) maar wel voor de hele week.',
     ex_req: 'Wat je toestel verlaat: een verzoek met je afgeronde coördinaat naar Open-Meteo, een verzoek om het vaste raster (voor iedereen gelijk, zegt niets over jou) en het Buienradar-beeld. Niets wordt bewaard buiten dit toestel.',
     ex_log: 'Verzoeken deze keer',
-    m_menu: 'Delen', chip_hint: 'Tik: aan of uit. Lang indrukken: alleen dit deel.', all: 'Alles', geo: 'Mijn locatie', geo_temp: 'Mijn locatie', newplace: 'Nieuwe plek', th_t: ['Volgt het toestel', 'Licht', 'Donker', 'Nerd'],
+    m_menu: 'Delen', chip_hint: 'Tik: aan of uit (bewaard). Lang indrukken: even alleen dit deel, tot je het menu sluit.', all: 'Alles', delplace: 'Deze plek verwijderen', sure: 'Zeker? \u2715', geo: 'Mijn locatie', geo_temp: 'Mijn locatie', newplace: 'Nieuwe plek', th_t: ['Volgt het toestel', 'Licht', 'Donker', 'Nerd'],
     gps_busy: 'Positie opvragen...', gps_denied: 'Locatie geweigerd door de browser', gps_timeout: 'Locatie duurde te lang', gps_unavail: 'Locatie niet beschikbaar', home: 'Terug naar je plek',
     foot: 'Sly Weather test · een Sly Solutions-experiment · gegevens KNMI via Open-Meteo en Buienradar'
   },
@@ -256,7 +269,7 @@ const I18N = {
     ex_p: 'An experiment: one timeline for the coming hours and the whole week, with the map and the forecast for any moment. A friend suggested it (think Flowx). The first two hours come from the Buienradar radar (5-minute steps), after that from the KNMI model via Open-Meteo: 15-minute steps for the first 24 hours, hourly beyond. After the radar window the map is a model grid of 10 x 10 points over the Netherlands, so coarse (about 40 km) but available for the whole week.',
     ex_req: 'What leaves your device: one request with your rounded coordinate to Open-Meteo, one request for the fixed grid (identical for everyone, says nothing about you) and the Buienradar image. Nothing is stored outside this device.',
     ex_log: 'Requests this time',
-    m_menu: 'Sections', chip_hint: 'Tap: on or off. Press and hold: only this section.', all: 'All', geo: 'My location', geo_temp: 'My location', newplace: 'New place', th_t: ['Follows the device', 'Light', 'Dark', 'Nerd'],
+    m_menu: 'Sections', chip_hint: 'Tap: on or off (saved). Press and hold: only this section for now, until you close the menu.', all: 'All', delplace: 'Remove this place', sure: 'Sure? \u2715', geo: 'My location', geo_temp: 'My location', newplace: 'New place', th_t: ['Follows the device', 'Light', 'Dark', 'Nerd'],
     gps_busy: 'Getting position...', gps_denied: 'Location denied by the browser', gps_timeout: 'Location took too long', gps_unavail: 'Location unavailable', home: 'Back to your place',
     foot: 'Sly Weather test · a Sly Solutions experiment · data KNMI via Open-Meteo and Buienradar'
   }
@@ -325,7 +338,7 @@ const places = LS.get('bb_places', []); let cur = LS.get('bb_cur', 0), tempPlace
 let place = places[cur] || null;
 const geoAvail = window.isSecureContext && 'geolocation' in navigator;
 /* Andere plek (uit de lijst van de hoofdapp, of tijdelijk via Mijn locatie): opnieuw ophalen, cursor op nu, kaart terug op de plek */
-function setPlace(p) { place = p; pan = {dx: 0, dy: 0}; sel = null; modelCanvas = null; $('placename').textContent = p ? p.name : 'Sly Weather'; $('empty').hidden = !!p; $('content').hidden = true; if (p) refreshAll(false); }
+function setPlace(p) { place = p; pan = {dx: 0, dy: 0}; sel = null; modelCanvas = null; $('placename').textContent = p ? p.name : '\u2013'; $('empty').hidden = !!p; $('content').hidden = true; if (p) refreshAll(false); }
 let meteo = null, grid = null, radar = null, bars = [], busy = false;
 let zoomH = LS.get('bbt_zoom', 24); if (!ZOOMS.includes(zoomH)) zoomH = 24;
 let sel = null, tStart = 0, tEnd = 0;
@@ -333,7 +346,7 @@ const roundDigits = () => +LS.get('bb_round', 2);
 const model = () => LS.get('bb_model', 'knmi_seamless');
 
 /* ============ Ophalen ============ */
-function setStatus(txt, err) { $('status').textContent = txt; $('status').classList.toggle('err', !!err); }
+function setStatus(txt, err) { $('statustext').textContent = txt; $('status').classList.toggle('err', !!err); }
 function gridUrl() {
   const la = [], lo = [];
   for (let r = 0; r < GRID.n; r++) for (let c = 0; c < GRID.n; c++) { la.push((GRID.lat0 + r * (GRID.lat1 - GRID.lat0) / (GRID.n - 1)).toFixed(2)); lo.push((GRID.lon0 + c * (GRID.lon1 - GRID.lon0) / (GRID.n - 1)).toFixed(2)); }
@@ -625,21 +638,24 @@ function drawAll() { if (raf) return; raf = requestAnimationFrame(() => { raf = 
 /* Welke delen open: eerste keer alles, daarna de keuze uit bbt_tiles */
 const SECTIONS = ['now', 'tl', 'map', 'txt', 'ex'], SEC_EL = {now: 'readout', tl: 'tlcard', map: 'mapcard', txt: 'story', ex: 'explain'};
 let shown = LS.get('bbt_tiles', SECTIONS).filter(k => SECTIONS.includes(k));
+/* solo: tijdelijke voorvertoning van één deel (lang indrukken), alleen zolang het menu open staat; niet bewaard */
+let solo = null;
 function applySections() {
-  SECTIONS.forEach(k => { $(SEC_EL[k]).hidden = !shown.includes(k); });
-  $('chips').innerHTML = SECTIONS.map(k => `<button type="button" data-sec="${k}" aria-pressed="${shown.includes(k)}">${t('sec_' + k)}</button>`).join('') + `<button type="button" data-sec="all" aria-pressed="${shown.length === SECTIONS.length}">${t('all')}</button>`;
+  const v = solo && !$('menu').hidden ? [solo] : shown;
+  SECTIONS.forEach(k => { $(SEC_EL[k]).hidden = !v.includes(k); });
+  $('chips').innerHTML = SECTIONS.map(k => `<button type="button" data-sec="${k}" aria-pressed="${shown.includes(k)}" class="${solo === k ? 'solo' : ''}">${t('sec_' + k)}</button>`).join('') + `<button type="button" data-sec="all" aria-pressed="${shown.length === SECTIONS.length}">${t('all')}</button>`;
   if (meteo) { modelCanvas = null; drawAll(); }
 }
-/* Menupaneel: open en dicht met de knop (of Klaar); zolang het open staat is de inhoud weg, daarna komt alles terug zoals gekozen */
-function setMenu(open) { $('menu').hidden = !open; $('menubtn').setAttribute('aria-expanded', String(open)); }
+/* Menu: open en dicht met de knop; bij sluiten vervalt de voorvertoning en geldt weer de bewaarde keuze */
+function setMenu(open) { $('menu').hidden = !open; $('menubtn').setAttribute('aria-expanded', String(open)); if (!open) solo = null; applySections(); }
 $('menubtn').addEventListener('click', () => setMenu($('menu').hidden));
 function renderMenu() {
   $('chiphint').textContent = t('chip_hint');
   const sl = $('placesel'); sl.innerHTML = '';
   places.forEach((q, i) => { const o = document.createElement('option'); o.value = i; o.textContent = q.name; o.selected = place === q; sl.appendChild(o); });
   if (tempPlace) { const o = document.createElement('option'); o.value = 'tmp'; o.textContent = tempPlace.name; o.selected = place === tempPlace; sl.appendChild(o); }
-  sl.hidden = !places.length && !tempPlace;
-  $('geobtn').textContent = '\u25CE ' + t('geo'); $('geobtn').hidden = !geoAvail; $('newplace').textContent = t('newplace');
+  sl.hidden = places.length + (tempPlace ? 1 : 0) < 2;
+  $('geotxt').textContent = t('geo'); $('geobtn').hidden = !geoAvail; $('newplace').textContent = t('newplace'); $('delbtn').hidden = !place; $('delbtn').title = t('delplace');
   const th = LS.get('bb_theme', 'auto');
   $('themes').innerHTML = ['auto', 'light', 'dark', 'nerd'].map((k, i) => `<button type="button" data-th="${k}" aria-pressed="${th === k}" title="${t('th_t')[i]}">${['\u25D0', '\u2600', '\u263E', '\u2328'][i]}</button>`).join('');
   $('langs').innerHTML = ['nl', 'en'].map(k => `<button type="button" data-lang="${k}" aria-pressed="${lang === k}">${k.toUpperCase()}</button>`).join('');
@@ -655,6 +671,16 @@ $('geobtn').addEventListener('click', () => {
   }, err => { setStatus(t(err.code === 1 ? 'gps_denied' : err.code === 3 ? 'gps_timeout' : 'gps_unavail'), true); addLog('gps', 'mislukt: ' + err.message, null, Math.round(performance.now() - t0), 'code ' + err.code); },
   {enableHighAccuracy: false, timeout: 15000, maximumAge: 600000});
 });
+/* Plek verwijderen: eerst "Zeker?", daarna weg uit de lijst van de hoofdapp; een tijdelijke plek valt gewoon weg */
+let delArmed = null;
+$('delbtn').addEventListener('click', () => {
+  const b = $('delbtn');
+  if (!delArmed) { delArmed = setTimeout(() => { delArmed = null; b.textContent = '\u2715'; }, 3000); b.textContent = t('sure'); return; }
+  clearTimeout(delArmed); delArmed = null; b.textContent = '\u2715';
+  if (place === tempPlace) { tempPlace = null; setPlace(places[cur] || null); }
+  else { places.splice(cur, 1); cur = 0; LS.set('bb_places', places); LS.set('bb_cur', cur); try { localStorage.removeItem('bb_cache'); } catch (e) {} setPlace(places[0] || null); }
+  renderMenu();
+});
 $('themes').addEventListener('click', e => { const b = e.target.closest('button'); if (b) applyTheme(b.dataset.th); });
 $('langs').addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.lang !== lang) { LS.set('bb_lang', b.dataset.lang); location.reload(); } });
 /* Kaart: + en −, ⌖ terug naar je plek, slepen om te verschuiven */
@@ -669,9 +695,9 @@ $('map').addEventListener('pointermove', e => {
 });
 ['pointerup', 'pointercancel'].forEach(k => $('map').addEventListener(k, () => { mapDrag = null; }));
 /* Tik: aan of uit (Alles: alles aan). Lang indrukken (450 ms): alleen dit deel; de tik die daarop volgt wordt genegeerd */
-function setShown(list) { shown = list; LS.set('bbt_tiles', shown); applySections(); }
+function setShown(list) { shown = list; solo = null; LS.set('bbt_tiles', shown); applySections(); }
 let holdT = 0, held = false;
-$('chips').addEventListener('pointerdown', e => { const b = e.target.closest('button'); if (!b || b.dataset.sec === 'all') return; held = false; clearTimeout(holdT); holdT = setTimeout(() => { held = true; setShown([b.dataset.sec]); }, 450); });
+$('chips').addEventListener('pointerdown', e => { const b = e.target.closest('button'); if (!b || b.dataset.sec === 'all') return; held = false; clearTimeout(holdT); holdT = setTimeout(() => { held = true; solo = b.dataset.sec; applySections(); }, 450); });
 ['pointerup', 'pointercancel', 'pointerleave'].forEach(k => $('chips').addEventListener(k, () => clearTimeout(holdT)));
 $('chips').addEventListener('contextmenu', e => e.preventDefault());
 $('chips').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (held) { held = false; return; } const k = b.dataset.sec;
