@@ -15,9 +15,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>Sly Weather</title>
 <meta name="application-name" content="Sly Weather">
-<meta name="version" content="1.7">
+<meta name="version" content="1.8">
 <!--
-  Sly Weather v1.7: weather and rain for your own spot in the Netherlands, without sharing your location.
+  Sly Weather v1.8: weather and rain for your own spot in the Netherlands, without sharing your location.
   A Sly Solutions project · https://slysolutions.nl
   Live app      https://slysolutions.nl/weather/
   Source, issues and ideas: https://github.com/SlySolutions/sly-weather
@@ -332,7 +332,9 @@ footer a{color:inherit}
 .tl .story{margin-top:10px;font-size:.9rem}.tl .story p{margin:0 0 6px}.tl .story p:last-child{margin:0}
 /* Klein kaartje onder de tijdlijn: volgt de cursor; 0,54x tot 8x, slepen, ⌖ terug naar je plek */
 .tl .mapwrap{position:relative;margin-top:12px}
-.tl canvas.tlmap{display:block;width:100%;height:auto;border-radius:10px;background:var(--map-sea);cursor:grab;touch-action:none}
+.tl canvas.tlmap{display:block;width:100%;height:auto;border-radius:10px;background:var(--map-sea);touch-action:pan-y}
+.tl canvas.tlmap.free{cursor:grab;touch-action:none}
+.tl .mapzoom button.on{background:var(--accent);color:#1B1208;border-color:transparent}
 .tl .maprow{display:flex;align-items:center;gap:8px;margin-top:12px}.tl .maprow .btn{padding:4px 10px;font-size:.78rem}
 .tl .mapwrap.min,.tl .legend.min{display:none}
 .tl .maplbl{position:absolute;left:10px;top:10px;font-size:.78rem;font-weight:700;background:var(--bg-2);border:1px solid var(--line);padding:2px 8px;border-radius:999px;max-width:calc(100% - 60px)}
@@ -462,7 +464,7 @@ footer a{color:inherit}
         <canvas id="tl" role="img" aria-label="Tijdlijn"></canvas>
         <div class="legend" id="tllegend"></div>
         <div class="maprow"><button class="btn small" id="tlmaptoggle" type="button" aria-expanded="true"></button></div>
-        <div class="mapwrap"><canvas class="tlmap" id="tlmap" role="img" aria-label="Neerslagkaart"></canvas><div class="maplbl" id="tlmaplbl"></div><div class="mapzoom"><button type="button" id="mzin" aria-label="+">+</button><button type="button" id="mzout" aria-label="-">−</button><button type="button" id="mzhome" data-i18n-title="home_title">⌖</button></div></div>
+        <div class="mapwrap"><canvas class="tlmap" id="tlmap" role="img" aria-label="Neerslagkaart"></canvas><div class="maplbl" id="tlmaplbl"></div><div class="mapzoom"><button type="button" id="mzin" aria-label="+">+</button><button type="button" id="mzout" aria-label="-">−</button><button type="button" id="mzhome" data-i18n-title="home_title">⌖</button><button type="button" id="mzfree" aria-pressed="false">🔒</button></div></div>
         <div class="legend" id="tlmaplegend"></div>
         <div class="story" id="tlstory"></div>
       </div>
@@ -538,7 +540,7 @@ footer a{color:inherit}
 <script>{{LEAFLET_JS}}</script>
 <script>
 /* ============ Data ============ */
-const APP_VERSION = '1.7';
+const APP_VERSION = '1.8';
 const GEMEENTEN = {{GEMEENTEN}};
 const PROVINCIES = {{PROVINCIES}};
 const LIJNEN = {{LIJNEN}};
@@ -599,7 +601,7 @@ const I18N = {
     tl_temp: 'temperatuur', tl_wind: 'wind (zonder schaal)', tl_cloud: 'bewolking per uur, donkerder is meer', tl_rain: 'neerslag', tl_now: 'nu', tl_hi: 'hoogste overdag', tl_lo: 'laagste in de nacht',
     model_lbl: 'model', map_model_sub: '±40 km', map_radar_lbl: 'Radar {t}', map_radar_fut: 'Radar {t}, verwacht', map_model_lbl: 'Model {d} {t} · ±40 km',
     leg_radar: 'Radar: licht, matig, zwaar', leg_model: 'Model mm per uur: 0,2 / 0,5 / 1 / 2,5 / 5+', leg_place: 'je plek',
-    map_hide: 'Kaartje verbergen', map_show: 'Kaartje tonen', m_menu: 'Delen', chip_hint: 'Tik: aan of uit (bewaard). Lang indrukken: even alleen dit deel, tot je het menu sluit.', all: 'Alles',
+    map_hide: 'Kaartje verbergen', map_show: 'Kaartje tonen', map_lock: 'Kaart vast: alleen + en −, je plek in het midden. Tik om slepen en pinch aan te zetten.', map_free: 'Kaart vrij: slepen en pinch. Tik om weer vast te zetten.', m_menu: 'Delen', chip_hint: 'Tik: aan of uit (bewaard). Lang indrukken: even alleen dit deel, tot je het menu sluit.', all: 'Alles',
     sec_now: 'Nu', sec_strip: 'Buien', sec_tl: 'Tijdlijn', sec_chart: 'Grafiek', sec_map: 'Kaart', sec_days: 'Dagen'
   },
   en: {
@@ -647,7 +649,7 @@ const I18N = {
     tl_temp: 'temperature', tl_wind: 'wind (no scale)', tl_cloud: 'cloud cover per hour, darker is more', tl_rain: 'precipitation', tl_now: 'now', tl_hi: 'day high', tl_lo: 'night low',
     model_lbl: 'model', map_model_sub: '±40 km', map_radar_lbl: 'Radar {t}', map_radar_fut: 'Radar {t}, expected', map_model_lbl: 'Model {d} {t} · ±40 km',
     leg_radar: 'Radar: light, moderate, heavy', leg_model: 'Model mm per hour: 0.2 / 0.5 / 1 / 2.5 / 5+', leg_place: 'your place',
-    map_hide: 'Hide map', map_show: 'Show map', m_menu: 'Sections', chip_hint: 'Tap: on or off (saved). Press and hold: only this section for now, until you close the menu.', all: 'All',
+    map_hide: 'Hide map', map_show: 'Show map', map_lock: 'Map locked: + and − only, your place in the centre. Tap to allow drag and pinch.', map_free: 'Map free: drag and pinch. Tap to lock again.', m_menu: 'Sections', chip_hint: 'Tap: on or off (saved). Press and hold: only this section for now, until you close the menu.', all: 'All',
     sec_now: 'Now', sec_strip: 'Showers', sec_tl: 'Timeline', sec_chart: 'Chart', sec_map: 'Map', sec_days: 'Days'
   }
 };
@@ -697,7 +699,7 @@ function applyLang(l) {
   $('maptitle').textContent = picking ? t('pick_title') : t('map_title'); $('mapsub').textContent = picking ? t('pick_sub') : t('map_sub');
   if (tempPlace) { tempPlace.name = t('geo_temp'); renderPlaces(); }
   if (!currentPlace()) setStatus(t('st_none'));
-  renderChips(); applyTLMap();
+  renderChips(); applyTLMap(); applyFree();
   if (meteo && currentPlace()) render(lastLat, lastLon); else if (map) drawLabels();
 }
 document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => applyLang(b.dataset.lang)));
@@ -1536,6 +1538,7 @@ function viewBox() {
 function drawTLMap() {
   const c = $('tlmap'); if (!tlReady || !c.clientWidth) return;
   const dpr = devicePixelRatio || 1, {W, H} = tlMapGeom();
+  if (!mapFree) pan = {dx: 0, dy: 0};
   VB = viewBox(); $('mzin').disabled = mapZ >= ZMAX; $('mzout').disabled = mapZ <= ZMIN;
   c.style.height = H + 'px'; c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); const g = c.getContext('2d'); g.scale(dpr, dpr);
   g.fillStyle = col('--map-sea'); g.fillRect(0, 0, W, H);
@@ -1570,6 +1573,7 @@ $('mzhome').addEventListener('click', () => { pan = {dx: 0, dy: 0}; if (mapZ < 2
 let mapDrag = null, mapRaf = 0, pinch = null; const ptrs = new Map();
 const redrawMap = () => { if (!mapRaf) mapRaf = requestAnimationFrame(() => { mapRaf = 0; drawTLMap(); }); };
 $('tlmap').addEventListener('pointerdown', e => {
+  if (!mapFree) return;
   ptrs.set(e.pointerId, {x: e.clientX, y: e.clientY}); try { $('tlmap').setPointerCapture(e.pointerId); } catch (x) {}
   if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = {d: Math.hypot(a.x - b.x, a.y - b.y), z: mapZ}; mapDrag = null; }
   else { pinch = null; mapDrag = {x: e.clientX, y: e.clientY, dx: pan.dx, dy: pan.dy}; }
@@ -1583,7 +1587,11 @@ $('tlmap').addEventListener('pointermove', e => {
   redrawMap();
 });
 ['pointerup', 'pointercancel'].forEach(k => $('tlmap').addEventListener(k, e => { ptrs.delete(e.pointerId); pinch = null; mapDrag = null; }));
-$('tlmap').addEventListener('wheel', e => { if (!tlReady) return; e.preventDefault(); const r = $('tlmap').getBoundingClientRect(); zoomAround(mapZ * (e.deltaY < 0 ? 1.2 : 1 / 1.2), e.clientX - r.left, e.clientY - r.top); }, {passive: false});
+$('tlmap').addEventListener('wheel', e => { if (!tlReady || !mapFree) return; e.preventDefault(); const r = $('tlmap').getBoundingClientRect(); zoomAround(mapZ * (e.deltaY < 0 ? 1.2 : 1 / 1.2), e.clientX - r.left, e.clientY - r.top); }, {passive: false});
+/* Vast (standaard): alleen + en −, je plek in het midden; vrij: slepen, pinch en muiswiel. Keuze bewaard */
+let mapFree = LS.get('bb_mapfree', false) === true;
+function applyFree() { $('mzfree').textContent = mapFree ? '🔓' : '🔒'; $('mzfree').setAttribute('aria-pressed', String(mapFree)); $('mzfree').classList.toggle('on', mapFree); $('mzfree').title = t(mapFree ? 'map_free' : 'map_lock'); $('mzfree').setAttribute('aria-label', $('mzfree').title); $('mzhome').hidden = !mapFree; $('tlmap').classList.toggle('free', mapFree); if (!mapFree) pan = {dx: 0, dy: 0}; if (tlReady) drawTLMap(); }
+$('mzfree').addEventListener('click', () => { mapFree = !mapFree; LS.set('bb_mapfree', mapFree); applyFree(); });
 /* Kaartje minimaliseren: de keuze blijft bewaard */
 let tlMapOpen = LS.get('bb_tlmap', true) !== false;
 function applyTLMap() { $('tlmaptoggle').textContent = (tlMapOpen ? '\u25BE ' : '\u25B8 ') + t(tlMapOpen ? 'map_hide' : 'map_show'); $('tlmaptoggle').setAttribute('aria-expanded', String(tlMapOpen)); document.querySelector('.tl .mapwrap').classList.toggle('min', !tlMapOpen); $('tlmaplegend').classList.toggle('min', !tlMapOpen); if (tlMapOpen && tlReady) setTimeout(drawTLMap, 0); }
