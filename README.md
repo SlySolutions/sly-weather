@@ -18,7 +18,7 @@ Live: **https://slysolutions.nl/weather/** (open on your phone and choose *Add t
 - Built-in offline map of the Netherlands (municipalities, places, districts, motorways, rivers) to pick a spot by tapping, by place name or by four-digit postcode.
 - Optional "My location" button (https only): one tap shows the weather for where you are now as a temporary place, rounded on the device, saved only if you choose to.
 - Three themes in the Sly Solutions style (light, dark, nerd), reorderable and collapsible tiles.
-- Timeline tile: hours and week in one (3 h to 7 d) with rain bars, temperature (day high in red, night low in blue), wind and cloud cover; drag along it and the map and a written forecast follow that moment. Within the radar hours the map shows the radar frame, beyond that a coarse model grid over the Netherlands (about 40 km).
+- Timeline tile: hours and week in one (3 h to 7 d) with rain bars, temperature (day high in red, night low in blue), wind and cloud cover; drag along it and a small map right under it plus a written forecast follow that moment (the big map follows too). Within the radar hours the map shows the radar frame, beyond that a coarse model grid over the Netherlands (about 40 km).
 - Sections menu (≡): tap a section to switch it on or off (saved), press and hold to show only that one while the menu is open.
 - Tile mode: add `?tile=strip` (or `?tile=now,strip`, `tl`, `map`, `chart`, `days`) to the URL to show only those tiles with the place name, handy as a home-screen shortcut. Long-press the installed app icon for ready-made shortcuts (Showers, Now, Radar, Timeline).
 
