@@ -60,3 +60,8 @@ Permissies: `INTERNET`, en `ACCESS_FINE_LOCATION` alleen als je de GPS-knop wilt
 - Wegen en rivieren zijn vereenvoudigd tot ±60 m en tonen één rijbaan; de A10-ring en knooppunten zijn daardoor schematisch. Plaatsnamen en postcodecentroïden zijn nauwkeurig genoeg voor de afronding van ±1 km.
 - Officiële KNMI-waarschuwingen zijn vanuit een los HTML-bestand niet op te halen (KNMI vraagt een API-sleutel, MeteoAlarm staat geen browserverzoeken toe); in een app-schil of via een eigen domein kan dat wel.
 - Postcodes zijn op 4 cijfers (PC4-centroïde, ±1 km). De volledige PC6-tabel (±460.000 regels) zou het bestand meerdere MB groter maken en voegt met de afronding op ±1 km niets toe; tik na het zoeken desnoods de stip nog even goed.
+
+## Achtergrond
+
+- [docs/BESLISSINGEN.md](docs/BESLISSINGEN.md): alle ontwerpkeuzes met reden en afgewezen alternatief.
+- [docs/GEDACHTEGANG.md](docs/GEDACHTEGANG.md): hoe het project is bedacht en gegroeid, wat misging, hoe je verder bouwt.

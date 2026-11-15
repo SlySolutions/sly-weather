@@ -5,7 +5,7 @@ A single HTML file: no server, no account, no cookies, no analytics. Dutch and E
 
 Live: **https://slysolutions.nl/weather/** (open on your phone and choose *Add to home screen*).
 
-*Nederlands: zie [README.nl.md](README.nl.md).*
+*Nederlands: zie [README.nl.md](README.nl.md). Design decisions and background (Dutch): [docs/](docs/).*
 
 
 ## What it does
