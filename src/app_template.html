@@ -15,9 +15,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>Sly Weather</title>
 <meta name="application-name" content="Sly Weather">
-<meta name="version" content="1.4">
+<meta name="version" content="1.5">
 <!--
-  Sly Weather v1.4: weather and rain for your own spot in the Netherlands, without sharing your location.
+  Sly Weather v1.5: weather and rain for your own spot in the Netherlands, without sharing your location.
   A Sly Solutions project · https://slysolutions.nl
   Live app      https://slysolutions.nl/weather/
   Source, issues and ideas: https://github.com/SlySolutions/sly-weather
@@ -330,6 +330,14 @@ footer a{color:inherit}
 .tl .legend .dot{display:inline-block;width:8px;height:8px;border-radius:999px;vertical-align:0;margin-right:4px;background:var(--temp)}
 .tl .legend .dot.lo{background:var(--temp-cold)}
 .tl .story{margin-top:10px;font-size:.9rem}.tl .story p{margin:0 0 6px}.tl .story p:last-child{margin:0}
+/* Klein kaartje onder de tijdlijn: volgt de cursor; 0,54x tot 8x, slepen, ⌖ terug naar je plek */
+.tl .mapwrap{position:relative;margin-top:12px}
+.tl canvas.tlmap{display:block;width:100%;height:auto;border-radius:10px;background:var(--map-sea);cursor:grab;touch-action:pan-y}
+.tl .maplbl{position:absolute;left:10px;top:10px;font-size:.78rem;font-weight:700;background:var(--bg-2);border:1px solid var(--line);padding:2px 8px;border-radius:999px;max-width:calc(100% - 60px)}
+.tl .mapzoom{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:4px}
+.tl .mapzoom button{appearance:none;width:32px;height:32px;border-radius:999px;border:1px solid var(--line);background:var(--bg-2);color:var(--text);font:inherit;font-size:1.1rem;font-weight:700;line-height:1;cursor:pointer;padding:0}
+.tl .mapzoom button:disabled{opacity:.4;cursor:default}
+:root[data-theme="nerd"] .tl .mapzoom button,:root[data-theme="nerd"] .tl .maplbl{border-radius:2px}
 @media (min-width:900px){.tl canvas{height:230px}}
 /* ---- Menu met delen: tik is aan of uit (bewaard), lang indrukken toont even alleen dat deel zolang het menu open staat ---- */
 .menu{position:absolute;right:0;top:calc(100% + 6px);max-width:min(440px,100%);background:var(--bg-2);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px 12px;z-index:31}
@@ -449,6 +457,8 @@ footer a{color:inherit}
         <div class="tlhead"><button class="btn small" id="nowbtn" type="button" data-i18n="now">Nu</button><div class="seg" id="zoom" role="group"><button type="button" data-z="3">3 u</button><button type="button" data-z="12">12 u</button><button type="button" data-z="24">24 u</button><button type="button" data-z="72">3 d</button><button type="button" data-z="168">7 d</button></div></div>
         <canvas id="tl" role="img" aria-label="Tijdlijn"></canvas>
         <div class="legend" id="tllegend"></div>
+        <div class="mapwrap"><canvas class="tlmap" id="tlmap" role="img" aria-label="Neerslagkaart"></canvas><div class="maplbl" id="tlmaplbl"></div><div class="mapzoom"><button type="button" id="mzin" aria-label="+">+</button><button type="button" id="mzout" aria-label="-">−</button><button type="button" id="mzhome" data-i18n-title="home_title">⌖</button></div></div>
+        <div class="legend" id="tlmaplegend"></div>
         <div class="story" id="tlstory"></div>
       </div>
     </section>
@@ -523,7 +533,7 @@ footer a{color:inherit}
 <script>{{LEAFLET_JS}}</script>
 <script>
 /* ============ Data ============ */
-const APP_VERSION = '1.4';
+const APP_VERSION = '1.5';
 const GEMEENTEN = {{GEMEENTEN}};
 const PROVINCIES = {{PROVINCIES}};
 const LIJNEN = {{LIJNEN}};
@@ -582,7 +592,8 @@ const I18N = {
     radar_dry: 'Radar om {t}: droog boven {p}.', radar_wet: 'Radar om {t}: {l} boven {p}.', radar_exp: 'Radar voor {t} (verwacht): {l} boven {p}.', radar_exp_dry: 'Radar voor {t} (verwacht): droog boven {p}.',
     day_sum: '{d}: {min}° tot {max}°, {mm} mm neerslag, {w}. Zon op {a}, onder {b}.',
     tl_temp: 'temperatuur', tl_wind: 'wind (zonder schaal)', tl_cloud: 'bewolking per uur, donkerder is meer', tl_rain: 'neerslag', tl_now: 'nu', tl_hi: 'hoogste overdag', tl_lo: 'laagste in de nacht',
-    model_lbl: 'model', map_model_sub: '±40 km',
+    model_lbl: 'model', map_model_sub: '±40 km', map_radar_lbl: 'Radar {t}', map_radar_fut: 'Radar {t}, verwacht', map_model_lbl: 'Model {d} {t} · ±40 km',
+    leg_radar: 'Radar: licht, matig, zwaar', leg_model: 'Model mm per uur: 0,2 / 0,5 / 1 / 2,5 / 5+', leg_place: 'je plek',
     m_menu: 'Delen', chip_hint: 'Tik: aan of uit (bewaard). Lang indrukken: even alleen dit deel, tot je het menu sluit.', all: 'Alles',
     sec_now: 'Nu', sec_strip: 'Buien', sec_tl: 'Tijdlijn', sec_chart: 'Grafiek', sec_map: 'Kaart', sec_days: 'Dagen'
   },
@@ -629,7 +640,8 @@ const I18N = {
     radar_dry: 'Radar at {t}: dry over {p}.', radar_wet: 'Radar at {t}: {l} over {p}.', radar_exp: 'Radar for {t} (expected): {l} over {p}.', radar_exp_dry: 'Radar for {t} (expected): dry over {p}.',
     day_sum: '{d}: {min}° to {max}°, {mm} mm of precipitation, {w}. Sunrise {a}, sunset {b}.',
     tl_temp: 'temperature', tl_wind: 'wind (no scale)', tl_cloud: 'cloud cover per hour, darker is more', tl_rain: 'precipitation', tl_now: 'now', tl_hi: 'day high', tl_lo: 'night low',
-    model_lbl: 'model', map_model_sub: '±40 km',
+    model_lbl: 'model', map_model_sub: '±40 km', map_radar_lbl: 'Radar {t}', map_radar_fut: 'Radar {t}, expected', map_model_lbl: 'Model {d} {t} · ±40 km',
+    leg_radar: 'Radar: light, moderate, heavy', leg_model: 'Model mm per hour: 0.2 / 0.5 / 1 / 2.5 / 5+', leg_place: 'your place',
     m_menu: 'Sections', chip_hint: 'Tap: on or off (saved). Press and hold: only this section for now, until you close the menu.', all: 'All',
     sec_now: 'Now', sec_strip: 'Showers', sec_tl: 'Timeline', sec_chart: 'Chart', sec_map: 'Map', sec_days: 'Days'
   }
@@ -693,7 +705,7 @@ function applyTheme(th) {
   themeBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.themeSet === th)));
   LS.set('bb_theme', th);
   document.querySelector('meta[name=theme-color]').setAttribute('content', getComputedStyle(root).getPropertyValue('--bg').trim());
-  setTimeout(() => { startRain(); if (map) restyleMap(); if (tlReady) { modelCache = {}; drawAll(); } }, 0);
+  setTimeout(() => { startRain(); if (map) restyleMap(); if (tlReady) { modelCache = {}; modelUrls = {}; drawAll(); } }, 0);
 }
 themeBtns.forEach(b => b.addEventListener('click', () => applyTheme(b.dataset.themeSet)));
 applyTheme(LS.get('bb_theme', 'auto'));
@@ -744,19 +756,19 @@ function layoutCards() {
   });
   LS.set('bb_order', order); LS.set('bb_folded', folded);
   if (map) setTimeout(() => map.invalidateSize(), 50);
-  if (tlReady) setTimeout(drawTL, 0);
+  if (tlReady) setTimeout(() => { drawTL(); drawTLMap(); }, 0);
 }
 DEFAULT_ORDER.forEach(k => {
   const el = cardEl(k); const ctl = document.createElement('span'); ctl.className = 'cardctl';
   ctl.innerHTML = `<button type="button" data-mv="-1" data-i18n-title="mv_up">▲</button><button type="button" data-mv="1" data-i18n-title="mv_down">▼</button><button type="button" class="fold" data-i18n-title="fold"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>`;
   el.querySelector('.head').appendChild(ctl);
   const wp = document.createElement('a'); wp.className = 'wplace'; wp.href = location.pathname || './'; wp.setAttribute('data-i18n-title', 'open_app'); el.querySelector('.head h2').after(wp);
-  ctl.querySelectorAll('[data-mv]').forEach(b => b.addEventListener('click', () => { const i = order.indexOf(k), j = i + (+b.dataset.mv); if (j < 0 || j >= order.length) return; [order[i], order[j]] = [order[j], order[i]]; layoutCards(); el.scrollIntoView({behavior: 'smooth', block: 'nearest'}); }));
+  ctl.querySelectorAll('[data-mv]').forEach(b => b.addEventListener('click', () => { const i = order.indexOf(k), j = i + (+b.dataset.mv); if (j < 0 || j >= order.length) return; [order[i], order[j]] = [order[j], order[i]]; layoutCards(); renderChips(); el.scrollIntoView({behavior: 'smooth', block: 'nearest'}); }));
   ctl.querySelector('.fold').addEventListener('click', () => { folded[k] = !folded[k]; layoutCards(); });
   el.querySelector('.head h2').addEventListener('click', () => { folded[k] = !folded[k]; layoutCards(); });
   el.querySelector('.head h2').style.cursor = 'pointer';
 });
-$('resetlayout').addEventListener('click', () => { order = [...DEFAULT_ORDER]; folded = {}; layoutCards(); });
+$('resetlayout').addEventListener('click', () => { order = [...DEFAULT_ORDER]; folded = {}; layoutCards(); renderChips(); });
 
 /* ============ Plekken ============ */
 let places = LS.get('bb_places', []);
@@ -1277,10 +1289,10 @@ function applyVisible() {
     cardEl(k).hidden = !ok;
   });
   if (map) setTimeout(() => map.invalidateSize(), 50);
-  if (tlReady) setTimeout(drawTL, 0);
+  if (tlReady) setTimeout(() => { drawTL(); drawTLMap(); }, 0);
 }
 function renderChips() {
-  $('chips').innerHTML = DEFAULT_ORDER.map(k => `<button type="button" data-sec="${k}" aria-pressed="${shown.includes(k)}" class="${solo === k ? 'solo' : ''}">${t('sec_' + k)}</button>`).join('') + `<button type="button" data-sec="all" aria-pressed="${shown.length === DEFAULT_ORDER.length}">${t('all')}</button>`;
+  $('chips').innerHTML = order.map(k => `<button type="button" data-sec="${k}" aria-pressed="${shown.includes(k)}" class="${solo === k ? 'solo' : ''}">${t('sec_' + k)}</button>`).join('') + `<button type="button" data-sec="all" aria-pressed="${shown.length === DEFAULT_ORDER.length}">${t('all')}</button>`;
   $('chiphint').textContent = t('chip_hint');
 }
 function setMenu(open) { $('menu').hidden = !open; $('menubtn').setAttribute('aria-expanded', String(open)); if (!open) solo = null; renderChips(); applyVisible(); }
@@ -1467,7 +1479,7 @@ function gridAt(lat, lon, hi) {
   const v = (rr, cc) => P[rr * GRID.n + cc][hi] || 0;
   return lerp(lerp(v(r, c), v(r, c + 1), b), lerp(v(r + 1, c), v(r + 1, c + 1), b), a);
 }
-function modelUrl(hi) {
+function modelCanvas(hi) {
   if (modelCache[hi]) return modelCache[hi];
   const sw = 240, y0 = mercY(BOX.north), y1 = mercY(BOX.south), sh = Math.round(sw * (y0 - y1) / ((BOX.east - BOX.west) * Math.PI / 180));
   const c = document.createElement('canvas'); c.width = sw; c.height = sh; const g = c.getContext('2d'); const im = g.createImageData(sw, sh);
@@ -1476,8 +1488,10 @@ function modelUrl(hi) {
     const lon = BOX.west + (i + .5) / sw * (BOX.east - BOX.west); const v = gridAt(lat, lon, hi); const lv = mmhLevel(v); if (!lv) continue;
     const k = (j * sw + i) * 4; im.data[k] = cols[lv][0]; im.data[k + 1] = cols[lv][1]; im.data[k + 2] = cols[lv][2]; im.data[k + 3] = Math.round(120 + Math.min(1, v / 5) * 110);
   } }
-  g.putImageData(im, 0, 0); return (modelCache[hi] = c.toDataURL('image/png'));
+  g.putImageData(im, 0, 0); return (modelCache[hi] = c);
 }
+let modelUrls = {};
+function modelUrl(hi) { return modelUrls[hi] || (modelUrls[hi] = modelCanvas(hi).toDataURL('image/png')); }
 function modelOff() { if (modelOverlay) { modelOverlay.remove(); modelOverlay = null; } if (radarLayer && !picking) radarLayer.setOpacity(radarOpacity()); }
 function mapFollow() {
   if (!map || picking || !tlReady) return;
@@ -1492,16 +1506,68 @@ function mapFollow() {
     $('maptime').hidden = false; $('mtlabel').textContent = t('model_lbl'); $('mtlabel').className = 'fut'; $('mtclock').textContent = dayName(sel, true) + ' ' + clock(hi * 3600000 + grid.t0 + tzOffset * 1000) + ' · ' + t('map_model_sub');
   } else modelOff();
 }
+/* Het kaartje in de tegel: provincies, radarbeeld of modellaag voor het gekozen moment, je plek; zoom 0,54x (hele radarbeeld) tot 8x rond je plek, slepen, ⌖ terug */
+const MAPZ = [0.54, 1, 2, 4, 8]; let mapZ = LS.get('bb_mapzoom', 1); if (!MAPZ.includes(mapZ)) mapZ = 1; let VB = BOX, pan = {dx: 0, dy: 0};
+const tlMapGeom = () => { const W = $('tlmap').clientWidth; const kx = (BOX.east - BOX.west) * Math.PI / 180, ky = mercY(BOX.north) - mercY(BOX.south); return {W, H: Math.round(W * ky / kx)}; };
+const mpx = (lon, W) => (lon - VB.west) / (VB.east - VB.west) * W;
+const mpy = (lat, H) => (mercY(VB.north) - mercY(lat)) / (mercY(VB.north) - mercY(VB.south)) * H;
+function viewBox() {
+  const p = currentPlace();
+  if (mapZ === 1 && !pan.dx && !pan.dy) return BOX;
+  const w = (BOX.east - BOX.west) / mapZ, yn = mercY(BOX.north), ys = mercY(BOX.south), h = (yn - ys) / mapZ;
+  const bx = p && mapZ > 1 ? p.lon : (BOX.west + BOX.east) / 2, by = p && mapZ > 1 ? mercY(p.lat) : (yn + ys) / 2;
+  const cx = Math.max(RADAR.west + w / 2, Math.min(RADAR.east - w / 2, bx + pan.dx)), cy = Math.max(mercY(RADAR.south) + h / 2, Math.min(mercY(RADAR.north) - h / 2, by + pan.dy));
+  pan = {dx: cx - bx, dy: cy - by};
+  return {west: cx - w / 2, east: cx + w / 2, north: unmercY(cy + h / 2), south: unmercY(cy - h / 2)};
+}
+function drawTLMap() {
+  const c = $('tlmap'); if (!tlReady || !c.clientWidth) return;
+  const dpr = devicePixelRatio || 1, {W, H} = tlMapGeom();
+  VB = viewBox(); $('mzin').disabled = mapZ === MAPZ[MAPZ.length - 1]; $('mzout').disabled = mapZ === MAPZ[0]; c.style.touchAction = mapZ > 1 ? 'none' : 'pan-y';
+  c.style.height = H + 'px'; c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); const g = c.getContext('2d'); g.scale(dpr, dpr);
+  g.fillStyle = col('--map-sea'); g.fillRect(0, 0, W, H);
+  g.fillStyle = col('--map-land'); g.strokeStyle = col('--map-prov'); g.lineWidth = 1; g.lineJoin = 'round';
+  PROVINCIES.forEach(p => p.r.forEach(r => { g.beginPath(); r.forEach((q, k) => k ? g.lineTo(mpx(q[0], W), mpy(q[1], H)) : g.moveTo(mpx(q[0], W), mpy(q[1], H))); g.closePath(); g.fill(); }));
+  PROVINCIES.forEach(p => p.r.forEach(r => { g.beginPath(); r.forEach((q, k) => k ? g.lineTo(mpx(q[0], W), mpy(q[1], H)) : g.moveTo(mpx(q[0], W), mpy(q[1], H))); g.closePath(); g.stroke(); }));
+  const rw = radarWindow(); let lbl = '';
+  if (rw && sel >= rw.from && sel <= rw.to + 300000) {
+    const f = Math.max(0, Math.min(radar.n - 1, Math.round((sel - tzOffset * 1000 - radar.base) / 300000) + HIST));
+    const sx = f * RADAR_W + (VB.west - RADAR.west) / (RADAR.east - RADAR.west) * RADAR_W, sw = (VB.east - VB.west) / (RADAR.east - RADAR.west) * RADAR_W;
+    const sy = (mercY(RADAR.north) - mercY(VB.north)) / (mercY(RADAR.north) - mercY(RADAR.south)) * RADAR_H, sh = (mercY(VB.north) - mercY(VB.south)) / (mercY(RADAR.north) - mercY(RADAR.south)) * RADAR_H;
+    g.globalAlpha = .85; g.drawImage(radar.img, sx, sy, sw, sh, 0, 0, W, H); g.globalAlpha = 1;
+    const ft = radar.base + (f - HIST) * 300000 + tzOffset * 1000;
+    lbl = t(f > HIST ? 'map_radar_fut' : 'map_radar_lbl', {t: clock(ft)});
+  } else if (grid) {
+    const hi = Math.max(0, Math.min(grid.p[0].length - 1, Math.ceil((sel - tzOffset * 1000 - grid.t0) / 3600000)));
+    const dx = mpx(BOX.west, W), dy = mpy(BOX.north, H);
+    g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(modelCanvas(hi), dx, dy, mpx(BOX.east, W) - dx, mpy(BOX.south, H) - dy);
+    lbl = t('map_model_lbl', {d: dayName(sel, true), t: clock(hi * 3600000 + grid.t0 + tzOffset * 1000)});
+  }
+  const p = currentPlace();
+  if (p) { const d = roundDigits(), ppx = mpx(+p.lon.toFixed(d), W), ppy = mpy(+p.lat.toFixed(d), H); g.fillStyle = col('--accent'); g.strokeStyle = col('--bg-2'); g.lineWidth = 2; g.beginPath(); g.arc(ppx, ppy, 6, 0, Math.PI * 2); g.fill(); g.stroke(); }
+  $('tlmaplbl').textContent = lbl;
+}
+[['mzin', 1], ['mzout', -1]].forEach(([id, d]) => $(id).addEventListener('click', () => { const i = MAPZ.indexOf(mapZ) + d; if (i < 0 || i >= MAPZ.length) return; mapZ = MAPZ[i]; LS.set('bb_mapzoom', mapZ); if (tlReady) drawTLMap(); }));
+$('mzhome').addEventListener('click', () => { pan = {dx: 0, dy: 0}; if (mapZ < 2) { mapZ = 2; LS.set('bb_mapzoom', mapZ); } if (tlReady) drawTLMap(); });
+let mapDrag = null, mapRaf = 0;
+$('tlmap').addEventListener('pointerdown', e => { mapDrag = {x: e.clientX, y: e.clientY, dx: pan.dx, dy: pan.dy}; try { $('tlmap').setPointerCapture(e.pointerId); } catch (x) {} });
+$('tlmap').addEventListener('pointermove', e => {
+  if (!mapDrag || !tlReady) return; const W = $('tlmap').clientWidth, H = $('tlmap').clientHeight;
+  pan = {dx: mapDrag.dx - (e.clientX - mapDrag.x) * (VB.east - VB.west) / W, dy: mapDrag.dy + (e.clientY - mapDrag.y) * (mercY(VB.north) - mercY(VB.south)) / H};
+  if (!mapRaf) mapRaf = requestAnimationFrame(() => { mapRaf = 0; drawTLMap(); });
+});
+['pointerup', 'pointercancel'].forEach(k => $('tlmap').addEventListener(k, () => { mapDrag = null; }));
 let tlRaf = 0;
-function drawAll() { if (tlRaf) return; tlRaf = requestAnimationFrame(() => { tlRaf = 0; drawTL(); drawReadout(); mapFollow(); }); }
+function drawAll() { if (tlRaf) return; tlRaf = requestAnimationFrame(() => { tlRaf = 0; drawTL(); drawTLMap(); drawReadout(); mapFollow(); }); }
 function renderTL(lat, lon) {
-  tlLat = lat; tlLon = lon; buildBars(lat, lon); modelCache = {};
+  tlLat = lat; tlLon = lon; buildBars(lat, lon); modelCache = {}; modelUrls = {};
   if (sel == null || sel < nowLocal() - 3600000) sel = nowLocal();
   tlReady = true; applyZoom(); setRange(); if (sel > tEnd) sel = nowLocal();
+  $('tlmaplegend').innerHTML = `<span><i style="background:${col('--rain-1')}"></i><i style="background:${col('--rain-3')}"></i><i style="background:${col('--rain-4')}"></i>${t('leg_radar')}</span><span><i style="background:${col('--rain-1')}"></i><i style="background:${col('--rain-2')}"></i><i style="background:${col('--rain-3')}"></i><i style="background:${col('--rain-4')}"></i><i style="background:${col('--rain-5')}"></i>${t('leg_model')}</span><span><i style="background:${col('--accent')};border-radius:999px"></i>${t('leg_place')}</span>`;
   $('tllegend').innerHTML = `<span><i class="ln"></i>${t('tl_temp')}</span><span><i class="dot"></i>${t('tl_hi')}</span><span><i class="dot lo"></i>${t('tl_lo')}</span><span><i class="ln wind"></i>${t('tl_wind')}</span><span><i class="band"></i>${t('tl_cloud')}</span><span><i class="bar"></i>${t('tl_rain')}</span><span><i class="nowm"></i>${t('tl_now')}</span>`;
   drawAll();
 }
-addEventListener('resize', () => { if (tlReady) drawTL(); });
+addEventListener('resize', () => { if (tlReady) { drawTL(); drawTLMap(); } });
 
 /* ============ Start ============ */
 initMap();
