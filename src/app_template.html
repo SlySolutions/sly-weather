@@ -1,0 +1,1120 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#14171B">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Sly Weather</title>
+<meta name="application-name" content="Sly Weather">
+<meta name="version" content="1.0">
+<!--
+  Sly Weather v1.0 — weather and rain for your own spot in the Netherlands, without sharing your location.
+  A Sly Solutions project · https://slysolutions.nl
+  Live app      https://slysolutions.nl/weather/
+  Source, issues and ideas: https://github.com/SlySolutions/sly-weather
+  License: CC BY-NC-SA 4.0 (name and logo excluded). Data: Open-Meteo, Buienradar, CBS, OpenStreetMap, GeoNames, 4pp.
+-->
+<meta name="description" content="Weer en buien voor jouw plek in Nederland, zonder je locatie te delen. Weather and rain for your spot in the Netherlands without sharing your location.">
+<style>
+/* ---- Lettertypen (ingebakken, geen verzoek naar Google) ---- */
+@font-face{font-family:"Manrope";font-style:normal;font-weight:200 800;font-display:swap;src:url(data:font/woff2;base64,{{FONT_MANROPE}}) format("woff2")}
+@font-face{font-family:"Space Mono";font-style:normal;font-weight:400;font-display:swap;src:url(data:font/woff2;base64,{{FONT_MONO400}}) format("woff2")}
+@font-face{font-family:"Space Mono";font-style:normal;font-weight:700;font-display:swap;src:url(data:font/woff2;base64,{{FONT_MONO700}}) format("woff2")}
+
+/* ---- Leaflet (ingebakken) ---- */
+{{LEAFLET_CSS}}
+
+/* ---- Ontwerp: tokens van slysolutions.nl (licht / donker / nerd) ----
+   Layout: tegels in één volgorde; op telefoon één kolom, vanaf 900px twee kolommen (CSS columns),
+   zodat de gebruiker de volgorde zelf kan bepalen. ---- */
+:root{
+  --brand-orange:#F68712;
+  --bg:#F4F5F7; --bg-2:#FFFFFF; --bg-3:#E9EBEF;
+  --text:#22282F; --text-2:#5A6470; --line:#D7DBE1;
+  --accent:#F68712; --accent-ink:#B85E00; --accent-soft:#FDEBD8;
+  --logo-ink:#2D2929; --logo-lg:#BDBCBC;
+  --focus:#1F6FEB;
+  --rain-1:#BFE3FF; --rain-2:#5FB4F2; --rain-3:#1F6FEB; --rain-4:#8B3FD9; --rain-5:#D23B6B;
+  --temp:#E0702A; --temp-cold:#2F7FD6;
+  --map-land:#E3E6EA; --map-line:#C9CFD6; --map-prov:#8A939E; --map-sea:#F4F5F7; --map-water:#9CC4E8; --map-road:#C9A27A; --map-place:#5A6470; --map-urban:#D5D9DE; --map-rail:#9AA3AD; --map-hw:#D98B2B; --map-place2:#8C96A2;
+  --ok:#2E8B57;
+  --radius:14px;
+  --font-body:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-mono:"Space Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --font-head:var(--font-body);
+  --shadow:0 1px 2px rgba(20,25,30,.06),0 10px 30px -18px rgba(20,25,30,.25);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]):not([data-theme="nerd"]){
+    --bg:#14171B; --bg-2:#1C2026; --bg-3:#242930;
+    --text:#E7E9EC; --text-2:#A6AEB8; --line:#30363E;
+    --accent:#F68712; --accent-ink:#FFB066; --accent-soft:#3A2A18;
+    --logo-ink:#E7E9EC; --logo-lg:#3A4048;
+    --rain-1:#3B7DB8; --rain-2:#5FB4F2; --rain-3:#9CD3FF; --rain-4:#C79BFF; --rain-5:#FF7AA2;
+    --temp:#FFB066; --temp-cold:#7FB6FF;
+    --map-land:#2A3038; --map-line:#3A424C; --map-prov:#6B7684; --map-sea:#14171B; --map-water:#3D6A94; --map-road:#6E5A44; --map-place:#A6AEB8; --map-urban:#363D47; --map-rail:#6F7984; --map-hw:#B9772A; --map-place2:#737E8B;
+    --ok:#5BD08A;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14171B; --bg-2:#1C2026; --bg-3:#242930;
+  --text:#E7E9EC; --text-2:#A6AEB8; --line:#30363E;
+  --accent:#F68712; --accent-ink:#FFB066; --accent-soft:#3A2A18;
+  --logo-ink:#E7E9EC; --logo-lg:#3A4048;
+  --rain-1:#3B7DB8; --rain-2:#5FB4F2; --rain-3:#9CD3FF; --rain-4:#C79BFF; --rain-5:#FF7AA2;
+  --temp:#FFB066; --temp-cold:#7FB6FF;
+  --map-land:#2A3038; --map-line:#3A424C; --map-prov:#6B7684; --map-sea:#14171B; --map-water:#3D6A94; --map-road:#6E5A44; --map-place:#A6AEB8; --map-urban:#363D47; --map-rail:#6F7984; --map-hw:#B9772A; --map-place2:#737E8B;
+  --ok:#5BD08A;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+:root[data-theme="nerd"]{
+  --bg:#0A0E0C; --bg-2:#0F1512; --bg-3:#152019;
+  --text:#9FE8A8; --text-2:#5FAA6A; --line:#1F3A27;
+  --accent:#F68712; --accent-ink:#FFB066; --accent-soft:#1E2A14;
+  --logo-ink:#9FE8A8; --logo-lg:#16281B;
+  --rain-1:#2F6B4A; --rain-2:#3FA66A; --rain-3:#5BF07A; --rain-4:#C8FF5B; --rain-5:#F68712;
+  --temp:#F68712; --temp-cold:#5FB4F2;
+  --map-land:#101A14; --map-line:#1F3A27; --map-prov:#5FAA6A; --map-sea:#0A0E0C; --map-water:#2A6B5A; --map-road:#4A5A2A; --map-place:#9FE8A8; --map-urban:#15241B; --map-rail:#3E7A4A; --map-hw:#5FA86C; --map-place2:#4F8A5C;
+  --ok:#5BF07A;
+  --font-body:var(--font-mono); --font-head:var(--font-mono);
+  --radius:2px; --shadow:none;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.5;-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--bg)}
+#rain{position:fixed;inset:0;z-index:0;pointer-events:none;display:none;opacity:.22}
+:root[data-theme="nerd"] #rain{display:block}
+.app{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding-block:0 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+:root[data-theme="nerd"] .card,:root[data-theme="nerd"] header.top{background:color-mix(in srgb,var(--bg-2) 86%,transparent)}
+
+/* ---- Kop ---- */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:10px;padding-block:10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;min-width:0}
+.brand .name{font-family:var(--font-head);font-weight:800;font-size:1.2rem;letter-spacing:-.01em;white-space:nowrap}
+.brand .name b{color:var(--accent);font-weight:800}
+:root[data-theme="nerd"] .brand .name::after{content:"_";color:var(--accent);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--bg-2)}
+.seg button{appearance:none;border:0;background:transparent;color:var(--text-2);font:inherit;font-size:.8rem;font-weight:700;padding:6px 9px;cursor:pointer;line-height:1;min-height:30px;min-width:30px}
+.seg button[aria-pressed="true"]{background:var(--text);color:var(--bg)}
+.seg button+button{border-left:1px solid var(--line)}
+:root[data-theme="nerd"] .seg,:root[data-theme="nerd"] .btn,:root[data-theme="nerd"] .chip,:root[data-theme="nerd"] .iconbtn{border-radius:2px}
+.iconbtn{appearance:none;border:1px solid var(--line);background:var(--bg-2);color:var(--text);width:34px;height:34px;border-radius:999px;cursor:pointer;display:inline-grid;place-items:center;font:inherit;flex:none}
+.iconbtn:hover,.seg button:hover{color:var(--text)}
+.iconbtn.spin svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* ---- Algemeen ---- */
+.eyebrow{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-2)}
+:root[data-theme="nerd"] .eyebrow{color:var(--accent)}
+.card{background:var(--bg-2);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px 20px;box-shadow:var(--shadow);min-width:0;break-inside:avoid;margin-bottom:16px}
+:root[data-theme="nerd"] .card{border-color:var(--text-2)}
+.card h2{margin:0;font-size:1rem;font-weight:800;font-family:var(--font-head);letter-spacing:-.01em;text-wrap:balance}
+.card .head{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;margin-bottom:12px}
+.card .head h2{margin-right:auto}
+.card.folded .head{margin-bottom:0}
+.card.folded .body{display:none}
+.card.folded .head .eyebrow{display:none}
+.cardctl{display:inline-flex;gap:2px;margin-left:4px}
+.cardctl button{appearance:none;border:1px solid var(--line);background:transparent;color:var(--text-2);width:26px;height:26px;border-radius:7px;cursor:pointer;font:inherit;font-size:.75rem;line-height:1;display:grid;place-items:center}
+.cardctl button:hover:not(:disabled){color:var(--text);background:var(--bg-3)}
+.cardctl button:disabled{opacity:.3;cursor:default}
+.cardctl .fold svg{transition:transform .2s}
+.card.folded .cardctl .fold svg{transform:rotate(-90deg)}
+:root[data-theme="nerd"] .cardctl button{border-radius:2px}
+.muted{color:var(--text-2)}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;font-weight:700;text-decoration:none;border:1px solid var(--line);font-size:.9rem;cursor:pointer;font-family:inherit;background:var(--bg-2);color:var(--text);line-height:1.2}
+.btn.primary{background:var(--accent);color:#1B1208;border-color:transparent}
+.btn.primary:disabled{opacity:.5;cursor:default}
+.btn.primary:hover:not(:disabled){filter:brightness(1.05)}
+:root[data-theme="nerd"] .btn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+.btn.small{padding:6px 12px;font-size:.8rem}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.78rem;background:var(--bg-3);color:var(--text-2)}
+input[type=text],input[type=number]{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
+:root[data-theme="nerd"] input{border-radius:2px;border-color:var(--text-2)}
+.cards{margin-top:16px}
+@media (min-width:900px){.cards{columns:2;column-gap:16px}}
+[hidden]{display:none!important}
+
+/* ---- Locatiebalk ---- */
+.locbar{display:flex;align-items:center;justify-content:space-between;gap:10px 12px;flex-wrap:wrap;margin-top:16px}
+.locbar .place{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap}
+.locbar .place .n{font-weight:800;font-size:1.2rem;font-family:var(--font-head);letter-spacing:-.01em}
+.locbar select{font:inherit;color:var(--text);background:var(--bg-2);border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-weight:700;max-width:11rem}
+:root[data-theme="nerd"] select{border-radius:2px}
+.locbar .actions{display:flex;gap:6px;align-items:center}
+.status{font-size:.8rem;color:var(--text-2)}
+.status .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px;vertical-align:1px}
+.status.err .dot{background:var(--rain-5)}
+
+/* ---- Nu ---- */
+.now{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;align-items:center}
+.now .big{font-family:var(--font-head);font-weight:800;font-size:clamp(3rem,10vw,4.2rem);line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.now .big sup{font-size:.4em;font-weight:600;vertical-align:top;margin-left:2px;color:var(--text-2)}
+.now .desc{font-size:1.05rem;font-weight:700}
+.now .sub{font-size:.85rem;color:var(--text-2)}
+.now .ico{font-size:2.2rem;line-height:1}
+.rainline{margin-top:14px;padding:12px 14px;border-radius:calc(var(--radius) - 4px);background:var(--bg-3);display:flex;gap:10px;align-items:flex-start}
+.rainline.wet{background:var(--accent-soft)}
+.rainline .t{font-weight:800}
+.rainline .s{font-size:.85rem;color:var(--text-2)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.kpi{border:1px solid var(--line);border-radius:calc(var(--radius) - 4px);padding:10px 12px;min-width:0}
+.kpi .k{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2)}
+.kpi .v{font-weight:800;font-size:1.25rem;font-variant-numeric:tabular-nums;font-family:var(--font-head);white-space:nowrap}
+.kpi .v small{font-size:.7em;font-weight:600;color:var(--text-2)}
+@media (max-width:420px){.kpis{grid-template-columns:1fr 1fr}.kpi:last-child{grid-column:1/-1}}
+
+/* ---- Buienstrip ---- */
+.strip{position:relative;margin-top:22px}
+.strip .cells{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:1px;height:46px;border-radius:8px;overflow:hidden;background:var(--line)}
+.strip .cells i{display:block;background:var(--bg-3);position:relative}
+.strip .cells i[data-l="1"]{background:var(--rain-1)}.strip .cells i[data-l="2"]{background:var(--rain-2)}.strip .cells i[data-l="3"]{background:var(--rain-3)}.strip .cells i[data-l="4"]{background:var(--rain-4)}.strip .cells i[data-l="5"]{background:var(--rain-5)}
+.strip .cells i.past{opacity:.45}
+.strip .cells i.est{background-image:repeating-linear-gradient(135deg,transparent 0 4px,rgba(0,0,0,.12) 4px 6px)}
+.strip .nowline{position:absolute;top:-4px;bottom:16px;width:2px;background:var(--accent);transform:translateX(-1px)}
+.strip .nowline::after{content:attr(data-now);position:absolute;top:-16px;left:-8px;font-family:var(--font-mono);font-size:.65rem;color:var(--accent-ink);letter-spacing:.08em}
+.strip .ticks{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.68rem;color:var(--text-2);margin-top:4px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.75rem;color:var(--text-2);margin-top:8px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:4px}
+
+/* ---- Grafiek ---- */
+.chartwrap{overflow-x:auto;overflow-y:hidden;margin:0 -6px;padding:0 6px;scrollbar-width:thin}
+.chartwrap svg{display:block}
+.chart text{font-family:var(--font-mono);font-size:10px;fill:var(--text-2)}
+.chart .grid line{stroke:var(--line);stroke-width:1}
+.chart .temp{fill:none;stroke:var(--temp);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.chart .temparea{fill:var(--temp);opacity:.08}
+.chart .bar{fill:var(--rain-2)}
+.chart .prob{fill:none;stroke:var(--rain-3);stroke-width:1.5;stroke-dasharray:3 3;opacity:.8}
+.chart .nowl{stroke:var(--accent);stroke-width:1.5}
+.chart .daysep{stroke:var(--text-2);stroke-width:1;stroke-dasharray:2 4}
+.chart .lbl{fill:var(--text);font-weight:700}
+.chart .hover{fill:var(--text);opacity:.06}
+.tip{position:fixed;z-index:50;pointer-events:none;background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:.8rem;box-shadow:var(--shadow);max-width:220px}
+.tip b{font-family:var(--font-mono)}
+
+/* ---- Kaart ---- */
+.mapbox{position:relative;height:min(62vh,520px);min-height:340px;border-radius:calc(var(--radius) - 4px);overflow:hidden;border:1px solid var(--line);background:var(--map-sea)}
+#map{position:absolute;inset:0;background:var(--map-sea);font-family:inherit}
+.leaflet-container{background:var(--map-sea)}
+.leaflet-container .leaflet-control-attribution{display:none}
+.leaflet-bar a{background:var(--bg-2);color:var(--text);border-bottom-color:var(--line)}
+.leaflet-bar a:hover{background:var(--bg-3)}
+.leaflet-bar{border:1px solid var(--line);box-shadow:none}
+.gmlabel,.provlabel,.rdlbl{position:absolute;left:0;top:0;pointer-events:none;white-space:nowrap}.gmlabel span,.provlabel span,.rdlbl b{display:inline-block;transform:translate(-50%,-50%)}
+.gmlabel span{font-family:var(--font-mono);font-size:10px;color:var(--text-2);text-shadow:0 0 3px var(--bg),0 0 3px var(--bg);opacity:.8}
+.provlabel span{font-family:var(--font-head);font-weight:800;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--map-prov);opacity:.9}
+.pl{position:absolute;left:0;top:0;pointer-events:none;white-space:nowrap;font-family:var(--font-body);font-size:11px;color:var(--map-place);text-shadow:0 0 3px var(--map-land),0 0 3px var(--map-land),0 0 4px var(--map-land)}
+.pl::before{content:"";position:absolute;left:-7px;top:50%;width:5px;height:5px;border-radius:50%;background:var(--map-place);transform:translateY(-50%)}
+.pl.big{font-weight:800;font-size:12.5px}.pl.big::before{width:7px;height:7px;left:-9px}
+.pin{width:18px;height:18px;border-radius:50%;background:var(--accent);border:3px solid var(--bg-2);box-shadow:0 0 0 2px var(--accent);transform:translate(-50%,-50%)}
+.pin.pick{background:var(--text);box-shadow:0 0 0 2px var(--text)}
+.pickring{position:absolute;left:50%;top:50%;width:30px;height:30px;border:2px dashed var(--accent);border-radius:50%;transform:translate(-50%,-50%)}
+.maptime{position:absolute;right:10px;top:10px;z-index:500;background:var(--bg-2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-family:var(--font-mono);font-size:.78rem;display:flex;gap:10px;align-items:center}
+.maptime .fut{color:var(--accent-ink)}
+.mapctl{display:flex;align-items:center;gap:12px;margin-top:12px}
+.mapctl input[type=range]{flex:1;accent-color:var(--accent)}
+.pickbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.pickbar input{flex:1 1 150px}
+.pickmsg{font-size:.8rem;color:var(--text-2);flex-basis:100%}.pickmsg:not(:empty){padding:10px 14px;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;background:var(--bg-3);color:var(--text);font-size:.88rem;line-height:1.45}.pickmsg.ok{border-left-color:#3BA55D}
+.pickhint{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:500;background:var(--bg-2);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.8rem;white-space:nowrap;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis}
+.detailbtn{position:absolute;left:10px;top:84px;z-index:500;padding:5px 10px}.homebtn,.gpsbtn{position:absolute;left:10px;top:124px;z-index:500;padding:5px 10px}.detailbtn[aria-pressed=false]{opacity:.7;text-decoration:line-through}
+.rdlbl b{font-family:var(--font-mono);font-weight:700;font-size:9.5px;line-height:1;color:#fff;background:var(--map-hw);border-radius:3px;padding:2px 4px;letter-spacing:.02em}
+.pl.mid{font-weight:700;font-size:11.5px}.pl.wijk{color:var(--map-place2);font-size:10px;font-style:italic}.pl.wijk::before{width:3px;height:3px;left:-6px;background:var(--map-place2)}
+.leaflet-radar-pane{z-index:450;pointer-events:none}
+.suggwrap{position:relative;flex-basis:100%}.suggwrap input{width:100%}
+.sugg{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:30;background:var(--bg-2);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.18);max-height:240px;overflow:auto}
+.sugg button{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;padding:9px 14px;background:none;border:0;border-bottom:1px solid var(--line);color:var(--text);font:inherit;cursor:pointer}
+.sugg button:last-child{border-bottom:0}.sugg button:hover,.sugg button.sel{background:var(--bg-3)}.sugg small{color:var(--text-2);font-family:var(--font-mono);font-size:.72rem;white-space:nowrap}
+.sugg .none{padding:9px 14px;color:var(--text-2);font-size:.85rem}
+.radarlegend{display:flex;gap:10px;flex-wrap:wrap;font-size:.75rem;color:var(--text-2);margin-top:8px}
+
+/* ---- Dagen ---- */
+.days{display:grid;gap:0}
+.day{display:grid;grid-template-columns:3.4rem 2rem minmax(0,1fr) auto auto;grid-template-areas:"d i w t p";gap:6px 10px;align-items:center;padding:9px 0;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.day .d{grid-area:d}.day .ico{grid-area:i}.day .w{grid-area:w}.day .t{grid-area:t}.day .p{grid-area:p}
+.day .p .pr{display:block}
+@media (max-width:560px){.day{grid-template-columns:3.4rem 1.8rem minmax(0,1fr) auto;grid-template-areas:"d i w t" "d i w p"}.day .p{min-width:0}.day .p .pr{display:inline;margin-left:4px}.day .w{white-space:normal;font-size:.8rem;line-height:1.3}}
+.day:first-child{border-top:0}
+.day .d{font-weight:800}
+.day .ico{font-size:1.3rem;text-align:center}
+.day .w{color:var(--text-2);font-size:.85rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.day .t{font-family:var(--font-mono);font-size:.9rem;white-space:nowrap}
+.day .t .mn{color:var(--text-2)}
+.day .p{font-family:var(--font-mono);font-size:.8rem;color:var(--rain-3);white-space:nowrap;text-align:right;min-width:4.5rem}
+.day .p.dry{color:var(--text-2)}
+.tbar{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--temp-cold),var(--temp));opacity:.7}
+
+/* ---- Nerd ---- */
+.nerd{display:none}
+:root[data-theme="nerd"] .nerd{display:block}
+.nerd pre,.log{font-family:var(--font-mono);font-size:.72rem;line-height:1.5;white-space:pre-wrap;word-break:break-all;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;margin:0;max-height:260px;overflow:auto;color:var(--text-2)}
+.log b{color:var(--text)}
+.nerd .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.nerd label{font-size:.8rem;color:var(--text-2);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.nerd input[type=number]{width:7rem}
+dl.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:10px 0 0;font-size:.8rem}
+dl.kv dt{color:var(--text-2);font-family:var(--font-mono)}
+dl.kv dd{margin:0;font-family:var(--font-mono);word-break:break-all}
+
+/* ---- Voet ---- */
+footer{margin-top:20px;padding-top:16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--text-2)}
+footer .sly u{text-decoration-color:var(--accent);text-underline-offset:3px}.sly{display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit}
+footer .sly svg{height:22px;width:26px}
+footer a{color:inherit}
+.privacy{font-size:.8rem;color:var(--text-2);margin-top:4px;line-height:1.55}
+.privacy b{color:var(--text)}
+
+/* ---- Eerste keer ---- */
+.welcome h1{font-family:var(--font-head);font-weight:800;font-size:clamp(1.5rem,5vw,2.1rem);letter-spacing:-.02em;margin:0 0 6px;text-wrap:balance;line-height:1.15}
+.welcome p{margin:0 0 10px;max-width:60ch;color:var(--text-2)}
+.welcome .eyebrow{margin-bottom:6px;display:block}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}#rain{display:none!important}}
+</style>
+</head>
+<body>
+<canvas id="rain" aria-hidden="true"></canvas>
+<div class="app">
+  <header class="top">
+    <a class="brand" href="#" id="brandlink" aria-label="Sly Weather">
+      <span class="name">Sly <b>Weather</b></span>
+    </a>
+    <div class="controls">
+      <div class="seg lang" role="group" aria-label="Taal / Language">
+        <button type="button" data-lang="nl" aria-pressed="true">NL</button>
+        <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </div>
+      <div class="seg theme" role="group" aria-label="Thema">
+        <button type="button" data-theme-set="auto" aria-pressed="true" data-i18n-title="th_auto">◐</button>
+        <button type="button" data-theme-set="light" aria-pressed="false" data-i18n-title="th_light">☀</button>
+        <button type="button" data-theme-set="dark" aria-pressed="false" data-i18n-title="th_dark">☾</button>
+        <button type="button" data-theme-set="nerd" aria-pressed="false" data-i18n-title="th_nerd">⌨</button>
+      </div>
+      <button class="iconbtn" id="refresh" type="button" data-i18n-title="refresh" aria-label="Vernieuwen">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Locatie -->
+  <div class="locbar" id="locbar" hidden>
+    <div class="place">
+      <span class="n" id="placename">—</span>
+      <select id="placesel" aria-label="Plek" hidden></select>
+      <span class="actions"><button class="btn small" id="pickbtn" type="button" data-i18n="newplace">Nieuwe plek</button><button class="btn small" id="delbtn" type="button" data-i18n-title="delplace">✕</button></span>
+    </div>
+    <div class="status" id="status"><span class="dot"></span><span id="statustext"></span></div>
+  </div>
+
+  <div class="cards" id="cards">
+    <!-- Eerste keer -->
+    <section class="card welcome" id="welcome">
+      <span class="eyebrow" data-i18n="w_eyebrow">Eerste keer</span>
+      <h1 data-i18n="w_h1">Kies je plek op de kaart. Verder hoef je niets te delen.</h1>
+      <p data-i18n="w_p1">Zoom in en tik op de kaart. De app rondt je keuze af op ongeveer een kilometer, bewaart hem alleen op dit toestel en vraagt daarna de verwachting op. Geen account, geen cookies.</p>
+      <p class="muted" style="font-size:.85rem" data-i18n="w_p2">Wat je toestel verlaat: één verzoek met een afgerond coördinaat naar Open-Meteo, en één verzoek om het landelijke radarbeeld van Buienradar dat voor iedereen gelijk is.</p>
+    </section>
+
+    <!-- Nu -->
+    <section class="card" id="nowcard" data-card="now" hidden>
+      <div class="head"><h2 data-i18n="now">Nu</h2><span class="eyebrow" id="nowtime"></span></div>
+      <div class="body">
+        <div class="now">
+          <div class="big" id="temp">—<sup>°C</sup></div>
+          <div>
+            <div class="desc"><span class="ico" id="nowico" aria-hidden="true"></span> <span id="nowdesc">…</span></div>
+            <div class="sub" id="nowsub"></div>
+          </div>
+        </div>
+        <div class="rainline" id="rainline"><div><div class="t" id="raintitle">…</div><div class="s" id="rainsub"></div></div></div>
+        <div class="kpis">
+          <div class="kpi"><div class="k" data-i18n="next1h">Komend uur</div><div class="v" id="mm1">— <small>mm</small></div></div>
+          <div class="kpi"><div class="k" data-i18n="next12h">Komende 12 uur</div><div class="v" id="mm12">— <small>mm</small></div></div>
+          <div class="kpi"><div class="k" data-i18n="drywin">Droog venster</div><div class="v" id="dry" style="font-size:1rem">—</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Buienstrip -->
+    <section class="card" id="stripcard" data-card="strip" hidden>
+      <div class="head"><h2 data-i18n="strip_title">Buien de komende 2 uur</h2><span class="eyebrow" id="stripsrc"></span></div>
+      <div class="body">
+        <div class="strip">
+          <div class="cells" id="cells"></div>
+          <div class="nowline" id="nowline" data-now="nu"></div>
+          <div class="ticks" id="stripticks"></div>
+        </div>
+        <div class="legend"><span><i style="background:var(--bg-3)"></i><span data-i18n="l0">droog</span></span><span><i style="background:var(--rain-1)"></i><span data-i18n="l1">licht</span></span><span><i style="background:var(--rain-2)"></i><span data-i18n="l2">matig</span></span><span><i style="background:var(--rain-3)"></i><span data-i18n="l3">zwaar</span></span><span><i style="background:var(--rain-4)"></i><span data-i18n="l4">zeer zwaar</span></span><span class="muted" data-i18n="l_note">gearceerd = modelschatting per kwartier</span></div>
+      </div>
+    </section>
+
+    <!-- Grafiek -->
+    <section class="card" id="chartcard" data-card="chart" hidden>
+      <div class="head"><h2 data-i18n="chart_title">Per uur, 48 uur vooruit</h2><span class="eyebrow" data-i18n="chart_sub">temperatuur · neerslag · kans</span></div>
+      <div class="body"><div class="chartwrap" id="chartwrap"></div></div>
+    </section>
+
+    <!-- Kaart -->
+    <section class="card" id="mapcard" data-card="map">
+      <div class="head"><h2 id="maptitle">Neerslagradar</h2><span class="eyebrow" id="mapsub"></span></div>
+      <div class="body">
+        <div class="mapbox">
+          <div id="map" role="application" aria-label="Kaart"></div>
+          <div class="maptime" id="maptime" hidden><span id="mtlabel">—</span><span id="mtclock" class="muted"></span></div>
+          <div class="pickhint" id="pickhint" hidden></div>
+          <button class="btn small detailbtn" id="detailbtn" type="button" aria-pressed="true"><span data-i18n="detail">Details</span></button>
+          <button class="btn small homebtn" id="homebtn" type="button" data-i18n-title="home_title" hidden>⌖ <span data-i18n="home">Mijn plek</span></button>
+          <button class="btn small gpsbtn" id="gpsbtn" type="button" hidden>◎ <span data-i18n="gps">GPS</span></button>
+        </div>
+        <div class="mapctl" id="mapctl" hidden>
+          <button class="iconbtn" id="play" type="button" data-i18n-title="play">▶</button>
+          <input type="range" id="frame" min="0" max="23" value="12" aria-label="Radar">
+        </div>
+        <div class="pickbar" id="pickbar" hidden>
+          <div class="suggwrap"><input type="search" id="picksearch" data-i18n-ph="search_ph" autocomplete="off" inputmode="search" enterkeyhint="search"><div class="sugg" id="sugg" hidden></div></div>
+          <input type="text" id="pickname" data-i18n-ph="pick_ph" maxlength="30">
+          <button class="btn primary" id="picksave" type="button" disabled data-i18n="save">Bewaren</button>
+          <button class="btn" id="pickcancel" type="button" data-i18n="cancel">Annuleren</button>
+          <span class="muted num" id="pickcoord" style="font-size:.78rem"></span>
+          <span class="pickmsg" id="pickmsg"></span>
+        </div>
+        <div class="radarlegend" id="radarlegend"><span class="chip" data-i18n="radar_src">bron: Buienradar, landelijk beeld</span><span class="chip" data-i18n="map_src">kaart: CBS, OpenStreetMap, GeoNames, 4pp</span></div>
+      </div>
+    </section>
+
+    <!-- Dagen -->
+    <section class="card" id="dayscard" data-card="days" hidden>
+      <div class="head"><h2 data-i18n="days_title">Komende dagen</h2><span class="eyebrow" data-i18n="days_sub">KNMI-model via Open-Meteo</span></div>
+      <div class="body"><div class="days" id="days"></div></div>
+    </section>
+  </div>
+
+  <!-- Nerd -->
+  <section class="card nerd" id="nerdcard">
+    <div class="head"><h2 data-i18n="nerd_title">Nerd mode: wat verlaat je toestel</h2><span class="eyebrow" data-i18n="nerd_sub">verzoeklog · ruwe waarden</span></div>
+    <div class="log" id="log"></div>
+    <dl class="kv" id="kv"></dl>
+    <div class="row">
+      <label><span data-i18n="n_round">Afronding</span> <select id="rounding"><option value="2">0,01° (≈1 km)</option><option value="1">0,1° (≈10 km)</option></select></label>
+      <label><span data-i18n="n_model">Model</span> <select id="model"><option value="knmi_seamless">KNMI HARMONIE (knmi_seamless)</option><option value="best_match">Open-Meteo best match</option></select></label>
+      <label>Radar <input type="checkbox" id="radaron" checked> <span data-i18n="n_fetch">ophalen</span></label>
+      <label><span data-i18n="n_manual">Handmatig</span> <input type="number" id="mlat" step="0.01" placeholder="lat"> <input type="number" id="mlon" step="0.01" placeholder="lon"> <button class="btn small" id="msave" type="button" data-i18n="n_saveplace">Bewaar als plek</button></label>
+      <button class="btn small" id="resetlayout" type="button" data-i18n="n_resetlayout">Tegelvolgorde herstellen</button>
+      <button class="btn small" id="wipe" type="button" data-i18n="n_wipe">Wis alle lokale gegevens</button>
+    </div>
+  </section>
+
+  <p class="privacy" id="privacy"></p>
+
+  <footer>
+    <a class="sly" href="https://slysolutions.nl" rel="noopener" target="_blank" title="Sly Solutions">{{BRAND_SVG_SMALL}}<span data-i18n-html="footer_by">Een <b>Sly Solutions</b>-project · <u>slysolutions.nl</u> ↗</span></a>
+    <span data-i18n-html="footer_data">Data: Open-Meteo (CC BY 4.0, KNMI-model) · Buienradar · CBS/Kadaster · © OpenStreetMap-bijdragers (ODbL) · GeoNames · 4pp · geen cookies, geen trackers</span>
+  </footer>
+</div>
+
+<div class="tip" id="tip" hidden></div>
+
+<script>{{LEAFLET_JS}}</script>
+<script>
+/* ============ Data ============ */
+const APP_VERSION = '1.0';
+const GEMEENTEN = {{GEMEENTEN}};
+const PROVINCIES = {{PROVINCIES}};
+const LIJNEN = {{LIJNEN}};
+const PLAATSEN = `{{PLAATSEN}}`.split('\n').map(s => { const a = s.split('\t'); return [a[0], +a[1] / 1000, +a[2] / 1000, +a[3], +a[4]]; });
+const PC4 = {}; '{{PC4}}'.split(';').forEach(s => { const a = s.split(','); PC4[a[0]] = [a[1] / 1000, a[2] / 1000, +a[3]]; });
+/* Lijnen zijn opgeslagen als polyline-tekst (3 decimalen); hier uitgepakt naar [lon, lat] */
+function decLine(s) { const out = []; let i = 0, lat = 0, lon = 0; while (i < s.length) { let b, sh = 0, r = 0; do { b = s.charCodeAt(i++) - 63; r |= (b & 31) << sh; sh += 5; } while (b >= 32); lat += (r & 1 ? ~(r >> 1) : r >> 1); sh = 0; r = 0; do { b = s.charCodeAt(i++) - 63; r |= (b & 31) << sh; sh += 5; } while (b >= 32); lon += (r & 1 ? ~(r >> 1) : r >> 1); out.push([lon / 1000, lat / 1000]); } return out; }
+LIJNEN.roads.forEach(r => { r.l = r.l.map(decLine); }); LIJNEN.rivers.forEach(r => { r.l = r.l.map(decLine); });
+/* Hoekpunten van het Buienradar-beeld (550x512, Mercator), geijkt op de provinciegrenzen */
+const RADAR = {{RADAR_BOUNDS}};
+const RADAR_W = 550, RADAR_H = 512, HIST = 12, FUT = 12;
+const RADAR_URL = 'https://image.buienradar.nl/2.0/image/sprite/RadarMapRainNL?height=512&width=550&extension=png&renderBackground=False&renderBranding=False&renderText=False&history=' + HIST + '&forecast=' + FUT + '&skip=0';
+
+/* ============ Taal ============ */
+const I18N = {
+  nl: {
+    th_auto: 'Volg systeem', th_light: 'Licht', th_dark: 'Donker', th_nerd: 'Nerd', refresh: 'Vernieuwen',
+    newplace: 'Nieuwe plek', delplace: 'Deze plek verwijderen', sure: 'Zeker? ✕',
+    w_eyebrow: 'Eerste keer', w_h1: 'Kies je plek op de kaart. Verder hoef je niets te delen.',
+    w_p1: 'Zoom in en tik op de kaart. De app rondt je keuze af op ongeveer een kilometer, bewaart hem alleen op dit toestel en vraagt daarna de verwachting op. Geen account, geen cookies. Je kunt ook zoeken op plaatsnaam of postcode; die lijst zit in de app zelf.',
+    w_p2: 'Wat je toestel verlaat: één verzoek met een afgerond coördinaat naar Open-Meteo, en één verzoek om het landelijke radarbeeld van Buienradar dat voor iedereen gelijk is.',
+    now: 'Nu', localtime: 'lokale tijd', feels: 'Voelt als', wind: 'wind', humidity: 'vocht',
+    next1h: 'Komend uur', next12h: 'Komende 12 uur', drywin: 'Droog venster', dry_none: 'geen', dry_all: 'hele 12 uur',
+    rain_now: 'Het regent nu', rain_ends: 'Nog ongeveer {m}, droog rond {t}.', rain_long: 'Het blijft naar verwachting nog zeker 2 uur nat.', rain_again: ' Daarna weer regen rond {t}.',
+    dry_next: 'Droog, volgende bui over {m}', dry_next_sub: 'Rond {t}, {i}{d}{s}.', dur: ', duurt ongeveer {m}', src_model: ' (modelschatting)', src_radar: ' (radar)',
+    dry_title: 'Droog', dry_sub: 'De komende 24 uur geen neerslag verwacht.',
+    strip_title: 'Buien de komende 2 uur', strip_radar: 'radar per 5 min, daarna model', strip_model: 'model per kwartier (radar uit)', nowlbl: 'nu',
+    l0: 'droog', l1: 'licht', l2: 'matig', l3: 'zwaar', l4: 'zeer zwaar', l_note: 'gearceerd = modelschatting per kwartier',
+    chart_title: 'Per uur, 48 uur vooruit', chart_sub: 'temperatuur · neerslag · kans', chart_plbl: 'Neerslag mm/u', chart_prob: '· stippellijn = kans', chance: 'kans',
+    map_title: 'Neerslagradar', map_sub: 'afgelopen uur · komend uur', pick_title: 'Kies je plek', pick_sub: 'zoom in en tik', pick_hint: 'Tik op de kaart om je plek te kiezen', pick_ph: 'Naam, bijvoorbeeld Thuis', save: 'Bewaren', cancel: 'Annuleren', rounded: 'afgerond', myplace: 'Mijn plek',
+    search_ph: 'Zoek plaats of postcode (4 cijfers)', home: 'Mijn plek', home_title: 'Zoom naar mijn plek',
+    gps: 'GPS', gps_busy: 'Positie opvragen…', gps_ok: 'Positie gevonden en afgerond. Pas de stip eventueel aan en bewaar.',
+    gps_none: 'Deze browser biedt geen locatie aan. Zoek hieronder op plaats of postcode.',
+    gps_insecure: 'GPS werkt hier niet: de browser staat locatie alleen toe als de app via https draait (of als echte app). Dit bestand is lokaal geopend. Zoek hieronder op plaats of postcode.',
+    gps_denied: 'Locatie geweigerd. Sta locatie toe voor deze pagina in de browserinstellingen, of zoek op plaats of postcode.',
+    gps_unavail: 'Positie onbekend: locatie staat uit op het toestel of er is geen GPS-fix. Zoek op plaats of postcode.',
+    gps_timeout: 'Geen positie binnen 20 s. Probeer opnieuw (buiten gaat sneller) of zoek op plaats of postcode.',
+    gps_ff: ' Firefox/Focus: zet in Android onder Instellingen → Apps → Firefox Focus → Machtigingen → Locatie op "Toestaan tijdens gebruik" (Focus vraagt het wel, maar heeft zelf geen toegang) en probeer opnieuw.', detail: 'Details', search_none: 'Niets gevonden', search_pc: 'postcode', search_more: 'typ 4 cijfers', search_inh: 'inw.',
+    play: 'Afspelen', expected: 'verwacht', radar_src: 'bron: Buienradar, landelijk beeld', map_src: 'kaart: CBS, OpenStreetMap, GeoNames, 4pp',
+    days_title: 'Komende dagen', days_sub: 'KNMI-model via Open-Meteo', today: 'vandaag', dry: 'droog',
+    nerd_title: 'Nerd mode: wat verlaat je toestel', nerd_sub: 'verzoeklog · ruwe waarden', nolog: 'Nog geen verzoeken.', n_round: 'Afronding', n_model: 'Model', n_fetch: 'ophalen', n_manual: 'Handmatig', n_saveplace: 'Bewaar als plek', n_resetlayout: 'Tegelvolgorde herstellen', n_wipe: 'Wis alle lokale gegevens',
+    st_cache: 'Uit cache, {t}', st_upd: 'Bijgewerkt {t}', st_off: 'Geen verbinding, oude data van {t}', st_fail: 'Ophalen mislukt: {e}', st_none: 'Nog niet opgehaald',
+    privacy: '<b>Privacy.</b> Deze app heeft geen server, account, cookies of statistieken. Je plek staat alleen in de lokale opslag van deze browser. Per verversing verlaten precies twee verzoeken je toestel: een afgerond coördinaat (≈1 km) naar <b>Open-Meteo</b> voor de verwachting, en een verzoek om het <b>landelijke radarbeeld van Buienradar</b>, dat voor iedereen identiek is. De buienverwachting voor jouw plek wordt uit dat beeld op je eigen toestel afgelezen. Elke server ziet onvermijdelijk je IP-adres.',
+    footer_by: 'Een <b>Sly Solutions</b>-project · <u>slysolutions.nl</u> ↗ · v' + APP_VERSION, footer_data: 'Data: Open-Meteo (CC BY 4.0, KNMI-model) · Buienradar · CBS/Kadaster · © OpenStreetMap-bijdragers (ODbL) · GeoNames · 4pp · geen cookies, geen trackers · <a href="https://github.com/SlySolutions/sly-weather" rel="noopener" target="_blank">broncode op GitHub</a> · <a href="https://github.com/SlySolutions/sly-weather/issues" rel="noopener" target="_blank">fout of idee melden</a>',
+    kv_coord: 'coördinaat verzonden', kv_round: 'afgerond op {n} decimalen', kv_model: 'model', kv_tz: 'tijdzone', kv_px: 'radar pixel', kv_px_v: 'x={x} y={y} van {w}×{h}, {n} beelden, 3×3 max', kv_na: 'niet beschikbaar', kv_bounds: 'radar hoekpunten', kv_levels: 'radar niveaus (−60…+55 min)', kv_q: 'kwartieren mm (komende 6 u)', kv_cache: 'cache', kv_cache_v: 'localStorage bb_cache, 10 min geldig', kv_places: 'opgeslagen plekken',
+    mv_up: 'Omhoog', mv_down: 'Omlaag', fold: 'In- of uitklappen',
+    min: 'min', hour: 'uur', h: 'u', km_h: 'km/u',
+    days: ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'], daysL: ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'], months: ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'],
+    dirs: ['N', 'NO', 'O', 'ZO', 'Z', 'ZW', 'W', 'NW']
+  },
+  en: {
+    th_auto: 'Follow system', th_light: 'Light', th_dark: 'Dark', th_nerd: 'Nerd', refresh: 'Refresh',
+    newplace: 'New place', delplace: 'Remove this place', sure: 'Sure? ✕',
+    w_eyebrow: 'First time', w_h1: 'Pick your spot on the map. Nothing else needs sharing.',
+    w_p1: 'Zoom in and tap the map. The app rounds your choice to about a kilometre, keeps it only on this device and then fetches the forecast. No account, no cookies. You can also search by place name or postcode; that list is built into the app.',
+    w_p2: 'What leaves your device: one request with a rounded coordinate to Open-Meteo, and one request for the national Buienradar radar image, which is identical for everyone.',
+    now: 'Now', localtime: 'local time', feels: 'Feels like', wind: 'wind', humidity: 'humidity',
+    next1h: 'Next hour', next12h: 'Next 12 hours', drywin: 'Dry window', dry_none: 'none', dry_all: 'all 12 hours',
+    rain_now: 'Raining now', rain_ends: 'About {m} to go, dry around {t}.', rain_long: 'Expected to stay wet for at least 2 more hours.', rain_again: ' Rain again around {t}.',
+    dry_next: 'Dry, next shower in {m}', dry_next_sub: 'Around {t}, {i}{d}{s}.', dur: ', lasting about {m}', src_model: ' (model estimate)', src_radar: ' (radar)',
+    dry_title: 'Dry', dry_sub: 'No precipitation expected in the next 24 hours.',
+    strip_title: 'Showers, next 2 hours', strip_radar: 'radar per 5 min, then model', strip_model: 'model per 15 min (radar off)', nowlbl: 'now',
+    l0: 'dry', l1: 'light', l2: 'moderate', l3: 'heavy', l4: 'very heavy', l_note: 'hatched = model estimate per 15 min',
+    chart_title: 'Hourly, next 48 hours', chart_sub: 'temperature · precipitation · chance', chart_plbl: 'Precipitation mm/h', chart_prob: '· dashed = chance', chance: 'chance',
+    map_title: 'Rain radar', map_sub: 'past hour · next hour', pick_title: 'Pick your spot', pick_sub: 'zoom in and tap', pick_hint: 'Tap the map to pick your spot', pick_ph: 'Name, e.g. Home', save: 'Save', cancel: 'Cancel', rounded: 'rounded', myplace: 'My place',
+    search_ph: 'Search place or postcode (4 digits)', home: 'My place', home_title: 'Zoom to my place',
+    gps: 'GPS', gps_busy: 'Getting position…', gps_ok: 'Position found and rounded. Adjust the pin if you like, then save.',
+    gps_none: 'This browser offers no location. Search by place or postcode below.',
+    gps_insecure: 'GPS does not work here: the browser only allows location when the app runs over https (or as a real app). This file was opened locally. Search by place or postcode below.',
+    gps_denied: 'Location denied. Allow location for this page in the browser settings, or search by place or postcode.',
+    gps_unavail: 'Position unknown: location is off on the device or there is no GPS fix. Search by place or postcode.',
+    gps_timeout: 'No position within 20 s. Try again (faster outdoors) or search by place or postcode.',
+    gps_ff: ' Firefox/Focus: in Android go to Settings → Apps → Firefox Focus → Permissions → Location and set it to "Allow while using" (Focus asks, but has no access itself), then try again.', detail: 'Details', search_none: 'Nothing found', search_pc: 'postcode', search_more: 'type 4 digits', search_inh: 'pop.',
+    play: 'Play', expected: 'expected', radar_src: 'source: Buienradar, national image', map_src: 'map: CBS, OpenStreetMap, GeoNames, 4pp',
+    days_title: 'Coming days', days_sub: 'KNMI model via Open-Meteo', today: 'today', dry: 'dry',
+    nerd_title: 'Nerd mode: what leaves your device', nerd_sub: 'request log · raw values', nolog: 'No requests yet.', n_round: 'Rounding', n_model: 'Model', n_fetch: 'fetch', n_manual: 'Manual', n_saveplace: 'Save as place', n_resetlayout: 'Reset tile order', n_wipe: 'Wipe all local data',
+    st_cache: 'From cache, {t}', st_upd: 'Updated {t}', st_off: 'Offline, data from {t}', st_fail: 'Fetch failed: {e}', st_none: 'Not fetched yet',
+    privacy: '<b>Privacy.</b> This app has no server, account, cookies or analytics. Your place lives only in this browser\'s local storage. Each refresh sends exactly two requests: a rounded coordinate (≈1 km) to <b>Open-Meteo</b> for the forecast, and a request for the <b>national Buienradar radar image</b>, identical for everyone. The shower forecast for your spot is read from that image on your own device. Any server inevitably sees your IP address.',
+    footer_by: 'A <b>Sly Solutions</b> project · <u>slysolutions.nl</u> ↗ · v' + APP_VERSION, footer_data: 'Data: Open-Meteo (CC BY 4.0, KNMI model) · Buienradar · CBS/Kadaster · © OpenStreetMap contributors (ODbL) · GeoNames · 4pp · no cookies, no trackers · <a href="https://github.com/SlySolutions/sly-weather" rel="noopener" target="_blank">source on GitHub</a> · <a href="https://github.com/SlySolutions/sly-weather/issues" rel="noopener" target="_blank">report a bug or idea</a>',
+    kv_coord: 'coordinate sent', kv_round: 'rounded to {n} decimals', kv_model: 'model', kv_tz: 'time zone', kv_px: 'radar pixel', kv_px_v: 'x={x} y={y} of {w}×{h}, {n} frames, 3×3 max', kv_na: 'not available', kv_bounds: 'radar bounds', kv_levels: 'radar levels (−60…+55 min)', kv_q: '15-min mm (next 6 h)', kv_cache: 'cache', kv_cache_v: 'localStorage bb_cache, valid 10 min', kv_places: 'saved places',
+    mv_up: 'Move up', mv_down: 'Move down', fold: 'Collapse or expand',
+    min: 'min', hour: 'hour', h: 'h', km_h: 'km/h',
+    days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], daysL: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    dirs: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
+  }
+};
+const WMO = {
+  0: ['Onbewolkt', 'Clear', '☀️', '🌙'], 1: ['Vrijwel onbewolkt', 'Mostly clear', '🌤️', '🌙'], 2: ['Half bewolkt', 'Partly cloudy', '⛅', '☁️'], 3: ['Bewolkt', 'Overcast', '☁️', '☁️'],
+  45: ['Mist', 'Fog', '🌫️', '🌫️'], 48: ['Aanvriezende mist', 'Freezing fog', '🌫️', '🌫️'],
+  51: ['Lichte motregen', 'Light drizzle', '🌦️', '🌧️'], 53: ['Motregen', 'Drizzle', '🌧️', '🌧️'], 55: ['Dichte motregen', 'Dense drizzle', '🌧️', '🌧️'],
+  56: ['IJzel (licht)', 'Light freezing drizzle', '🌧️', '🌧️'], 57: ['IJzel', 'Freezing drizzle', '🌧️', '🌧️'],
+  61: ['Lichte regen', 'Light rain', '🌧️', '🌧️'], 63: ['Regen', 'Rain', '🌧️', '🌧️'], 65: ['Zware regen', 'Heavy rain', '🌧️', '🌧️'],
+  66: ['IJsregen (licht)', 'Light freezing rain', '🌧️', '🌧️'], 67: ['IJsregen', 'Freezing rain', '🌧️', '🌧️'],
+  71: ['Lichte sneeuw', 'Light snow', '🌨️', '🌨️'], 73: ['Sneeuw', 'Snow', '🌨️', '🌨️'], 75: ['Zware sneeuw', 'Heavy snow', '❄️', '❄️'], 77: ['Korrelsneeuw', 'Snow grains', '🌨️', '🌨️'],
+  80: ['Lichte buien', 'Light showers', '🌦️', '🌧️'], 81: ['Buien', 'Showers', '🌧️', '🌧️'], 82: ['Zware buien', 'Heavy showers', '⛈️', '⛈️'],
+  85: ['Sneeuwbuien', 'Snow showers', '🌨️', '🌨️'], 86: ['Zware sneeuwbuien', 'Heavy snow showers', '❄️', '❄️'],
+  95: ['Onweer', 'Thunderstorm', '⛈️', '⛈️'], 96: ['Onweer met hagel', 'Thunderstorm with hail', '⛈️', '⛈️'], 99: ['Zwaar onweer met hagel', 'Severe thunderstorm with hail', '⛈️', '⛈️']
+};
+
+/* ============ Hulpjes ============ */
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, '0');
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+let lang = LS.get('bb_lang', (navigator.language || 'nl').toLowerCase().startsWith('nl') ? 'nl' : 'en');
+const t = (k, vars) => { let s = I18N[lang][k] ?? I18N.nl[k] ?? k; if (vars) for (const [a, b] of Object.entries(vars)) s = s.replace('{' + a + '}', b); return s; };
+const fmt1 = n => (Math.round(n * 10) / 10).toLocaleString(lang === 'nl' ? 'nl-NL' : 'en-GB', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+/* Open-Meteo geeft lokale tijden zonder zone; we rekenen in "pseudo-UTC" ms zodat getUTC* de lokale klok geeft. */
+let tzOffset = 3600;
+const parseLocal = s => { const m = s.match(/(\d+)-(\d+)-(\d+)T(\d+):(\d+)/); return Date.UTC(+m[1], m[2] - 1, +m[3], +m[4], +m[5]); };
+const nowLocal = () => Date.now() + tzOffset * 1000;
+const clock = ms => { const d = new Date(ms); return pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()); };
+const minsText = m => m < 60 ? `${m} ${t('min')}` : (m % 60 === 0 ? `${m / 60} ${t('hour')}` : `${Math.floor(m / 60)} ${t('h')} ${m % 60} ${t('min')}`);
+const wmo = (c, day = 1) => { const w = WMO[c] || ['Onbekend', 'Unknown', '•', '•']; return {txt: lang === 'nl' ? w[0] : w[1], ico: day ? w[2] : w[3]}; };
+const windDir = d => t('dirs')[Math.round(d / 45) % 8];
+const bft = k => { const th = [1, 5, 11, 19, 28, 38, 49, 61, 74, 88, 102, 117]; let b = 0; while (b < 12 && k >= th[b]) b++; return b; };
+
+function applyLang(l) {
+  lang = l; LS.set('bb_lang', l); document.documentElement.lang = l;
+  document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === l)));
+  document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.dataset.i18n));
+  document.querySelectorAll('[data-i18n-html]').forEach(el => el.innerHTML = t(el.dataset.i18nHtml));
+  document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); el.setAttribute('aria-label', t(el.dataset.i18nTitle)); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => el.placeholder = t(el.dataset.i18nPh));
+  $('privacy').innerHTML = t('privacy'); $('nowline').dataset.now = t('nowlbl');
+  $('pickhint').textContent = t('pick_hint'); if (!log.length) $('log').textContent = t('nolog');
+  $('maptitle').textContent = picking ? t('pick_title') : t('map_title'); $('mapsub').textContent = picking ? t('pick_sub') : t('map_sub');
+  if (!currentPlace()) setStatus(t('st_none'));
+  if (meteo && currentPlace()) render(lastLat, lastLon); else if (map) drawLabels();
+}
+document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => applyLang(b.dataset.lang)));
+
+/* ============ Thema ============ */
+const root = document.documentElement;
+const themeBtns = [...document.querySelectorAll('[data-theme-set]')];
+function applyTheme(th) {
+  if (th === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', th);
+  themeBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.themeSet === th)));
+  LS.set('bb_theme', th);
+  document.querySelector('meta[name=theme-color]').setAttribute('content', getComputedStyle(root).getPropertyValue('--bg').trim());
+  setTimeout(() => { startRain(); if (map) restyleMap(); }, 0);
+}
+themeBtns.forEach(b => b.addEventListener('click', () => applyTheme(b.dataset.themeSet)));
+applyTheme(LS.get('bb_theme', 'auto'));
+
+/* Nerd mode: matrix rain, zoals op slysolutions.nl */
+let rainRaf = null;
+function startRain() {
+  const cv = $('rain'); if (!cv.getContext) return;
+  if (root.getAttribute('data-theme') !== 'nerd' || rainRaf) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cx = cv.getContext('2d'); let cols = [], fs = 16, last = 0;
+  const chars = '01アイウエオカキクケコ$%&#@<>/\\=+-*mm°C'.split('');
+  const size = () => { cv.width = innerWidth; cv.height = innerHeight; cols = []; for (let i = 0; i < Math.floor(cv.width / fs); i++) cols.push(Math.random() * -60); };
+  size(); addEventListener('resize', () => { if (rainRaf) size(); });
+  const frame = ts => {
+    if (root.getAttribute('data-theme') !== 'nerd') { rainRaf = null; cx.clearRect(0, 0, cv.width, cv.height); return; }
+    if (ts - last > 60) {
+      last = ts; cx.fillStyle = 'rgba(10,14,12,0.18)'; cx.fillRect(0, 0, cv.width, cv.height); cx.font = fs + 'px monospace';
+      for (let i = 0; i < cols.length; i++) {
+        cx.fillStyle = Math.random() < 0.06 ? '#F68712' : '#5BF07A';
+        cx.fillText(chars[(Math.random() * chars.length) | 0], i * fs, cols[i] * fs);
+        if (cols[i] * fs > cv.height && Math.random() > 0.975) cols[i] = 0;
+        cols[i] += 0.35 + Math.random() * 0.5;
+      }
+    }
+    rainRaf = requestAnimationFrame(frame);
+  };
+  rainRaf = requestAnimationFrame(frame);
+}
+
+/* ============ Tegels: volgorde en inklappen ============ */
+const DEFAULT_ORDER = ['now', 'strip', 'chart', 'map', 'days'];
+let order = LS.get('bb_order', DEFAULT_ORDER).filter(k => DEFAULT_ORDER.includes(k));
+DEFAULT_ORDER.forEach(k => { if (!order.includes(k)) order.push(k); });
+let folded = LS.get('bb_folded', {});
+const cardEl = k => document.querySelector(`.card[data-card="${k}"]`);
+function layoutCards() {
+  const host = $('cards');
+  order.forEach(k => host.appendChild(cardEl(k)));
+  order.forEach((k, i) => {
+    const el = cardEl(k); el.classList.toggle('folded', !!folded[k]);
+    const c = el.querySelector('.cardctl'); c.querySelector('[data-mv="-1"]').disabled = i === 0; c.querySelector('[data-mv="1"]').disabled = i === order.length - 1;
+    c.querySelector('.fold').setAttribute('aria-expanded', String(!folded[k]));
+  });
+  LS.set('bb_order', order); LS.set('bb_folded', folded);
+  if (map) setTimeout(() => map.invalidateSize(), 50);
+}
+DEFAULT_ORDER.forEach(k => {
+  const el = cardEl(k); const ctl = document.createElement('span'); ctl.className = 'cardctl';
+  ctl.innerHTML = `<button type="button" data-mv="-1" data-i18n-title="mv_up">▲</button><button type="button" data-mv="1" data-i18n-title="mv_down">▼</button><button type="button" class="fold" data-i18n-title="fold"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>`;
+  el.querySelector('.head').appendChild(ctl);
+  ctl.querySelectorAll('[data-mv]').forEach(b => b.addEventListener('click', () => { const i = order.indexOf(k), j = i + (+b.dataset.mv); if (j < 0 || j >= order.length) return; [order[i], order[j]] = [order[j], order[i]]; layoutCards(); el.scrollIntoView({behavior: 'smooth', block: 'nearest'}); }));
+  ctl.querySelector('.fold').addEventListener('click', () => { folded[k] = !folded[k]; layoutCards(); });
+  el.querySelector('.head h2').addEventListener('click', () => { folded[k] = !folded[k]; layoutCards(); });
+  el.querySelector('.head h2').style.cursor = 'pointer';
+});
+$('resetlayout').addEventListener('click', () => { order = [...DEFAULT_ORDER]; folded = {}; layoutCards(); });
+
+/* ============ Plekken ============ */
+let places = LS.get('bb_places', []);
+let cur = LS.get('bb_cur', 0);
+const roundDigits = () => +LS.get('bb_round', 2);
+$('rounding').value = String(roundDigits());
+$('model').value = LS.get('bb_model', 'knmi_seamless');
+$('radaron').checked = LS.get('bb_radar', true);
+$('rounding').addEventListener('change', e => { LS.set('bb_round', +e.target.value); refreshAll(true); });
+$('model').addEventListener('change', e => { LS.set('bb_model', e.target.value); refreshAll(true); });
+$('radaron').addEventListener('change', e => { LS.set('bb_radar', e.target.checked); refreshAll(true); });
+$('wipe').addEventListener('click', () => { ['bb_places', 'bb_cur', 'bb_cache', 'bb_theme', 'bb_round', 'bb_model', 'bb_radar', 'bb_lang', 'bb_order', 'bb_folded', 'bb_detail'].forEach(LS.del); location.reload(); });
+$('msave').addEventListener('click', () => { const la = +$('mlat').value, lo = +$('mlon').value; if (!la || !lo) return; savePlace(la.toFixed(2) + ', ' + lo.toFixed(2), la, lo); });
+
+function currentPlace() { return places[cur] || null; }
+function renderPlaces() {
+  const p = currentPlace();
+  $('locbar').hidden = !p; $('welcome').hidden = !!p;
+  if (!p) return;
+  $('placename').textContent = p.name;
+  const sel = $('placesel'); sel.innerHTML = '';
+  places.forEach((q, i) => { const o = document.createElement('option'); o.value = i; o.textContent = q.name; o.selected = i === cur; sel.appendChild(o); });
+  sel.hidden = places.length < 2;
+}
+$('placesel').addEventListener('change', e => { cur = +e.target.value; LS.set('bb_cur', cur); renderPlaces(); refreshAll(); });
+let delArmed = null;
+$('delbtn').addEventListener('click', () => {
+  const b = $('delbtn');
+  if (!delArmed) { delArmed = setTimeout(() => { delArmed = null; b.textContent = '✕'; }, 3000); b.textContent = t('sure'); return; }
+  clearTimeout(delArmed); delArmed = null; b.textContent = '✕';
+  places.splice(cur, 1); cur = 0; LS.set('bb_places', places); LS.set('bb_cur', cur); LS.del('bb_cache'); renderPlaces();
+  if (places.length) refreshAll(); else { showEmpty(); if (pin) { pin.remove(); pin = null; } startPick(); }
+});
+function savePlace(name, lat, lon) {
+  places.push({name, lat: +lat.toFixed(4), lon: +lon.toFixed(4)}); cur = places.length - 1;
+  LS.set('bb_places', places); LS.set('bb_cur', cur); renderPlaces(); stopPick(); refreshAll(true);
+}
+function showEmpty() { DEFAULT_ORDER.filter(k => k !== 'map').forEach(k => cardEl(k).hidden = true); }
+
+/* ============ Kaart (ingebakken, geen tegels) ============ */
+let map, radarLayer, pin, pickPin, labelLayer, gmLayer, provLayer, lineLayer, placeLayer, vlLayer, picking = false, pickLatLng = null;
+let detail = LS.get('bb_detail', true) !== false, primShown = false;
+/* Radarpixels zijn ±1,5 km groot; ver ingezoomd wordt het beeld daarom doorzichtiger */
+const radarOpacity = () => map.getZoom() >= 11.5 ? .45 : map.getZoom() >= 10 ? .65 : .9;
+const wantPrim = () => !detail || !map ? 0 : map.getZoom() >= 11.5 ? 2 : map.getZoom() >= 10.5 ? 1 : 0;
+const NL_BOUNDS = L.latLngBounds([50.6, 3.1], [53.7, 7.4]);
+function initMap() {
+  map = L.map('map', {preferCanvas: true, zoomControl: true, attributionControl: false, minZoom: 6, maxZoom: 13, maxBounds: L.latLngBounds([49.3, -0.2], [55.0, 10.2]), maxBoundsViscosity: .8, zoomSnap: .5});
+  map.fitBounds(NL_BOUNDS, {padding: [6, 6]});
+  map.createPane('radar'); map.getPane('radar').classList.add('leaflet-radar-pane');
+  gmLayer = L.layerGroup().addTo(map); vlLayer = L.layerGroup().addTo(map); lineLayer = L.layerGroup().addTo(map); provLayer = L.layerGroup().addTo(map); placeLayer = L.layerGroup().addTo(map); labelLayer = L.layerGroup().addTo(map);
+  restyleMap();
+  map.on('zoomend', () => { if (wantPrim() !== primShown) restyleMap(); else drawLabels(); if (radarLayer && !picking) radarLayer.setOpacity(radarOpacity()); }); map.on('moveend', drawPlaces); drawLabels();
+  map.on('click', e => { if (picking) setPick(e.latlng); });
+  $('detailbtn').addEventListener('click', () => { detail = !detail; LS.set('bb_detail', detail); $('detailbtn').setAttribute('aria-pressed', String(detail)); restyleMap(); });
+  $('detailbtn').setAttribute('aria-pressed', String(detail));
+}
+function cssVar(n) { return getComputedStyle(root).getPropertyValue(n).trim(); }
+function restyleMap() {
+  gmLayer.clearLayers(); vlLayer.clearLayers(); provLayer.clearLayers(); lineLayer.clearLayers();
+  const land = cssVar('--map-land'), line = cssVar('--map-line'), prov = cssVar('--map-prov'), water = cssVar('--map-water'), road = cssVar('--map-road');
+  const ll = r => r.map(c => [c[1], c[0]]);
+  GEMEENTEN.forEach(g => g.r.forEach(r => L.polygon(ll(r), {color: line, weight: 1, fillColor: land, fillOpacity: 1, interactive: false}).addTo(gmLayer)));
+  const hw = cssVar('--map-hw');
+  /* OpenStreetMap-lijnen: rivieren, autowegen (N, alleen met details) en snelwegen (A) met rand */
+  LIJNEN.rivers.forEach(r => r.l.forEach(c => L.polyline(ll(c), {color: water, weight: r.k === 1 ? 2.4 : 1.3, opacity: .95, interactive: false}).addTo(lineLayer)));
+  primShown = wantPrim();
+  if (primShown >= 2) LIJNEN.roads.forEach(r => { if (r.k === 4) r.l.forEach(c => L.polyline(ll(c), {color: road, weight: .9, opacity: .6, interactive: false}).addTo(lineLayer)); });
+  if (primShown >= 1) LIJNEN.roads.forEach(r => { if (r.k === 3) r.l.forEach(c => L.polyline(ll(c), {color: road, weight: 1.1, opacity: .85, interactive: false}).addTo(lineLayer)); });
+  if (detail) LIJNEN.roads.forEach(r => { if (r.k === 2) r.l.forEach(c => L.polyline(ll(c), {color: road, weight: 1.5, opacity: .95, interactive: false}).addTo(lineLayer)); });
+  LIJNEN.roads.forEach(r => { if (r.k === 1) r.l.forEach(c => L.polyline(ll(c), {color: land, weight: 4.2, opacity: 1, interactive: false}).addTo(lineLayer)); });
+  LIJNEN.roads.forEach(r => { if (r.k === 1) r.l.forEach(c => L.polyline(ll(c), {color: hw, weight: 2.4, opacity: 1, interactive: false}).addTo(lineLayer)); });
+  PROVINCIES.forEach(p => p.r.forEach(r => L.polyline(ll(r), {color: prov, weight: 1.4, opacity: .8, interactive: false}).addTo(provLayer)));
+  drawLabels();
+}
+function drawLabels() {
+  labelLayer.clearLayers();
+  const z = map.getZoom();
+  if (z >= 7 && z < 9) PROVINCIES.forEach(p => { const big = p.r.reduce((a, b) => b.length > a.length ? b : a); const cx = big.reduce((s, c) => s + c[0], 0) / big.length, cy = big.reduce((s, c) => s + c[1], 0) / big.length; L.marker([cy, cx], {icon: L.divIcon({className: 'provlabel', html: '<span>' + p.n + '</span>', iconSize: null, iconAnchor: [0, 0]}), interactive: false}).addTo(labelLayer); });
+  drawPlaces();
+}
+function drawPlaces() {
+  placeLayer.clearLayers();
+  const z = map.getZoom(); if (z < 7.5) return;
+  const b = map.getBounds().pad(.1), boxes = [], drawn = new Set(), ch = z >= 11 ? 6.8 : 6.2;
+  const free = (x, y, w, h) => { for (const q of boxes) if (x < q[0] + q[2] && x + w > q[0] && y < q[1] + q[3] && y + h > q[1]) return false; boxes.push([x, y, w, h]); return true; };
+  const put = (lat, lon, cls, html, anchor) => L.marker([lat, lon], {icon: L.divIcon({className: cls, html, iconSize: null, iconAnchor: anchor}), interactive: false}).addTo(placeLayer);
+  /* snelwegnummers eerst: die krijgen voorrang */
+  if (z >= 8.5) { const seen = new Set(); LIJNEN.roads.forEach(r => { if (r.k !== 1 || !r.n) return; r.l.forEach(cc => { const cands = z >= 10 ? cc.filter((_, i) => i % 3 === 1) : cc.length > 6 ? [cc[Math.floor(cc.length / 2)]] : []; cands.forEach(c => { if (!b.contains([c[1], c[0]])) return; const g = z >= 11 ? 30 : z >= 10 ? 12 : 3; const key = r.n + ':' + Math.round(c[0] * g) + ':' + Math.round(c[1] * g); if (seen.has(key)) return; seen.add(key); const pt = map.latLngToLayerPoint([c[1], c[0]]); const w = r.n.length * 7 + 10; if (free(pt.x - w / 2 - 3, pt.y - 10, w + 6, 20)) put(c[1], c[0], 'rdlbl', '<b>' + r.n + '</b>', [0, 0]); }); }); }); }
+  /* plaatsnamen op grootte; wijken alleen ver ingezoomd en met details aan */
+  const minPop = !detail ? (z >= 10.5 ? 5000 : z >= 9.5 ? 20000 : z >= 8.5 ? 60000 : 150000) : z >= 11.5 ? -1 : z >= 10.5 ? 400 : z >= 10 ? 2500 : z >= 9 ? 15000 : z >= 8 ? 60000 : 150000;
+  for (const p of PLAATSEN) {
+    if (p[3] < minPop || !b.contains([p[1], p[2]])) continue;
+    if (p[4] && (!detail || z < 11)) continue;
+    const big = !p[4] && p[3] >= 100000, mid = !p[4] && !big && p[3] >= 20000;
+    const pt = map.latLngToLayerPoint([p[1], p[2]]); const w = p[0].length * ch * (big ? 1.15 : p[4] ? .9 : 1) + 16, h = 15;
+    if (!free(pt.x - 4, pt.y - 8, w, h)) continue;
+    drawn.add(p[0].toLowerCase());
+    put(p[1], p[2], 'pl' + (big ? ' big' : mid ? ' mid' : '') + (p[4] ? ' wijk' : ''), p[0], [-8, 7]);
+  }
+  /* gemeentenamen als laatste, alleen waar nog ruimte is */
+  if (detail && z >= 10.5) GEMEENTEN.forEach(g => { if (drawn.has(g.n.toLowerCase()) || !b.contains([g.c[1], g.c[0]])) return; const pt = map.latLngToLayerPoint([g.c[1], g.c[0]]); const w = g.n.length * 6.2 + 8; if (free(pt.x - w / 2, pt.y - 7, w, 14)) put(g.c[1], g.c[0], 'gmlabel', '<span>' + g.n + '</span>', [0, 0]); });
+}
+function nearestPlace(lat, lon, type, maxKm) {
+  let best = null, bd = 1e9;
+  PLAATSEN.forEach(p => { if (type != null && p[4] !== type) return; const d = Math.hypot((p[1] - lat) * 111, (p[2] - lon) * 68); if (d < bd) { bd = d; best = p; } });
+  return bd < (maxKm || 4) ? best[0] : null;
+}
+function placePin() {
+  const p = currentPlace(); $('homebtn').hidden = !p || picking; if (!p) return;
+  if (pin) pin.remove();
+  pin = L.marker([p.lat, p.lon], {icon: L.divIcon({className: '', html: '<div class="pin"></div>', iconSize: [0, 0]}), interactive: false, zIndexOffset: 1000}).addTo(map);
+}
+function startPick() {
+  picking = true; pickLatLng = null; $('pickhint').hidden = false; $('pickbar').hidden = false; $('mapctl').hidden = true; $('maptime').hidden = true; $('gpsbtn').hidden = false; $('homebtn').hidden = true;
+  $('picksave').disabled = true; $('pickcoord').textContent = ''; $('pickname').value = ''; $('pickmsg').textContent = '';
+  $('maptitle').textContent = t('pick_title'); $('mapsub').textContent = t('pick_sub');
+  if (radarLayer) radarLayer.setOpacity(.3);
+  $('picksearch').value = ''; $('sugg').hidden = true;
+  folded.map = false; layoutCards();
+  const p = currentPlace(); if (p) map.setView([p.lat, p.lon], Math.max(map.getZoom(), 10)); else map.fitBounds(NL_BOUNDS, {padding: [6, 6]});
+  if (p) $('mapcard').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+function setPick(ll) {
+  const d = roundDigits(), f = Math.pow(10, d);
+  pickLatLng = L.latLng(Math.round(ll.lat * f) / f, Math.round(ll.lng * f) / f);
+  if (pickPin) pickPin.remove();
+  pickPin = L.marker(pickLatLng, {icon: L.divIcon({className: '', html: '<div class="pin pick"></div><div class="pickring"></div>', iconSize: [0, 0]}), interactive: false, zIndexOffset: 1100}).addTo(map);
+  $('picksave').disabled = false; $('pickhint').hidden = true;
+  $('pickcoord').textContent = pickLatLng.lat.toFixed(d) + ', ' + pickLatLng.lng.toFixed(d) + ' (' + t('rounded') + ')';
+  if (!$('pickname').value) { const n = nearestPlace(pickLatLng.lat, pickLatLng.lng, 0, 4) || nearestPlace(pickLatLng.lat, pickLatLng.lng) || (GEMEENTEN.find(g => g.r.some(r => pointInRing(pickLatLng.lng, pickLatLng.lat, r))) || {}).n; if (n) $('pickname').value = n; }
+}
+function pointInRing(x, y, r) { let inside = false; for (let i = 0, j = r.length - 1; i < r.length; j = i++) { const xi = r[i][0], yi = r[i][1], xj = r[j][0], yj = r[j][1]; if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) inside = !inside; } return inside; }
+function stopPick() {
+  picking = false; $('pickhint').hidden = true; $('pickbar').hidden = true; if (pickPin) { pickPin.remove(); pickPin = null; }
+  $('gpsbtn').hidden = true; $('homebtn').hidden = !currentPlace();
+  $('maptitle').textContent = t('map_title'); $('mapsub').textContent = t('map_sub');
+  if (radarLayer) { radarLayer.setOpacity(radarOpacity()); $('mapctl').hidden = false; $('maptime').hidden = false; }
+}
+$('pickbtn').addEventListener('click', startPick);
+$('pickcancel').addEventListener('click', () => { if (currentPlace()) stopPick(); else $('pickhint').hidden = false; });
+$('picksave').addEventListener('click', () => { if (!pickLatLng) return; savePlace(($('pickname').value || t('myplace')).trim(), pickLatLng.lat, pickLatLng.lng); });
+$('pickname').addEventListener('keydown', e => { if (e.key === 'Enter') $('picksave').click(); });
+/* Naar eigen plek zoomen */
+$('homebtn').addEventListener('click', () => { const p = currentPlace(); if (p) map.setView([p.lat, p.lon], Math.max(map.getZoom(), 11)); });
+function pickMsg(txt, ok) { const el = $('pickmsg'); el.textContent = txt; el.classList.toggle('ok', !!ok); if (txt) setTimeout(() => el.scrollIntoView({behavior: 'smooth', block: 'nearest'}), 50); }
+/* GPS: alleen op verzoek, blijft op het toestel; bij falen staat erbij waarom */
+$('gpsbtn').addEventListener('click', () => {
+  if (!navigator.geolocation) { pickMsg(t('gps_none')); addLog('gps', 'navigator.geolocation ontbreekt', null, null, location.protocol); return; }
+  if (!window.isSecureContext) { pickMsg(t('gps_insecure') + ` [${location.protocol}]`); addLog('gps', 'geblokkeerd: geen secure context', null, null, location.protocol); return; }
+  pickMsg(t('gps_busy')); const t0 = performance.now();
+  navigator.geolocation.getCurrentPosition(pos => {
+    const ll = L.latLng(pos.coords.latitude, pos.coords.longitude);
+    map.setView(ll, Math.max(map.getZoom(), 12)); setPick(ll); pickMsg(t('gps_ok'), true);
+    addLog('gps', 'positie van het toestel, niet verzonden (±' + Math.round(pos.coords.accuracy) + ' m)', null, Math.round(performance.now() - t0), '');
+  }, err => {
+    const k = err.code === 1 ? 'gps_denied' : err.code === 3 ? 'gps_timeout' : 'gps_unavail';
+    const ff = /Firefox|Focus|FxiOS/i.test(navigator.userAgent) ? t('gps_ff') : '';
+    pickMsg(t(k) + ff + ` [${location.protocol} · code ${err.code} · ${err.message || ''}]`);
+    addLog('gps', 'mislukt: ' + err.message, null, Math.round(performance.now() - t0), 'code ' + err.code);
+  }, {enableHighAccuracy: true, timeout: 20000, maximumAge: 300000});
+});
+/* Zoeken op plaats of postcode: de lijst zit in het bestand, er gaat niets de deur uit */
+function searchPlaces(q) {
+  q = q.trim().toLowerCase(); if (!q) return [];
+  if (/^\d{4}$/.test(q)) { const p = PC4[q]; if (!p) return []; const town = p[2] >= 0 ? PLAATSEN[p[2]][0] : (nearestPlace(p[0], p[1], 0, 8) || ''); const wijk = nearestPlace(p[0], p[1], 1, 1.5); return [{n: `${town} · ${t('search_pc')} ${q}`, pc: true, town, lat: p[0], lon: p[1], sub: wijk || ''}]; }
+  if (/^\d+$/.test(q)) return [{more: true}];
+  const norm = s => s.toLowerCase().replace(/^(de |het |'t |den |'s-)/, '');
+  const starts = [], within = [];
+  for (const p of PLAATSEN) { const n = p[0].toLowerCase(); if (n.startsWith(q) || norm(n).startsWith(q)) starts.push(p); else if (n.includes(q)) within.push(p); if (starts.length >= 8) break; }
+  return starts.concat(within).slice(0, 8).map(p => ({n: p[0], lat: p[1], lon: p[2], sub: p[3] > 0 ? p[3].toLocaleString(lang === 'nl' ? 'nl-NL' : 'en-GB') + ' ' + t('search_inh') : ''}));
+}
+let suggHits = [];
+function showSugg() {
+  const box = $('sugg'); suggHits = searchPlaces($('picksearch').value);
+  if (!$('picksearch').value.trim()) { box.hidden = true; return; }
+  if (suggHits.length && suggHits[0].more) { box.innerHTML = `<div class="none">${t('search_more')}</div>`; box.hidden = false; return; }
+  box.innerHTML = suggHits.length ? suggHits.map((h, i) => `<button type="button" data-i="${i}"${i === 0 ? ' class="sel"' : ''}><span>${h.n}</span><small>${h.sub}</small></button>`).join('') : `<div class="none">${t('search_none')}</div>`;
+  box.hidden = false;
+}
+function pickSugg(i) {
+  const h = suggHits[i]; if (!h || h.more) return;
+  $('sugg').hidden = true; $('picksearch').value = h.n; $('picksearch').blur();
+  const ll = L.latLng(h.lat, h.lon); map.setView(ll, Math.max(map.getZoom(), 12));
+  $('pickname').value = ''; setPick(ll); $('pickname').value = h.pc ? (h.town || h.n) : h.n;
+  $('pickmsg').textContent = '';
+}
+$('picksearch').addEventListener('input', showSugg);
+$('picksearch').addEventListener('focus', showSugg);
+$('picksearch').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); pickSugg(0); } if (e.key === 'Escape') $('sugg').hidden = true; });
+$('sugg').addEventListener('click', e => { const b = e.target.closest('button'); if (b) pickSugg(+b.dataset.i); });
+document.addEventListener('pointerdown', e => { if (!e.target.closest('.suggwrap')) $('sugg').hidden = true; });
+
+/* ============ Verzoeklog (nerd) ============ */
+const log = [];
+function addLog(kind, url, bytes, ms, note) {
+  log.unshift({t: new Date(), kind, url, bytes, ms, note});
+  if (log.length > 12) log.pop();
+  $('log').innerHTML = log.map(l => `<b>${pad(l.t.getHours())}:${pad(l.t.getMinutes())}:${pad(l.t.getSeconds())} ${l.kind}</b> ${l.bytes != null ? (l.bytes / 1024).toFixed(1) + ' KB' : ''} ${l.ms != null ? l.ms + ' ms' : ''} ${l.note || ''}\n${l.url}`).join('\n\n');
+}
+function setKV(obj) { $('kv').innerHTML = Object.entries(obj).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join(''); }
+
+/* ============ Ophalen ============ */
+let meteo = null, radar = null, busy = false, lastLat = 0, lastLon = 0;
+const mercY = lat => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
+function setStatus(txt, err) { $('statustext').textContent = txt; $('status').classList.toggle('err', !!err); }
+let statusKey = null;
+
+async function refreshAll(force) {
+  const p = currentPlace(); if (!p || busy) return;
+  busy = true; $('refresh').classList.add('spin');
+  const d = roundDigits(), lat = +p.lat.toFixed(d), lon = +p.lon.toFixed(d);
+  lastLat = lat; lastLon = lon; placePin();
+  try {
+    const cache = LS.get('bb_cache', null);
+    const key = `${lat},${lon},${$('model').value},v3`;
+    if (!force && cache && cache.key === key && Date.now() - cache.ts < 10 * 60 * 1000) {
+      meteo = cache.data; tzOffset = meteo.utc_offset_seconds || 0; setStatus(t('st_cache', {t: clock(cache.ts + tzOffset * 1000)}));
+    } else {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,precipitation,is_day,relative_humidity_2m&minutely_15=precipitation&hourly=temperature_2m,apparent_temperature,precipitation,precipitation_probability,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,sunrise,sunset,wind_speed_10m_max&timezone=auto&forecast_days=7&forecast_minutely_15=96&models=${$('model').value}`;
+      const t0 = performance.now(); const r = await fetch(url, {cache: 'no-store'}); const txt = await r.text();
+      addLog('open-meteo', url, txt.length, Math.round(performance.now() - t0));
+      if (!r.ok) throw new Error('Open-Meteo ' + r.status);
+      meteo = JSON.parse(txt); if (meteo.error) throw new Error(meteo.reason);
+      tzOffset = meteo.utc_offset_seconds || 0;
+      LS.set('bb_cache', {key, ts: Date.now(), data: meteo});
+      setStatus(t('st_upd', {t: clock(Date.now() + tzOffset * 1000)}));
+    }
+  } catch (e) {
+    const cache = LS.get('bb_cache', null);
+    if (cache && cache.data) { meteo = cache.data; tzOffset = meteo.utc_offset_seconds || 0; setStatus(t('st_off', {t: clock(cache.ts + tzOffset * 1000)}), true); }
+    else { setStatus(t('st_fail', {e: e.message}), true); busy = false; $('refresh').classList.remove('spin'); return; }
+  }
+  radar = null;
+  if ($('radaron').checked) { try { radar = await loadRadar(); } catch (e) { addLog('buienradar', RADAR_URL, null, null, 'failed: ' + e.message); } }
+  render(lat, lon);
+  busy = false; $('refresh').classList.remove('spin');
+}
+$('refresh').addEventListener('click', () => refreshAll(true));
+
+function loadRadar() {
+  return new Promise((resolve, reject) => {
+    const img = new Image(); img.crossOrigin = 'anonymous'; const t0 = performance.now();
+    img.onload = () => {
+      const n = Math.round(img.naturalWidth / RADAR_W);
+      const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+      const cx = c.getContext('2d', {willReadFrequently: true}); cx.drawImage(img, 0, 0);
+      let data = null; try { data = cx.getImageData(0, 0, c.width, c.height).data; } catch (e) {}
+      const base = Math.floor(Date.now() / 300000) * 300000;
+      addLog('buienradar', RADAR_URL, null, Math.round(performance.now() - t0), n + ' frames');
+      resolve({img, n, data, base, w: c.width});
+    };
+    img.onerror = () => reject(new Error('image not loaded'));
+    img.src = RADAR_URL + '&_=' + Math.floor(Date.now() / 300000);
+  });
+}
+/* Kleur -> intensiteit (0 droog, 1 licht, 2 matig, 3 zwaar, 4 zeer zwaar), geschat uit de Buienradar-kleuren */
+function levelOf(r, g, b, a) {
+  if (a < 40) return 0;
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 510;
+  if (!(b >= r && b >= g)) return 4;
+  if (l > .72) return 1; if (l > .5) return 2; return 3;
+}
+function sampleRadar(lat, lon) {
+  if (!radar || !radar.data) return null;
+  const x = Math.round((lon - RADAR.west) / (RADAR.east - RADAR.west) * RADAR_W);
+  const y = Math.round((mercY(RADAR.north) - mercY(lat)) / (mercY(RADAR.north) - mercY(RADAR.south)) * RADAR_H);
+  if (x < 1 || y < 1 || x >= RADAR_W - 1 || y >= RADAR_H - 1) return null;
+  const out = [];
+  for (let f = 0; f < radar.n; f++) {
+    let lv = 0;
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      const i = ((y + dy) * radar.w + f * RADAR_W + x + dx) * 4; const d = radar.data;
+      lv = Math.max(lv, levelOf(d[i], d[i + 1], d[i + 2], d[i + 3]));
+    }
+    out.push({t: radar.base + (f - HIST) * 300000 + tzOffset * 1000, l: lv, src: 'radar'});
+  }
+  return {x, y, series: out};
+}
+let frames = [], frameIdx = HIST, playing = null;
+function buildRadarLayer() {
+  if (radarLayer) { radarLayer.remove(); radarLayer = null; }
+  frames = [];
+  if (!radar) { $('mapctl').hidden = true; $('maptime').hidden = true; return; }
+  const c = document.createElement('canvas'); c.width = RADAR_W; c.height = RADAR_H; const cx = c.getContext('2d');
+  for (let f = 0; f < radar.n; f++) { cx.clearRect(0, 0, RADAR_W, RADAR_H); cx.drawImage(radar.img, -f * RADAR_W, 0); frames.push(c.toDataURL('image/png')); }
+  radarLayer = L.imageOverlay(frames[HIST], [[RADAR.south, RADAR.west], [RADAR.north, RADAR.east]], {opacity: picking ? .3 : radarOpacity(), interactive: false, pane: 'radar'}).addTo(map);
+  $('frame').max = radar.n - 1; $('frame').value = HIST; frameIdx = HIST; showFrame(HIST);
+  if (!picking) { $('mapctl').hidden = false; $('maptime').hidden = false; }
+}
+function showFrame(i) {
+  frameIdx = i; if (!radarLayer) return; radarLayer.setUrl(frames[i]);
+  const rel = (i - HIST) * 5, ts = radar.base + (i - HIST) * 300000 + tzOffset * 1000;
+  $('mtlabel').textContent = rel === 0 ? t('nowlbl') : (rel > 0 ? '+' + rel + ' min' : rel + ' min');
+  $('mtlabel').className = rel > 0 ? 'fut' : ''; $('mtclock').textContent = clock(ts) + (rel > 0 ? ' ' + t('expected') : '');
+}
+$('frame').addEventListener('input', e => { stopPlay(); showFrame(+e.target.value); });
+function stopPlay() { if (playing) { clearInterval(playing); playing = null; $('play').textContent = '▶'; } }
+$('play').addEventListener('click', () => {
+  if (playing) { stopPlay(); return; }
+  $('play').textContent = '⏸';
+  playing = setInterval(() => { let i = frameIdx + 1; if (i >= frames.length) i = 0; $('frame').value = i; showFrame(i); }, 550);
+});
+
+/* ============ Analyse ============ */
+function buildSeries(lat, lon) {
+  const now = nowLocal(); const s = [];
+  const rs = sampleRadar(lat, lon);
+  if (rs) s.push(...rs.series);
+  const m = meteo.minutely_15; const lastRadar = s.length ? s[s.length - 1].t : -Infinity;
+  for (let i = 0; i < m.time.length; i++) {
+    const ts = parseLocal(m.time[i]); const mm = m.precipitation[i];
+    if (ts + 15 * 60000 <= now - 60 * 60000) continue;
+    const lv = mm <= 0 ? 0 : mm < 0.25 ? 1 : mm < 0.75 ? 2 : mm < 2 ? 3 : 4;
+    for (let k = 0; k < 3; k++) { const tt = ts + k * 300000; if (tt > lastRadar) s.push({t: tt, l: lv, mm: mm / 3, src: 'model'}); }
+  }
+  s.sort((a, b) => a.t - b.t);
+  return {s, rs};
+}
+function analyse(series) {
+  const now = nowLocal(); const fut = series.filter(x => x.t + 300000 > now);
+  const wet = x => x.l > 0;
+  const names = ['', t('l1'), t('l2'), t('l3'), t('l4')];
+  if (!fut.length) return null;
+  const r = {raining: wet(fut[0])};
+  if (r.raining) {
+    let i = 0, mx = 0; while (i < fut.length && wet(fut[i])) { mx = Math.max(mx, fut[i].l); i++; }
+    r.endsIn = i < fut.length ? Math.max(5, Math.round((fut[i].t - now) / 60000)) : null; r.max = names[mx];
+    let j = i; while (j < fut.length && !wet(fut[j])) j++;
+    r.nextIn = j < fut.length ? Math.round((fut[j].t - now) / 60000) : null;
+  } else {
+    let i = 0; while (i < fut.length && !wet(fut[i])) i++;
+    if (i < fut.length) {
+      r.nextIn = Math.max(1, Math.round((fut[i].t - now) / 60000)); let j = i, mx = 0; while (j < fut.length && wet(fut[j])) { mx = Math.max(mx, fut[j].l); j++; }
+      r.nextDur = j < fut.length ? Math.round((fut[j].t - fut[i].t) / 60000) : null; r.nextMax = names[mx]; r.nextSrc = fut[i].src;
+    }
+  }
+  return r;
+}
+function sumMM(hours) {
+  const now = nowLocal(); const m = meteo.minutely_15; let s = 0;
+  for (let i = 0; i < m.time.length; i++) { const ts = parseLocal(m.time[i]); if (ts + 15 * 60000 > now && ts < now + hours * 3600000) s += m.precipitation[i] || 0; }
+  return s;
+}
+function dryWindow() {
+  const now = nowLocal(); const m = meteo.minutely_15; let best = null, start = null;
+  const end12 = now + 12 * 3600000;
+  for (let i = 0; i <= m.time.length; i++) {
+    const ts = i < m.time.length ? parseLocal(m.time[i]) : end12; const inRange = i < m.time.length && ts + 15 * 60000 > now && ts < end12;
+    const dry = inRange && (m.precipitation[i] || 0) <= 0;
+    if (dry && start == null) start = Math.max(ts, now);
+    if ((!dry || i === m.time.length) && start != null) { const e = Math.min(ts, end12); if (!best || e - start > best.e - best.s) best = {s: start, e}; start = null; }
+  }
+  return best;
+}
+
+/* ============ Weergave ============ */
+function render(lat, lon) {
+  const c = meteo.current; const now = nowLocal();
+  DEFAULT_ORDER.forEach(k => cardEl(k).hidden = false);
+  const w = wmo(c.weather_code, c.is_day);
+  $('temp').innerHTML = Math.round(c.temperature_2m) + '<sup>°C</sup>';
+  $('nowico').textContent = w.ico; $('nowdesc').textContent = w.txt;
+  $('nowsub').textContent = `${t('feels')} ${Math.round(c.apparent_temperature)}° · ${t('wind')} ${windDir(c.wind_direction_10m)} ${bft(c.wind_speed_10m)} Bft (${Math.round(c.wind_speed_10m)} ${t('km_h')}) · ${c.relative_humidity_2m}% ${t('humidity')}`;
+  $('nowtime').textContent = clock(parseLocal(c.time)) + ' ' + t('localtime');
+
+  const {s, rs} = buildSeries(lat, lon); const a = analyse(s);
+  const rl = $('rainline');
+  if (a) {
+    rl.classList.toggle('wet', a.raining);
+    if (a.raining) {
+      $('raintitle').textContent = t('rain_now') + (a.max ? ' (' + a.max + ')' : '');
+      $('rainsub').textContent = a.endsIn == null ? t('rain_long') : t('rain_ends', {m: minsText(a.endsIn), t: clock(now + a.endsIn * 60000)}) + (a.nextIn ? t('rain_again', {t: clock(now + a.nextIn * 60000)}) : '');
+    } else if (a.nextIn != null) {
+      $('raintitle').textContent = t('dry_next', {m: minsText(a.nextIn)});
+      $('rainsub').textContent = t('dry_next_sub', {t: clock(now + a.nextIn * 60000), i: a.nextMax, d: a.nextDur ? t('dur', {m: minsText(a.nextDur)}) : '', s: a.nextSrc === 'model' ? t('src_model') : t('src_radar')});
+    } else { $('raintitle').textContent = t('dry_title'); $('rainsub').textContent = t('dry_sub'); }
+  }
+  $('mm1').innerHTML = fmt1(sumMM(1)) + ' <small>mm</small>'; $('mm12').innerHTML = fmt1(sumMM(12)) + ' <small>mm</small>';
+  const dw = dryWindow();
+  $('dry').textContent = !dw ? t('dry_none') : (dw.e - dw.s >= 12 * 3600000 - 60000 ? t('dry_all') : `${clock(dw.s)}–${clock(dw.e)}`);
+
+  renderStrip(s, rs);
+  renderChart();
+  renderDays();
+  buildRadarLayer();
+  placePin();
+  const kv = {};
+  kv[t('kv_coord')] = `${lat}, ${lon} (${t('kv_round', {n: roundDigits()})})`;
+  kv[t('kv_model')] = $('model').value; kv[t('kv_tz')] = meteo.timezone + ' (UTC' + (tzOffset >= 0 ? '+' : '') + tzOffset / 3600 + ')';
+  kv[t('kv_px')] = rs ? t('kv_px_v', {x: rs.x, y: rs.y, w: RADAR_W, h: RADAR_H, n: radar.n}) : t('kv_na');
+  kv[t('kv_bounds')] = `N ${RADAR.north} S ${RADAR.south} W ${RADAR.west} E ${RADAR.east} (Mercator)`;
+  kv[t('kv_levels')] = rs ? rs.series.map(x => x.l).join(' ') : '—';
+  kv[t('kv_q')] = meteo.minutely_15.precipitation.filter((_, i) => { const ts = parseLocal(meteo.minutely_15.time[i]); return ts + 900000 > now && ts < now + 6 * 3600000; }).join(' ');
+  kv['versie / version'] = APP_VERSION; kv[t('kv_cache')] = t('kv_cache_v'); kv[t('kv_places')] = places.map(p => `${p.name} ${p.lat},${p.lon}`).join(' | ');
+  setKV(kv);
+}
+function renderStrip(s, rs) {
+  const now = nowLocal(); const from = now - 30 * 60000, to = now + 120 * 60000;
+  const cells = s.filter(x => x.t >= from - 150000 && x.t < to);
+  $('cells').innerHTML = cells.map(x => `<i data-l="${x.l}" class="${x.t + 300000 <= now ? 'past' : ''} ${x.src === 'model' ? 'est' : ''}" title="${clock(x.t)}"></i>`).join('');
+  const first = cells.length ? cells[0].t : from, last = cells.length ? cells[cells.length - 1].t + 300000 : to;
+  $('nowline').style.left = ((now - first) / (last - first) * 100) + '%';
+  const ticks = []; for (let ts = Math.ceil(first / 1800000) * 1800000; ts <= last; ts += 1800000) ticks.push(ts);
+  $('stripticks').innerHTML = ticks.map(ts => `<span>${clock(ts)}</span>`).join('');
+  $('stripsrc').textContent = rs ? t('strip_radar') : t('strip_model');
+}
+function renderChart() {
+  const h = meteo.hourly; const now = nowLocal();
+  let i0 = h.time.findIndex(x => parseLocal(x) + 3600000 > now); if (i0 < 0) i0 = 0;
+  const N = Math.min(48, h.time.length - i0);
+  const T = [], P = [], PR = [], X = [];
+  for (let i = i0; i < i0 + N; i++) { X.push(parseLocal(h.time[i])); T.push(h.temperature_2m[i]); P.push(h.precipitation[i] || 0); PR.push(h.precipitation_probability ? h.precipitation_probability[i] : null); }
+  const wrap = $('chartwrap'); const colW = 26, left = 34, right = 10, W = left + N * colW + right;
+  const hT = 120, hP = 80, gap = 34, top = 18, H = top + hT + gap + hP + 26;
+  const tmin = Math.floor(Math.min(...T) - 1), tmax = Math.ceil(Math.max(...T) + 1);
+  const pmax = Math.max(1, Math.ceil(Math.max(...P) * 2) / 2);
+  const xi = i => left + i * colW + colW / 2, yT = v => top + hT - (v - tmin) / (tmax - tmin) * hT, yP = v => top + hT + gap + hP - v / pmax * hP;
+  let g = '<g class="grid">';
+  const tstep = (tmax - tmin) > 12 ? 4 : 2;
+  for (let v = Math.ceil(tmin / tstep) * tstep; v <= tmax; v += tstep) g += `<line x1="${left}" x2="${W - right}" y1="${yT(v)}" y2="${yT(v)}"/><text x="${left - 6}" y="${yT(v) + 3}" text-anchor="end">${v}°</text>`;
+  for (let v = 0; v <= pmax; v += pmax / 2) g += `<line x1="${left}" x2="${W - right}" y1="${yP(v)}" y2="${yP(v)}"/><text x="${left - 6}" y="${yP(v) + 3}" text-anchor="end">${v}</text>`;
+  g += '</g>';
+  let path = '', area = `M${xi(0)},${yT(tmin)}`;
+  T.forEach((v, i) => { path += (i ? 'L' : 'M') + xi(i).toFixed(1) + ',' + yT(v).toFixed(1); area += `L${xi(i).toFixed(1)},${yT(v).toFixed(1)}`; });
+  area += `L${xi(N - 1)},${yT(tmin)}Z`;
+  let bars = '', labels = '', seps = '', prob = '';
+  const imax = P.indexOf(Math.max(...P));
+  X.forEach((ts, i) => {
+    const d = new Date(ts); const hr = d.getUTCHours();
+    if (P[i] > 0) bars += `<rect class="bar" x="${xi(i) - colW / 2 + 2}" y="${yP(P[i])}" width="${colW - 4}" height="${Math.max(1, yP(0) - yP(P[i]))}" rx="2"/>`;
+    if (i === imax && P[i] > 0) labels += `<text class="lbl" x="${xi(i)}" y="${yP(P[i]) - 4}" text-anchor="middle">${fmt1(P[i])} mm</text>`;
+    if (hr % 3 === 0) labels += `<text x="${xi(i)}" y="${H - 10}" text-anchor="middle">${pad(hr)}</text>`;
+    if (hr === 0 && i > 0) seps += `<line class="daysep" x1="${xi(i) - colW / 2}" x2="${xi(i) - colW / 2}" y1="${top - 6}" y2="${H - 22}"/>`;
+    if (hr === 0 || (i === 0 && hr <= 20)) labels += `<text class="lbl" x="${xi(i) - colW / 2 + 4}" y="${top - 6}">${t('days')[d.getUTCDay()]} ${d.getUTCDate()} ${t('months')[d.getUTCMonth()]}</text>`;
+    if (PR[i] != null) prob += (i ? 'L' : 'M') + xi(i).toFixed(1) + ',' + (yP(0) - PR[i] / 100 * hP).toFixed(1);
+  });
+  const iTmax = T.indexOf(Math.max(...T)), iTmin = T.indexOf(Math.min(...T));
+  labels += `<text class="lbl" x="${xi(iTmax)}" y="${yT(T[iTmax]) - 6}" text-anchor="middle">${Math.round(T[iTmax])}°</text><text class="lbl" x="${xi(iTmin)}" y="${yT(T[iTmin]) + 14}" text-anchor="middle">${Math.round(T[iTmin])}°</text>`;
+  const nowX = left + ((now - X[0]) / 3600000) * colW;
+  wrap.innerHTML = `<svg class="chart" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img">${g}${seps}
+    <text x="${left}" y="${top + hT + gap - 12}" class="lbl">${t('chart_plbl')} <tspan style="font-weight:400">${t('chart_prob')}</tspan></text>
+    <path class="temparea" d="${area}"/><path class="temp" d="${path}"/>${bars}<path class="prob" d="${prob}"/>
+    <line class="nowl" x1="${nowX}" x2="${nowX}" y1="${top}" y2="${H - 22}"/>
+    <rect class="hover" id="hoverrect" x="0" y="${top}" width="${colW}" height="${H - 22 - top}" visibility="hidden"/>${labels}</svg>`;
+  const svgEl = wrap.firstElementChild, hr = $('hoverrect'), tip = $('tip');
+  const move = ev => {
+    const pt = svgEl.getBoundingClientRect(); const x = ev.clientX - pt.left;
+    const i = Math.floor((x - left) / colW); if (i < 0 || i >= N) { hr.setAttribute('visibility', 'hidden'); tip.hidden = true; return; }
+    hr.setAttribute('x', left + i * colW); hr.setAttribute('visibility', 'visible');
+    const d = new Date(X[i]); const ww = wmo(h.weather_code[i0 + i], 1);
+    tip.innerHTML = `<div class="eyebrow">${t('daysL')[d.getUTCDay()]} ${pad(d.getUTCHours())}:00</div><div>${ww.txt}</div><div><b>${Math.round(T[i])}°C</b> · <b>${fmt1(P[i])} mm</b>${PR[i] != null ? ` · ${t('chance')} <b>${PR[i]}%</b>` : ''}</div><div class="muted">${h.apparent_temperature ? t('feels').toLowerCase() + ' ' + Math.round(h.apparent_temperature[i0 + i]) + '° · ' : ''}${t('wind')} ${Math.round(h.wind_speed_10m[i0 + i])} ${t('km_h')}</div>`;
+    tip.hidden = false; tip.style.left = Math.min(innerWidth - 230, ev.clientX + 12) + 'px'; tip.style.top = (ev.clientY - 70) + 'px';
+  };
+  svgEl.addEventListener('pointermove', move); svgEl.addEventListener('pointerleave', () => { tip.hidden = true; hr.setAttribute('visibility', 'hidden'); });
+  wrap.scrollLeft = Math.max(0, nowX - 60);
+}
+function renderDays() {
+  const d = meteo.daily; const out = [];
+  const allMin = Math.min(...d.temperature_2m_min), allMax = Math.max(...d.temperature_2m_max);
+  for (let i = 0; i < d.time.length; i++) {
+    const dt = new Date(parseLocal(d.time[i] + 'T00:00')); const w = wmo(d.weather_code[i], 1);
+    const mm = d.precipitation_sum[i] || 0, pr = d.precipitation_probability_max ? d.precipitation_probability_max[i] : null;
+    const l = (d.temperature_2m_min[i] - allMin) / (allMax - allMin || 1) * 100, r = (d.temperature_2m_max[i] - allMin) / (allMax - allMin || 1) * 100;
+    out.push(`<div class="day"><span class="d">${i === 0 ? t('today') : t('days')[dt.getUTCDay()] + ' ' + dt.getUTCDate()}</span><span class="ico" aria-hidden="true">${w.ico}</span><span class="w">${w.txt}<div class="tbar" style="margin-top:4px;width:${Math.max(8, r - l)}%;margin-left:${l}%"></div></span><span class="t"><span class="mn">${Math.round(d.temperature_2m_min[i])}°</span> / ${Math.round(d.temperature_2m_max[i])}°</span><span class="p ${mm > 0 ? '' : 'dry'}">${mm > 0 ? fmt1(mm) + ' mm' : t('dry')}${pr != null ? '<span class="pr muted">' + pr + '%</span>' : ''}</span></div>`);
+  }
+  $('days').innerHTML = out.join('');
+}
+
+/* ============ Start ============ */
+initMap();
+layoutCards();
+applyLang(lang);
+renderPlaces();
+if (currentPlace()) { refreshAll(); } else { startPick(); }
+document.addEventListener('visibilitychange', () => { if (!document.hidden && currentPlace()) { const c = LS.get('bb_cache', null); if (!c || Date.now() - c.ts > 10 * 60000) refreshAll(); } });
+$('brandlink').addEventListener('click', e => { e.preventDefault(); scrollTo({top: 0, behavior: 'smooth'}); });
+</script>
+<script>if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});</script>
+</body>
+</html>
