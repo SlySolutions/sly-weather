@@ -2,25 +2,40 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="{{CSP}}">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#14171B">
+<!-- site-only -->
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<!-- /site-only -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>Sly Weather</title>
 <meta name="application-name" content="Sly Weather">
-<meta name="version" content="1.0">
+<meta name="version" content="1.1">
 <!--
-  Sly Weather v1.0 — weather and rain for your own spot in the Netherlands, without sharing your location.
+  Sly Weather v1.1: weather and rain for your own spot in the Netherlands, without sharing your location.
   A Sly Solutions project · https://slysolutions.nl
   Live app      https://slysolutions.nl/weather/
   Source, issues and ideas: https://github.com/SlySolutions/sly-weather
   License: CC BY-NC-SA 4.0 (name and logo excluded). Data: Open-Meteo, Buienradar, CBS, OpenStreetMap, GeoNames, 4pp.
 -->
-<meta name="description" content="Weer en buien voor jouw plek in Nederland, zonder je locatie te delen. Weather and rain for your spot in the Netherlands without sharing your location.">
+<meta name="description" content="Weather and rain for your own spot in the Netherlands, without sharing your location.">
+<!-- site-only -->
+<link rel="canonical" href="https://slysolutions.nl/weather/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Sly Weather">
+<meta property="og:description" content="Weather and rain for your own spot in the Netherlands, without sharing your location.">
+<meta property="og:url" content="https://slysolutions.nl/weather/">
+<meta property="og:image" content="https://slysolutions.nl/weather/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Sly Weather: weather and rain for your own spot in the Netherlands">
+<meta name="twitter:card" content="summary_large_image">
+<!-- /site-only -->
 <style>
 /* ---- Lettertypen (ingebakken, geen verzoek naar Google) ---- */
 @font-face{font-family:"Manrope";font-style:normal;font-weight:200 800;font-display:swap;src:url(data:font/woff2;base64,{{FONT_MANROPE}}) format("woff2")}
@@ -146,10 +161,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,[t
 :root[data-theme="nerd"] .btn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
 .btn.small{padding:6px 12px;font-size:.8rem}
 .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.78rem;background:var(--bg-3);color:var(--text-2)}
-input[type=text],input[type=number]{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0}
+input[type=text],input[type=number],input[type=search]{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:0;appearance:none;-webkit-appearance:none}
+input::placeholder{color:var(--text-2);opacity:.85}
+input[type=search]::-webkit-search-decoration{-webkit-appearance:none}
 :root[data-theme="nerd"] input{border-radius:2px;border-color:var(--text-2)}
 .cards{margin-top:16px}
-@media (min-width:900px){.cards{columns:2;column-gap:16px}}
+@media (min-width:900px){.cards{columns:2;column-gap:16px}.cards.first{columns:auto}.cards.first .welcome{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 40px;align-items:center}}
 [hidden]{display:none!important}
 
 /* ---- Locatiebalk ---- */
@@ -211,7 +228,7 @@ input[type=text],input[type=number]{font:inherit;color:var(--text);background:va
 .tip b{font-family:var(--font-mono)}
 
 /* ---- Kaart ---- */
-.mapbox{position:relative;height:min(62vh,520px);min-height:340px;border-radius:calc(var(--radius) - 4px);overflow:hidden;border:1px solid var(--line);background:var(--map-sea)}
+.mapbox{position:relative;z-index:0;height:min(62vh,520px);min-height:340px;border-radius:calc(var(--radius) - 4px);overflow:hidden;border:1px solid var(--line);background:var(--map-sea)}
 #map{position:absolute;inset:0;background:var(--map-sea);font-family:inherit}
 .leaflet-container{background:var(--map-sea)}
 .leaflet-container .leaflet-control-attribution{display:none}
@@ -286,6 +303,12 @@ footer a{color:inherit}
 .welcome h1{font-family:var(--font-head);font-weight:800;font-size:clamp(1.5rem,5vw,2.1rem);letter-spacing:-.02em;margin:0 0 6px;text-wrap:balance;line-height:1.15}
 .welcome p{margin:0 0 10px;max-width:60ch;color:var(--text-2)}
 .welcome .eyebrow{margin-bottom:6px;display:block}
+.welcome h1{margin-bottom:0}
+/* Naar boven: zwevend rechtsonder (duimbereik), pas na een schermhoogte scrollen */
+.totop{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:35;width:42px;height:42px;border-radius:999px;border:1px solid var(--line);background:var(--bg-2);color:var(--text);box-shadow:var(--shadow);display:grid;place-items:center;cursor:pointer;opacity:0;transform:translateY(8px);pointer-events:none;transition:opacity .2s,transform .2s}
+.totop.show{opacity:1;transform:none;pointer-events:auto}
+:root[data-theme="nerd"] .totop{border-radius:2px}
+.locbar .actions .btn svg{width:14px;height:14px}
 
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}#rain{display:none!important}}
 </style>
@@ -317,9 +340,9 @@ footer a{color:inherit}
   <!-- Locatie -->
   <div class="locbar" id="locbar" hidden>
     <div class="place">
-      <span class="n" id="placename">—</span>
+      <span class="n" id="placename">–</span>
       <select id="placesel" aria-label="Plek" hidden></select>
-      <span class="actions"><button class="btn small" id="pickbtn" type="button" data-i18n="newplace">Nieuwe plek</button><button class="btn small" id="delbtn" type="button" data-i18n-title="delplace">✕</button></span>
+      <span class="actions"><button class="btn small" id="pickbtn" type="button" data-i18n="newplace">Nieuwe plek</button><button class="btn small" id="geobtn" type="button" data-i18n-title="geo_title" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg><span data-i18n="geo">Mijn locatie</span></button><button class="btn small primary" id="geosave" type="button" data-i18n="geo_save" hidden>Bewaar als plek</button><button class="btn small" id="delbtn" type="button" data-i18n-title="delplace">✕</button></span>
     </div>
     <div class="status" id="status"><span class="dot"></span><span id="statustext"></span></div>
   </div>
@@ -327,10 +350,10 @@ footer a{color:inherit}
   <div class="cards" id="cards">
     <!-- Eerste keer -->
     <section class="card welcome" id="welcome">
-      <span class="eyebrow" data-i18n="w_eyebrow">Eerste keer</span>
-      <h1 data-i18n="w_h1">Kies je plek op de kaart. Verder hoef je niets te delen.</h1>
-      <p data-i18n="w_p1">Zoom in en tik op de kaart. De app rondt je keuze af op ongeveer een kilometer, bewaart hem alleen op dit toestel en vraagt daarna de verwachting op. Geen account, geen cookies.</p>
-      <p class="muted" style="font-size:.85rem" data-i18n="w_p2">Wat je toestel verlaat: één verzoek met een afgerond coördinaat naar Open-Meteo, en één verzoek om het landelijke radarbeeld van Buienradar dat voor iedereen gelijk is.</p>
+      <div><span class="eyebrow" data-i18n="w_eyebrow">Eerste keer</span>
+      <h1 data-i18n="w_h1">Kies je plek op de kaart. Verder hoef je niets te delen.</h1></div>
+      <div><p data-i18n="w_p1">Zoom in en tik op de kaart. De app rondt je keuze af op ongeveer een kilometer, bewaart hem alleen op dit toestel en vraagt daarna de verwachting op. Geen account, geen cookies.</p>
+      <p class="muted" style="font-size:.85rem" data-i18n="w_p2">Wat je toestel verlaat: één verzoek met een afgerond coördinaat naar Open-Meteo, en één verzoek om het landelijke radarbeeld van Buienradar dat voor iedereen gelijk is.</p></div>
     </section>
 
     <!-- Nu -->
@@ -338,7 +361,7 @@ footer a{color:inherit}
       <div class="head"><h2 data-i18n="now">Nu</h2><span class="eyebrow" id="nowtime"></span></div>
       <div class="body">
         <div class="now">
-          <div class="big" id="temp">—<sup>°C</sup></div>
+          <div class="big" id="temp">–<sup>°C</sup></div>
           <div>
             <div class="desc"><span class="ico" id="nowico" aria-hidden="true"></span> <span id="nowdesc">…</span></div>
             <div class="sub" id="nowsub"></div>
@@ -346,9 +369,9 @@ footer a{color:inherit}
         </div>
         <div class="rainline" id="rainline"><div><div class="t" id="raintitle">…</div><div class="s" id="rainsub"></div></div></div>
         <div class="kpis">
-          <div class="kpi"><div class="k" data-i18n="next1h">Komend uur</div><div class="v" id="mm1">— <small>mm</small></div></div>
-          <div class="kpi"><div class="k" data-i18n="next12h">Komende 12 uur</div><div class="v" id="mm12">— <small>mm</small></div></div>
-          <div class="kpi"><div class="k" data-i18n="drywin">Droog venster</div><div class="v" id="dry" style="font-size:1rem">—</div></div>
+          <div class="kpi"><div class="k" data-i18n="next1h">Komend uur</div><div class="v" id="mm1">– <small>mm</small></div></div>
+          <div class="kpi"><div class="k" data-i18n="next12h">Komende 12 uur</div><div class="v" id="mm12">– <small>mm</small></div></div>
+          <div class="kpi"><div class="k" data-i18n="drywin">Droog venster</div><div class="v" id="dry" style="font-size:1rem">–</div></div>
         </div>
       </div>
     </section>
@@ -378,7 +401,7 @@ footer a{color:inherit}
       <div class="body">
         <div class="mapbox">
           <div id="map" role="application" aria-label="Kaart"></div>
-          <div class="maptime" id="maptime" hidden><span id="mtlabel">—</span><span id="mtclock" class="muted"></span></div>
+          <div class="maptime" id="maptime" hidden><span id="mtlabel">–</span><span id="mtclock" class="muted"></span></div>
           <div class="pickhint" id="pickhint" hidden></div>
           <button class="btn small detailbtn" id="detailbtn" type="button" aria-pressed="true"><span data-i18n="detail">Details</span></button>
           <button class="btn small homebtn" id="homebtn" type="button" data-i18n-title="home_title" hidden>⌖ <span data-i18n="home">Mijn plek</span></button>
@@ -430,12 +453,13 @@ footer a{color:inherit}
   </footer>
 </div>
 
+<button class="totop" id="totop" type="button" data-i18n-title="totop" aria-label="Naar boven"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 <div class="tip" id="tip" hidden></div>
 
 <script>{{LEAFLET_JS}}</script>
 <script>
 /* ============ Data ============ */
-const APP_VERSION = '1.0';
+const APP_VERSION = '1.1';
 const GEMEENTEN = {{GEMEENTEN}};
 const PROVINCIES = {{PROVINCIES}};
 const LIJNEN = {{LIJNEN}};
@@ -454,6 +478,8 @@ const I18N = {
   nl: {
     th_auto: 'Volg systeem', th_light: 'Licht', th_dark: 'Donker', th_nerd: 'Nerd', refresh: 'Vernieuwen',
     newplace: 'Nieuwe plek', delplace: 'Deze plek verwijderen', sure: 'Zeker? ✕',
+    geo: 'Mijn locatie', geo_title: 'Weer voor waar ik nu ben (afgerond, blijft op het toestel)', geo_save: 'Bewaar als plek', geo_temp: 'Mijn locatie', geo_unsaved: 'tijdelijk, niet bewaard',
+    geo_abroad: 'buiten Nederland: kaart en radar dekken alleen Nederland, de verwachting werkt wel', totop: 'Naar boven',
     w_eyebrow: 'Eerste keer', w_h1: 'Kies je plek op de kaart. Verder hoef je niets te delen.',
     w_p1: 'Zoom in en tik op de kaart. De app rondt je keuze af op ongeveer een kilometer, bewaart hem alleen op dit toestel en vraagt daarna de verwachting op. Geen account, geen cookies. Je kunt ook zoeken op plaatsnaam of postcode; die lijst zit in de app zelf.',
     w_p2: 'Wat je toestel verlaat: één verzoek met een afgerond coördinaat naar Open-Meteo, en één verzoek om het landelijke radarbeeld van Buienradar dat voor iedereen gelijk is.',
@@ -472,23 +498,25 @@ const I18N = {
     gps_insecure: 'GPS werkt hier niet: de browser staat locatie alleen toe als de app via https draait (of als echte app). Dit bestand is lokaal geopend. Zoek hieronder op plaats of postcode.',
     gps_denied: 'Locatie geweigerd. Sta locatie toe voor deze pagina in de browserinstellingen, of zoek op plaats of postcode.',
     gps_unavail: 'Positie onbekend: locatie staat uit op het toestel of er is geen GPS-fix. Zoek op plaats of postcode.',
-    gps_timeout: 'Geen positie binnen 20 s. Probeer opnieuw (buiten gaat sneller) of zoek op plaats of postcode.',
+    gps_timeout: 'Geen positie binnen de tijd. Probeer opnieuw (buiten gaat sneller) of zoek op plaats of postcode.',
     gps_ff: ' Firefox/Focus: zet in Android onder Instellingen → Apps → Firefox Focus → Machtigingen → Locatie op "Toestaan tijdens gebruik" (Focus vraagt het wel, maar heeft zelf geen toegang) en probeer opnieuw.', detail: 'Details', search_none: 'Niets gevonden', search_pc: 'postcode', search_more: 'typ 4 cijfers', search_inh: 'inw.',
     play: 'Afspelen', expected: 'verwacht', radar_src: 'bron: Buienradar, landelijk beeld', map_src: 'kaart: CBS, OpenStreetMap, GeoNames, 4pp',
     days_title: 'Komende dagen', days_sub: 'KNMI-model via Open-Meteo', today: 'vandaag', dry: 'droog',
     nerd_title: 'Nerd mode: wat verlaat je toestel', nerd_sub: 'verzoeklog · ruwe waarden', nolog: 'Nog geen verzoeken.', n_round: 'Afronding', n_model: 'Model', n_fetch: 'ophalen', n_manual: 'Handmatig', n_saveplace: 'Bewaar als plek', n_resetlayout: 'Tegelvolgorde herstellen', n_wipe: 'Wis alle lokale gegevens',
     st_cache: 'Uit cache, {t}', st_upd: 'Bijgewerkt {t}', st_off: 'Geen verbinding, oude data van {t}', st_fail: 'Ophalen mislukt: {e}', st_none: 'Nog niet opgehaald',
-    privacy: '<b>Privacy.</b> Deze app heeft geen server, account, cookies of statistieken. Je plek staat alleen in de lokale opslag van deze browser. Per verversing verlaten precies twee verzoeken je toestel: een afgerond coördinaat (≈1 km) naar <b>Open-Meteo</b> voor de verwachting, en een verzoek om het <b>landelijke radarbeeld van Buienradar</b>, dat voor iedereen identiek is. De buienverwachting voor jouw plek wordt uit dat beeld op je eigen toestel afgelezen. Elke server ziet onvermijdelijk je IP-adres.',
+    privacy: '<b>Privacy.</b> Deze app heeft geen server, account, cookies of statistieken. Je plek staat alleen in de lokale opslag van deze browser. Per verversing verlaten precies twee verzoeken je toestel: een afgerond coördinaat (≈1 km) naar <b>Open-Meteo</b> voor de verwachting, en een verzoek om het <b>landelijke radarbeeld van Buienradar</b>, dat voor iedereen identiek is. De buienverwachting voor jouw plek wordt uit dat beeld op je eigen toestel afgelezen. De knop <b>Mijn locatie</b> vraagt de positie aan je toestel, rondt die meteen af en gebruikt alleen dat afgeronde punt; de ruwe positie wordt niet bewaard en verlaat het toestel niet. Deze beperkingen worden afgedwongen door een Content-Security-Policy in de pagina. Elke server ziet onvermijdelijk je IP-adres.',
     footer_by: 'Een <b>Sly Solutions</b>-project · <u>slysolutions.nl</u> ↗ · v' + APP_VERSION, footer_data: 'Data: Open-Meteo (CC BY 4.0, KNMI-model) · Buienradar · CBS/Kadaster · © OpenStreetMap-bijdragers (ODbL) · GeoNames · 4pp · geen cookies, geen trackers · <a href="https://github.com/SlySolutions/sly-weather" rel="noopener" target="_blank">broncode op GitHub</a> · <a href="https://github.com/SlySolutions/sly-weather/issues" rel="noopener" target="_blank">fout of idee melden</a>',
     kv_coord: 'coördinaat verzonden', kv_round: 'afgerond op {n} decimalen', kv_model: 'model', kv_tz: 'tijdzone', kv_px: 'radar pixel', kv_px_v: 'x={x} y={y} van {w}×{h}, {n} beelden, 3×3 max', kv_na: 'niet beschikbaar', kv_bounds: 'radar hoekpunten', kv_levels: 'radar niveaus (−60…+55 min)', kv_q: 'kwartieren mm (komende 6 u)', kv_cache: 'cache', kv_cache_v: 'localStorage bb_cache, 10 min geldig', kv_places: 'opgeslagen plekken',
     mv_up: 'Omhoog', mv_down: 'Omlaag', fold: 'In- of uitklappen',
-    min: 'min', hour: 'uur', h: 'u', km_h: 'km/u',
+    min: 'min', hour: 'uur', hours: 'uur', h: 'u', km_h: 'km/u',
     days: ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'], daysL: ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'], months: ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'],
     dirs: ['N', 'NO', 'O', 'ZO', 'Z', 'ZW', 'W', 'NW']
   },
   en: {
     th_auto: 'Follow system', th_light: 'Light', th_dark: 'Dark', th_nerd: 'Nerd', refresh: 'Refresh',
     newplace: 'New place', delplace: 'Remove this place', sure: 'Sure? ✕',
+    geo: 'My location', geo_title: 'Weather for where I am now (rounded, stays on the device)', geo_save: 'Save as place', geo_temp: 'My location', geo_unsaved: 'temporary, not saved',
+    geo_abroad: 'outside the Netherlands: the map and radar cover NL only, the forecast still works', totop: 'Back to top',
     w_eyebrow: 'First time', w_h1: 'Pick your spot on the map. Nothing else needs sharing.',
     w_p1: 'Zoom in and tap the map. The app rounds your choice to about a kilometre, keeps it only on this device and then fetches the forecast. No account, no cookies. You can also search by place name or postcode; that list is built into the app.',
     w_p2: 'What leaves your device: one request with a rounded coordinate to Open-Meteo, and one request for the national Buienradar radar image, which is identical for everyone.',
@@ -507,17 +535,17 @@ const I18N = {
     gps_insecure: 'GPS does not work here: the browser only allows location when the app runs over https (or as a real app). This file was opened locally. Search by place or postcode below.',
     gps_denied: 'Location denied. Allow location for this page in the browser settings, or search by place or postcode.',
     gps_unavail: 'Position unknown: location is off on the device or there is no GPS fix. Search by place or postcode.',
-    gps_timeout: 'No position within 20 s. Try again (faster outdoors) or search by place or postcode.',
+    gps_timeout: 'No position in time. Try again (faster outdoors) or search by place or postcode.',
     gps_ff: ' Firefox/Focus: in Android go to Settings → Apps → Firefox Focus → Permissions → Location and set it to "Allow while using" (Focus asks, but has no access itself), then try again.', detail: 'Details', search_none: 'Nothing found', search_pc: 'postcode', search_more: 'type 4 digits', search_inh: 'pop.',
     play: 'Play', expected: 'expected', radar_src: 'source: Buienradar, national image', map_src: 'map: CBS, OpenStreetMap, GeoNames, 4pp',
     days_title: 'Coming days', days_sub: 'KNMI model via Open-Meteo', today: 'today', dry: 'dry',
     nerd_title: 'Nerd mode: what leaves your device', nerd_sub: 'request log · raw values', nolog: 'No requests yet.', n_round: 'Rounding', n_model: 'Model', n_fetch: 'fetch', n_manual: 'Manual', n_saveplace: 'Save as place', n_resetlayout: 'Reset tile order', n_wipe: 'Wipe all local data',
     st_cache: 'From cache, {t}', st_upd: 'Updated {t}', st_off: 'Offline, data from {t}', st_fail: 'Fetch failed: {e}', st_none: 'Not fetched yet',
-    privacy: '<b>Privacy.</b> This app has no server, account, cookies or analytics. Your place lives only in this browser\'s local storage. Each refresh sends exactly two requests: a rounded coordinate (≈1 km) to <b>Open-Meteo</b> for the forecast, and a request for the <b>national Buienradar radar image</b>, identical for everyone. The shower forecast for your spot is read from that image on your own device. Any server inevitably sees your IP address.',
+    privacy: '<b>Privacy.</b> This app has no server, account, cookies or analytics. Your place lives only in this browser\'s local storage. Each refresh sends exactly two requests: a rounded coordinate (≈1 km) to <b>Open-Meteo</b> for the forecast, and a request for the <b>national Buienradar radar image</b>, identical for everyone. The shower forecast for your spot is read from that image on your own device. The <b>My location</b> button asks the device for its position, rounds it at once and uses only that rounded point; the raw position is never stored and never leaves the device. These limits are enforced by a Content-Security-Policy in the page. Any server inevitably sees your IP address.',
     footer_by: 'A <b>Sly Solutions</b> project · <u>slysolutions.nl</u> ↗ · v' + APP_VERSION, footer_data: 'Data: Open-Meteo (CC BY 4.0, KNMI model) · Buienradar · CBS/Kadaster · © OpenStreetMap contributors (ODbL) · GeoNames · 4pp · no cookies, no trackers · <a href="https://github.com/SlySolutions/sly-weather" rel="noopener" target="_blank">source on GitHub</a> · <a href="https://github.com/SlySolutions/sly-weather/issues" rel="noopener" target="_blank">report a bug or idea</a>',
     kv_coord: 'coordinate sent', kv_round: 'rounded to {n} decimals', kv_model: 'model', kv_tz: 'time zone', kv_px: 'radar pixel', kv_px_v: 'x={x} y={y} of {w}×{h}, {n} frames, 3×3 max', kv_na: 'not available', kv_bounds: 'radar bounds', kv_levels: 'radar levels (−60…+55 min)', kv_q: '15-min mm (next 6 h)', kv_cache: 'cache', kv_cache_v: 'localStorage bb_cache, valid 10 min', kv_places: 'saved places',
     mv_up: 'Move up', mv_down: 'Move down', fold: 'Collapse or expand',
-    min: 'min', hour: 'hour', h: 'h', km_h: 'km/h',
+    min: 'min', hour: 'hour', hours: 'hours', h: 'h', km_h: 'km/h',
     days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], daysL: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     dirs: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
   }
@@ -551,7 +579,7 @@ let tzOffset = 3600;
 const parseLocal = s => { const m = s.match(/(\d+)-(\d+)-(\d+)T(\d+):(\d+)/); return Date.UTC(+m[1], m[2] - 1, +m[3], +m[4], +m[5]); };
 const nowLocal = () => Date.now() + tzOffset * 1000;
 const clock = ms => { const d = new Date(ms); return pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()); };
-const minsText = m => m < 60 ? `${m} ${t('min')}` : (m % 60 === 0 ? `${m / 60} ${t('hour')}` : `${Math.floor(m / 60)} ${t('h')} ${m % 60} ${t('min')}`);
+const minsText = m => m < 60 ? `${m} ${t('min')}` : (m % 60 === 0 ? `${m / 60} ${t(m === 60 ? 'hour' : 'hours')}` : `${Math.floor(m / 60)} ${t('h')} ${m % 60} ${t('min')}`);
 const wmo = (c, day = 1) => { const w = WMO[c] || ['Onbekend', 'Unknown', '•', '•']; return {txt: lang === 'nl' ? w[0] : w[1], ico: day ? w[2] : w[3]}; };
 const windDir = d => t('dirs')[Math.round(d / 45) % 8];
 const bft = k => { const th = [1, 5, 11, 19, 28, 38, 49, 61, 74, 88, 102, 117]; let b = 0; while (b < 12 && k >= th[b]) b++; return b; };
@@ -566,6 +594,7 @@ function applyLang(l) {
   $('privacy').innerHTML = t('privacy'); $('nowline').dataset.now = t('nowlbl');
   $('pickhint').textContent = t('pick_hint'); if (!log.length) $('log').textContent = t('nolog');
   $('maptitle').textContent = picking ? t('pick_title') : t('map_title'); $('mapsub').textContent = picking ? t('pick_sub') : t('map_sub');
+  if (tempPlace) { tempPlace.name = t('geo_temp'); renderPlaces(); }
   if (!currentPlace()) setStatus(t('st_none'));
   if (meteo && currentPlace()) render(lastLat, lastLon); else if (map) drawLabels();
 }
@@ -651,17 +680,22 @@ $('radaron').addEventListener('change', e => { LS.set('bb_radar', e.target.check
 $('wipe').addEventListener('click', () => { ['bb_places', 'bb_cur', 'bb_cache', 'bb_theme', 'bb_round', 'bb_model', 'bb_radar', 'bb_lang', 'bb_order', 'bb_folded', 'bb_detail'].forEach(LS.del); location.reload(); });
 $('msave').addEventListener('click', () => { const la = +$('mlat').value, lo = +$('mlon').value; if (!la || !lo) return; savePlace(la.toFixed(2) + ', ' + lo.toFixed(2), la, lo); });
 
-function currentPlace() { return places[cur] || null; }
+/* Tijdelijke plek via "Mijn locatie": leeft alleen in het geheugen tot de gebruiker hem bewaart; na herladen toont de app weer de laatste bewaarde plek */
+let tempPlace = null;
+const geoAvail = window.isSecureContext && 'geolocation' in navigator;
+function currentPlace() { return tempPlace || places[cur] || null; }
 function renderPlaces() {
   const p = currentPlace();
-  $('locbar').hidden = !p; $('welcome').hidden = !!p;
+  $('locbar').hidden = !p; $('welcome').hidden = !!p; $('cards').classList.toggle('first', !p);
   if (!p) return;
   $('placename').textContent = p.name;
   const sel = $('placesel'); sel.innerHTML = '';
-  places.forEach((q, i) => { const o = document.createElement('option'); o.value = i; o.textContent = q.name; o.selected = i === cur; sel.appendChild(o); });
-  sel.hidden = places.length < 2;
+  places.forEach((q, i) => { const o = document.createElement('option'); o.value = i; o.textContent = q.name; o.selected = !tempPlace && i === cur; sel.appendChild(o); });
+  if (tempPlace) { const o = document.createElement('option'); o.value = 'tmp'; o.textContent = tempPlace.name; o.selected = true; sel.appendChild(o); }
+  sel.hidden = places.length + (tempPlace ? 1 : 0) < 2;
+  $('delbtn').hidden = !!tempPlace; $('geosave').hidden = !tempPlace; $('geobtn').hidden = !!tempPlace || !geoAvail || !places.length;
 }
-$('placesel').addEventListener('change', e => { cur = +e.target.value; LS.set('bb_cur', cur); renderPlaces(); refreshAll(); });
+$('placesel').addEventListener('change', e => { if (e.target.value === 'tmp') return; tempPlace = null; cur = +e.target.value; LS.set('bb_cur', cur); renderPlaces(); refreshAll(); });
 let delArmed = null;
 $('delbtn').addEventListener('click', () => {
   const b = $('delbtn');
@@ -671,6 +705,7 @@ $('delbtn').addEventListener('click', () => {
   if (places.length) refreshAll(); else { showEmpty(); if (pin) { pin.remove(); pin = null; } startPick(); }
 });
 function savePlace(name, lat, lon) {
+  tempPlace = null;
   places.push({name, lat: +lat.toFixed(4), lon: +lon.toFixed(4)}); cur = places.length - 1;
   LS.set('bb_places', places); LS.set('bb_cur', cur); renderPlaces(); stopPick(); refreshAll(true);
 }
@@ -799,6 +834,29 @@ $('gpsbtn').addEventListener('click', () => {
     addLog('gps', 'mislukt: ' + err.message, null, Math.round(performance.now() - t0), 'code ' + err.code);
   }, {enableHighAccuracy: true, timeout: 20000, maximumAge: 300000});
 });
+/* Mijn locatie: één positie-opvraag, direct afgerond zoals een tik op de kaart; de ruwe positie wordt niet bewaard en verlaat het toestel niet */
+$('geobtn').addEventListener('click', () => {
+  if (busy || !geoAvail) return;
+  setStatus(t('gps_busy')); const t0 = performance.now();
+  navigator.geolocation.getCurrentPosition(pos => {
+    const d = roundDigits(), f = Math.pow(10, d);
+    const lat = Math.round(pos.coords.latitude * f) / f, lon = Math.round(pos.coords.longitude * f) / f;
+    addLog('gps', 'positie van het toestel, afgerond op ' + d + ' decimalen, niet bewaard en niet verzonden (±' + Math.round(pos.coords.accuracy) + ' m)', null, Math.round(performance.now() - t0), '');
+    tempPlace = {name: t('geo_temp'), lat, lon};
+    if (picking) stopPick();
+    renderPlaces(); refreshAll(true);
+  }, err => {
+    const k = err.code === 1 ? 'gps_denied' : err.code === 3 ? 'gps_timeout' : 'gps_unavail';
+    const ff = /Firefox|Focus|FxiOS/i.test(navigator.userAgent) ? t('gps_ff') : '';
+    setStatus(t(k) + ff, true);
+    addLog('gps', 'mislukt: ' + err.message, null, Math.round(performance.now() - t0), 'code ' + err.code);
+  }, {enableHighAccuracy: false, timeout: 15000, maximumAge: 600000});
+});
+/* Bewaar als plek: dezelfde kiesmodus als een tik op de kaart, met de stip al op de afgeronde positie */
+$('geosave').addEventListener('click', () => {
+  const p = tempPlace; if (!p) return;
+  startPick(); map.setView([p.lat, p.lon], Math.max(map.getZoom(), 12)); setPick(L.latLng(p.lat, p.lon));
+});
 /* Zoeken op plaats of postcode: de lijst zit in het bestand, er gaat niets de deur uit */
 function searchPlaces(q) {
   q = q.trim().toLowerCase(); if (!q) return [];
@@ -842,7 +900,10 @@ function setKV(obj) { $('kv').innerHTML = Object.entries(obj).map(([k, v]) => `<
 /* ============ Ophalen ============ */
 let meteo = null, radar = null, busy = false, lastLat = 0, lastLon = 0;
 const mercY = lat => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
-function setStatus(txt, err) { $('statustext').textContent = txt; $('status').classList.toggle('err', !!err); }
+function setStatus(txt, err) {
+  if (tempPlace) { txt += ' · ' + t('geo_unsaved'); if (!NL_BOUNDS.contains([tempPlace.lat, tempPlace.lon])) txt += ' · ' + t('geo_abroad'); }
+  $('statustext').textContent = txt; $('status').classList.toggle('err', !!err);
+}
 let statusKey = null;
 
 async function refreshAll(force) {
@@ -862,7 +923,7 @@ async function refreshAll(force) {
       if (!r.ok) throw new Error('Open-Meteo ' + r.status);
       meteo = JSON.parse(txt); if (meteo.error) throw new Error(meteo.reason);
       tzOffset = meteo.utc_offset_seconds || 0;
-      LS.set('bb_cache', {key, ts: Date.now(), data: meteo});
+      if (!tempPlace) LS.set('bb_cache', {key, ts: Date.now(), data: meteo});
       setStatus(t('st_upd', {t: clock(Date.now() + tzOffset * 1000)}));
     }
   } catch (e) {
@@ -1029,7 +1090,7 @@ function render(lat, lon) {
   kv[t('kv_model')] = $('model').value; kv[t('kv_tz')] = meteo.timezone + ' (UTC' + (tzOffset >= 0 ? '+' : '') + tzOffset / 3600 + ')';
   kv[t('kv_px')] = rs ? t('kv_px_v', {x: rs.x, y: rs.y, w: RADAR_W, h: RADAR_H, n: radar.n}) : t('kv_na');
   kv[t('kv_bounds')] = `N ${RADAR.north} S ${RADAR.south} W ${RADAR.west} E ${RADAR.east} (Mercator)`;
-  kv[t('kv_levels')] = rs ? rs.series.map(x => x.l).join(' ') : '—';
+  kv[t('kv_levels')] = rs ? rs.series.map(x => x.l).join(' ') : '–';
   kv[t('kv_q')] = meteo.minutely_15.precipitation.filter((_, i) => { const ts = parseLocal(meteo.minutely_15.time[i]); return ts + 900000 > now && ts < now + 6 * 3600000; }).join(' ');
   kv['versie / version'] = APP_VERSION; kv[t('kv_cache')] = t('kv_cache_v'); kv[t('kv_places')] = places.map(p => `${p.name} ${p.lat},${p.lon}`).join(' | ');
   setKV(kv);
@@ -1113,8 +1174,13 @@ applyLang(lang);
 renderPlaces();
 if (currentPlace()) { refreshAll(); } else { startPick(); }
 document.addEventListener('visibilitychange', () => { if (!document.hidden && currentPlace()) { const c = LS.get('bb_cache', null); if (!c || Date.now() - c.ts > 10 * 60000) refreshAll(); } });
-$('brandlink').addEventListener('click', e => { e.preventDefault(); scrollTo({top: 0, behavior: 'smooth'}); });
+const noMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+$('brandlink').addEventListener('click', e => { e.preventDefault(); scrollTo({top: 0, behavior: noMotion() ? 'auto' : 'smooth'}); });
+addEventListener('scroll', () => $('totop').classList.toggle('show', scrollY > innerHeight), {passive: true});
+$('totop').addEventListener('click', () => scrollTo({top: 0, behavior: noMotion() ? 'auto' : 'smooth'}));
 </script>
+<!-- site-only -->
 <script>if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});</script>
+<!-- /site-only -->
 </body>
 </html>

@@ -1,4 +1,4 @@
-# Sly Weather — ontwerp en gedachtegang
+# Sly Weather: ontwerp en gedachtegang
 
 Dit document legt uit hoe het project is bedacht en gegroeid, welke problemen onderweg opdoken en hoe die zijn opgelost, en hoe je verder bouwt of een volgend project op dezelfde manier aanpakt. Het hoort bij `BESLISSINGEN.md` (de korte lijst met keuzes) en `README.nl.md` (gebruik en opbouw).
 
@@ -62,8 +62,12 @@ Dit zijn de momenten die het project beter maakten. Ze zijn bijna allemaal door 
 1. Pas `src/app_template.html` aan; verhoog `APP_VERSION` en de meta-tag `version`.
 2. `python3 src/build.py` schrijft `sly-weather.html` en `site/weather/index.html`.
 3. Test lokaal (een simpele webserver in de map volstaat) en op een telefoon via de live URL.
-4. Upload alleen `index.html` naar `public_html/weather` (cPanel → File Manager). Verander je `sw.js`, verhoog dan de cachenaam erin.
+4. Upload `index.html` naar `public_html/weather` (cPanel → File Manager), plus `.htaccess` of `og-image.png` als die veranderd zijn. Verander je `sw.js`, verhoog dan de cachenaam erin. Controleer daarna met `curl -sI -H 'Accept-Encoding: gzip' https://slysolutions.nl/weather/` dat `content-encoding: gzip` terugkomt.
 5. Commit en push naar GitHub; maak een Release met hetzelfde versienummer en `sly-weather.html` als bijlage.
+
+**Een nieuw verzoek of een nieuwe host toevoegen**
+
+De pagina heeft sinds 1.1 een Content-Security-Policy als meta-tag die `build.py` vult: alleen `api.open-meteo.com` (fetch), `image.buienradar.nl` en `image-cdn.buienradar.nl` (het radarbeeld; de eerste verwijst door naar de tweede) en data-URL's zijn toegestaan, en alleen de drie inline scripts met hun sha256-hash mogen draaien. Een nieuwe bron werkt dus pas als hij in `build.py` aan de CSP is toegevoegd, en dat is precies de bedoeling: elke nieuwe host is een bewuste keuze die in `BESLISSINGEN.md` thuishoort.
 
 **Kaartdata vernieuwen**
 
@@ -78,7 +82,20 @@ De data in `src/data/` is in november 2026 gemaakt uit: cartomap (gemeenten/prov
 5. *Luchtkwaliteit of pollen* via Open-Meteo Air Quality met hetzelfde afgeronde coördinaat.
 6. *Officiële waarschuwingen* zodra er een app-schil is (geen CORS-beperking) of een eigen minimale proxy op het eigen domein.
 
-## 7. Wat dit project leert voor een volgend project
+## 7. Versie 1.1: de eerste ronde feedback
+
+Na een dag live kwam feedback uit de review van de website. De wijzigingen, in volgorde van belang:
+
+1. **"Mijn locatie" naast "Nieuwe plek".** Zodra er een plek is bewaard, geeft één tik het weer voor waar je nu bent, als tijdelijke plek die niet wordt opgeslagen. De ruwe positie wordt meteen afgerond en verlaat het toestel niet; het verzoeklog laat alleen het afgeronde punt zien. "Bewaar als plek" opent de bestaande kiesmodus met de stip al goed. De eerste keer blijft kaart-eerst: dat is de kern van de privacykeuze.
+2. **"Naar boven"** als zwevende knop rechtsonder, alleen na een schermhoogte scrollen; de bovenbalk was op telefoons al vol.
+3. **Compressie.** De pagina ging ongecomprimeerd over de lijn. Eén blok in `.htaccess` (mod_deflate) brengt de overdracht van 929 KB naar ±380 KB; base64-lettertypen en kaartdata comprimeren nu eenmaal minder dan tekst.
+4. **Deelvoorbeeld.** Open Graph-tags en een `og-image.png` zodat een gedeelde link in WhatsApp een kaartje toont. Geen noindex.
+5. **Content-Security-Policy.** De privacybelofte "precies twee verzoeken" wordt nu door de browser afgedwongen. Dat leverde meteen een les op: het radarbeeld van `image.buienradar.nl` verwijst door naar `image-cdn.buienradar.nl`, wat in 1.0 onzichtbaar was. Het verzoeklog toonde de eerste host, de browser haalde het beeld bij de tweede. Nog steeds één verzoek met één algemeen plaatje, maar nu staat het in de docs.
+6. **Kleine dingen.** Engelse meervoudsvorm ("2 hours"), Engelse meta description, gestyled zoekveld, introkaart op breed scherm, geen lange gedachtestreep meer in teksten en docs, en het losse bestand zonder PWA-regels die vanaf schijf toch niet werken.
+
+Les: een CSP is niet alleen beveiliging, het is ook een meetinstrument. Zet hem aan en de browser vertelt je precies wat er werkelijk wordt opgehaald.
+
+## 8. Wat dit project leert voor een volgend project
 
 - **Begin met de harde eis**, niet met de functielijst. Hier was dat "geen data delen"; daaruit volgden bijna alle keuzes vanzelf.
 - **Zoek eerst naar bronnen die voor iedereen hetzelfde zijn.** Alles wat per gebruiker verschilt, is een lek; alles wat algemeen is, kun je lokaal personaliseren.

@@ -15,7 +15,8 @@ Live: **https://slysolutions.nl/weather/** (open on your phone and choose *Add t
 - Precipitation in mm for the next hour and the next 12 hours.
 - Hourly chart for 48 hours (temperature, precipitation, chance) and a 7-day forecast.
 - Animated rain radar for the whole country, past hour and next hour.
-- Built-in offline map of the Netherlands (municipalities, places, districts, motorways, rivers) to pick a spot by tapping, by place name or by four-digit postcode. Optional GPS button.
+- Built-in offline map of the Netherlands (municipalities, places, districts, motorways, rivers) to pick a spot by tapping, by place name or by four-digit postcode.
+- Optional "My location" button (https only): one tap shows the weather for where you are now as a temporary place, rounded on the device, saved only if you choose to.
 - Three themes in the Sly Solutions style (light, dark, nerd), reorderable and collapsible tiles.
 
 ## Privacy by design
@@ -25,7 +26,7 @@ Exactly two requests leave your device per refresh:
 1. One request to **Open-Meteo** (KNMI HARMONIE model) with your coordinate **rounded to about 1 km**.
 2. One request for the **national Buienradar radar image**, which is identical for everyone. The local rain nowcast is read from that image on your device.
 
-No geocoding, no map tiles, no third-party fonts or scripts: the map, fonts and Leaflet are embedded in the file. Saved places and settings live in your browser's local storage. "Nerd mode" shows a log of every outgoing request. GPS is used only when you press the button and never leaves the device.
+No geocoding, no map tiles, no third-party fonts or scripts: the map, fonts and Leaflet are embedded in the file. Saved places and settings live in your browser's local storage. "Nerd mode" shows a log of every outgoing request. Location is used only when you press a button: the raw position is rounded at once, never stored and never leaves the device. A Content-Security-Policy in the page makes the browser enforce all of this: only Open-Meteo and the Buienradar image host are allowed, nothing else can load or run.
 
 ## Run it yourself
 
@@ -37,7 +38,7 @@ Download [`sly-weather.html` from the latest release](../../releases/latest) and
 python3 src/build.py
 ```
 
-`src/app_template.html` holds the app (CSS, HTML, JavaScript). `build.py` inlines the fonts, Leaflet and the map data from `src/data/` and writes `sly-weather.html` and `site/weather/index.html`. Map data was prepared from CBS/Kadaster, OpenStreetMap (Overpass), GeoNames and the 4pp postcode table; the preparation scripts are not needed to build.
+`src/app_template.html` holds the app (CSS, HTML, JavaScript). `build.py` inlines the fonts, Leaflet and the map data from `src/data/`, computes the Content-Security-Policy hashes for the inline scripts, and writes `site/weather/index.html` (hosted copy with manifest, service worker and share preview) and `sly-weather.html` (standalone copy for opening from disk). Map data was prepared from CBS/Kadaster, OpenStreetMap (Overpass), GeoNames and the 4pp postcode table; the preparation scripts are not needed to build.
 
 ## Data and licenses
 
