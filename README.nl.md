@@ -18,13 +18,14 @@ Thema's: Auto, Licht, Donker en Nerd (knoppen rechtsboven). Nerd mode toont onde
 
 ## Wat verlaat je toestel
 
-Per verversing precies drie verzoeken:
+Per verversing precies vier verzoeken:
 
 1. `api.open-meteo.com`: een op 0,01° (≈1 km) afgerond coördinaat, model `knmi_seamless` (KNMI HARMONIE via Open-Meteo). Levert actueel weer, kwartierneerslag 24 u, uurwaarden 7 dagen, dagwaarden.
 2. `api.open-meteo.com`: een vast raster van 10 x 10 modelpunten over heel Nederland (uurneerslag, 7 dagen) voor het kaartje na de radaruren. Voor iedereen identiek, zegt niets over jou.
 3. `image.buienradar.nl`: het landelijke radarbeeld (24 beelden van 5 minuten: afgelopen uur en komend uur) als één sprite. Dit verzoek is voor iedereen identiek. De buienverwachting voor jouw plek wordt uit de pixels op je eigen toestel afgelezen.
+4. `data.buienradar.nl`: de landelijke metingen van de KNMI-weerstations (temperatuur, wind, zonkracht, regen), ook voor iedereen identiek. Je toestel kiest zelf het dichtstbijzijnde station; dat geeft het gemeten "nu" en hoe licht of grauw het buiten is.
 
-De GPS-knop (in de kiesmodus) en de knop "Mijn locatie" vragen de positie aan het toestel en ronden die meteen af; de ruwe positie wordt niet bewaard en verlaat het toestel niet. Een Content-Security-Policy in de pagina dwingt dit af: de browser staat alleen `api.open-meteo.com` en het radarbeeld van Buienradar (`image.buienradar.nl`, dat doorverwijst naar `image-cdn.buienradar.nl`) toe, en alleen de ingebakken scripts mogen draaien. Browsers staan locatie alleen toe via https of een app-schil; bij een lokaal geopend bestand legt de app uit waarom het niet werkt. De knop "Mijn plek" zoomt naar je opgeslagen plek.
+De GPS-knop (in de kiesmodus) en de knop "Mijn locatie" vragen de positie aan het toestel en ronden die meteen af; de ruwe positie wordt niet bewaard en verlaat het toestel niet. Een Content-Security-Policy in de pagina dwingt dit af: de browser staat alleen `api.open-meteo.com`, het radarbeeld van Buienradar (`image.buienradar.nl`, dat doorverwijst naar `image-cdn.buienradar.nl`) en de stationsmetingen (`data.buienradar.nl`) toe, en alleen de ingebakken scripts mogen draaien. Browsers staan locatie alleen toe via https of een app-schil; bij een lokaal geopend bestand legt de app uit waarom het niet werkt. De knop "Mijn plek" zoomt naar je opgeslagen plek.
 
 ## Bronnen
 

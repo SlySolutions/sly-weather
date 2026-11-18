@@ -5,7 +5,7 @@ Source: https://github.com/SlySolutions/sly-weather · License CC BY-NC-SA 4.0
 Assembles ../sly-weather.html and ../site/weather/index.html from app_template.html:
 fonts, Leaflet, map data and the logo are inlined so the app is one self-contained file.
 The Content-Security-Policy meta tag gets a sha256 hash per inline script, so the browser
-enforces "nothing but Open-Meteo and the Buienradar image" instead of the app just promising it.
+enforces "nothing but Open-Meteo and Buienradar (radar image, station readings)" instead of the app just promising it.
 Blocks between <!-- site-only --> and <!-- /site-only --> (manifest, icons, service worker,
 share preview) are left out of the standalone file, which is meant to be opened from disk."""
 import base64, hashlib, json, os, re
@@ -38,7 +38,7 @@ def assemble(template, scripts_expected):
         'script-src ' + hashes,
         "style-src 'unsafe-inline'",                              # inline <style> and style attributes (Leaflet, tiles)
         "img-src 'self' data: https://image.buienradar.nl https://image-cdn.buienradar.nl",  # icons, radar frames as data URLs, the Buienradar sprite (image.buienradar.nl redirects to image-cdn)
-        'connect-src https://api.open-meteo.com',                 # the only fetch()
+        'connect-src https://api.open-meteo.com https://data.buienradar.nl',  # the only fetch() calls: forecast and grid, station readings
         'font-src data:',                                         # fonts are inlined
         "manifest-src 'self'", "worker-src 'self'",               # PWA files next to index.html
         "base-uri 'none'", "form-action 'none'",

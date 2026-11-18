@@ -19,18 +19,21 @@ Live: **https://slysolutions.nl/weather/** (open on your phone and choose *Add t
 - Optional "My location" button (https only): one tap shows the weather for where you are now as a temporary place, rounded on the device, saved only if you choose to.
 - Three themes in the Sly Solutions style (light, dark, nerd), reorderable and collapsible tiles.
 - Timeline tile: hours and week in one (3 h to 7 d) with rain bars, temperature (day high in red, night low in blue), wind and cloud cover; drag along it and a small map right under it (pinch or scroll to zoom, drag to pan, collapsible) plus a written forecast follow that moment (the big map follows too). With the cursor on now, the tile also shows the Now tile's shower line and key numbers. Within the radar hours the map shows the radar frame, beyond that a coarse model grid over the Netherlands (about 40 km).
+- Timeline details (1.9): only the orange handle moves the time (the rest of the timeline scrolls the page), the Now button turns orange when you are away from now, the past is veiled, wind on a fixed scale with lines at 4, 6 and 8 Bft, and a dotted line for the chance of precipitation. The small map uses the same base as the big map (municipalities, rivers, roads and names by zoom, up to 16x) and shows a wind arrow and the weather at your place. Under it, "Now and the next hour" sums up the latest measurement nearby, the radar, the wind and the chance of rain. Both maps have a lock: locked means + and − only and the page scrolls over the map.
+- Fast start: the service worker shows the saved version at once and fetches a new one in the background (a button offers to load it); while the file is still coming in, a short loading screen in the Sly Solutions style is shown instead of a half-built page.
 - Sections menu (≡): tap a section to switch it on or off (saved), press and hold to show only that one while the menu is open.
 - Tile mode: add `?tile=strip` (or `?tile=now,strip`, `tl`, `map`, `chart`, `days`) to the URL to show only those tiles with the place name, handy as a home-screen shortcut. Long-press the installed app icon for ready-made shortcuts (Showers, Now, Radar, Timeline).
 
 ## Privacy by design
 
-Exactly three requests leave your device per refresh:
+Exactly four requests leave your device per refresh:
 
 1. One request to **Open-Meteo** (KNMI HARMONIE model) with your coordinate **rounded to about 1 km**.
 2. One request to **Open-Meteo** for a **fixed grid of 10 x 10 model points over the whole Netherlands** (hourly precipitation, 7 days), used for the map beyond the radar hours. The grid is identical for everyone and says nothing about you.
 3. One request for the **national Buienradar radar image**, which is identical for everyone. The local rain nowcast is read from that image on your device.
+4. One request for the **national readings of the KNMI weather stations** via Buienradar (temperature, wind, sunshine power, rain), also identical for everyone. Your device picks the nearest station itself; it gives the measured "now" and how light or dull it is outside.
 
-No geocoding, no map tiles, no third-party fonts or scripts: the map, fonts and Leaflet are embedded in the file. Saved places and settings live in your browser's local storage. "Nerd mode" shows a log of every outgoing request. Location is used only when you press a button: the raw position is rounded at once, never stored and never leaves the device. A Content-Security-Policy in the page makes the browser enforce all of this: only Open-Meteo and the Buienradar image host are allowed, nothing else can load or run.
+No geocoding, no map tiles, no third-party fonts or scripts: the map, fonts and Leaflet are embedded in the file. Saved places and settings live in your browser's local storage. "Nerd mode" shows a log of every outgoing request. Location is used only when you press a button: the raw position is rounded at once, never stored and never leaves the device. A Content-Security-Policy in the page makes the browser enforce all of this: only Open-Meteo and the two Buienradar hosts (radar image, station readings) are allowed, nothing else can load or run.
 
 ## Run it yourself
 
