@@ -598,7 +598,7 @@ footer a{color:inherit}
 <script>{{LEAFLET_JS}}</script>
 <script>
 /* ============ Data ============ */
-const APP_VERSION = '1.9.5';
+const APP_VERSION = '1.9.6';
 const GEMEENTEN = {{GEMEENTEN}};
 const PROVINCIES = {{PROVINCIES}};
 const LIJNEN = {{LIJNEN}};
@@ -663,8 +663,8 @@ const I18N = {
     bft_hint: 'Bft = Beaufort: windkracht van 0 (windstil) tot 12 (orkaan).',
     bft_names: ['windstil', 'zwak', 'zwak', 'matig', 'matig', 'vrij krachtig', 'krachtig', 'hard', 'stormachtig', 'storm', 'zware storm', 'zeer zware storm', 'orkaan'],
     k_chance: 'kans {p}%', k_peak: 'piek {v} mm/u · {t}', k_dry: 'droog', next12h_s: '12 uur',
-    s_title: 'Vandaag', s_title_tom: 'Vandaag en morgen', s_src_radar: 'de radar', s_src_model: 'het model',
-    s_wet_end: 'Het regent nu ({l}); volgens {s} is het rond {t} droog.', s_wet_on: 'Het regent nu ({l}) en volgens {s} blijft dat het komende uur zo.', s_rain_at: 'Het is nu droog, maar volgens {s} begint het rond {t} te regenen ({l}).', s_dry_on: 'Het komende uur blijft het volgens {s} droog', s_but: ', al geeft het model {p}% kans op wat neerslag',
+    s_title: 'Vandaag', s_title_tom: 'Vandaag en morgen',
+    s_wet_end: 'Het regent nu ({l}), rond {t} is het droog.', s_wet_on: 'Het regent nu ({l}) en dat blijft het komende uur zo.', s_rain_at: 'Het is nu droog, maar rond {t} begint het te regenen ({l}).', s_dry_on: 'Het komende uur blijft het droog', s_but: ', al geeft het model {p}% kans op wat neerslag',
     s_temp: 'Het is {temp}° en {lt}', s_feels_wind: ', maar door de wind voelt het als {f}°', s_feels: ', het voelt als {f}°', s_t1: '; over een uur {t}°',
     s_wind: 'Wind uit het {dir}, {bft} Bft ({bn}, {ws} km/u)', s_up: ', die het komende uur aantrekt naar {b} Bft', s_down: ', die het komende uur afneemt naar {b} Bft', s_gust: ', met stoten tot {g}',
     s_wet_lot: 'Sinds {t} is er flink wat regen gevallen (±{mm} mm), dus buiten is het nog nat.', s_wet_bit: 'Sinds {t} viel er wat regen (±{mm} mm); buiten kan het nog nat zijn.', s_slip: 'Met temperaturen rond het vriespunt kan het glad zijn.',
@@ -722,8 +722,8 @@ const I18N = {
     bft_hint: 'Bft = Beaufort: wind force from 0 (calm) to 12 (hurricane).',
     bft_names: ['calm', 'light air', 'light breeze', 'gentle breeze', 'moderate breeze', 'fresh breeze', 'strong breeze', 'near gale', 'gale', 'strong gale', 'storm', 'violent storm', 'hurricane'],
     k_chance: 'chance {p}%', k_peak: 'peak {v} mm/h · {t}', k_dry: 'dry', next12h_s: '12 hours',
-    s_title: 'Today', s_title_tom: 'Today and tomorrow', s_src_radar: 'the radar', s_src_model: 'the model',
-    s_wet_end: 'It is raining now ({l}); according to {s} it will be dry around {t}.', s_wet_on: 'It is raining now ({l}) and according to {s} it keeps raining for the next hour.', s_rain_at: 'It is dry now, but according to {s} rain starts around {t} ({l}).', s_dry_on: 'According to {s} the next hour stays dry', s_but: ', though the model gives a {p}% chance of some precipitation',
+    s_title: 'Today', s_title_tom: 'Today and tomorrow',
+    s_wet_end: 'It is raining now ({l}), dry again around {t}.', s_wet_on: 'It is raining now ({l}) and it keeps raining for the next hour.', s_rain_at: 'It is dry now, but rain starts around {t} ({l}).', s_dry_on: 'The next hour stays dry', s_but: ', though the model still puts the chance of some precipitation at {p}%',
     s_temp: 'It is {temp}° and {lt}', s_feels_wind: ', but the wind makes it feel like {f}°', s_feels: ', it feels like {f}°', s_t1: '; {t}° in an hour',
     s_wind: 'Wind from the {dir}, {bft} Bft ({bn}, {ws} km/h)', s_up: ', picking up to {b} Bft in the next hour', s_down: ', easing to {b} Bft in the next hour', s_gust: ', with gusts up to {g}',
     s_wet_lot: 'Quite a lot of rain has fallen since {t} (about {mm} mm), so it is still wet outside.', s_wet_bit: 'Some rain fell since {t} (about {mm} mm); it may still be wet outside.', s_slip: 'With temperatures around freezing it may be slippery.',
@@ -1662,11 +1662,11 @@ function renderStory() {
   if (!currentPlace() || !meteo) { $('tlsum').hidden = true; return; }
   const c = meteo.current, now = nowLocal(), h0 = hourAt(now), h1 = hourAt(now + 3600000), a = nowA, names = ['', t('l1'), t('l2'), t('l3'), t('l4')], p1 = [], p2 = [];
   const lt = lightNow(), wet = a && a.raining, tmp = Math.round(c.temperature_2m), fl = Math.round(c.apparent_temperature), t1 = Math.round(h1.temp), ws = c.wind_speed_10m, b0 = bft(ws), b1 = bft(h1.ws);
-  const s = t(nowRs ? 's_src_radar' : 's_src_model'), pr = Math.round(Math.max(h0.prob, hourAt(now + 1800000).prob)), l = a && a.max ? a.max : names[1];
+  const pr = Math.round(Math.max(h0.prob, hourAt(now + 1800000).prob)), l = a && a.max ? a.max : names[1];
   if (a) {
-    if (wet) p1.push(a.endsIn != null && a.endsIn <= 60 ? t('s_wet_end', {l, s, t: clock(now + a.endsIn * 60000)}) : t('s_wet_on', {l, s}));
-    else if (a.nextIn != null && a.nextIn <= 60) p1.push(t('s_rain_at', {s, t: clock(now + a.nextIn * 60000), l: a.nextMax || names[1]}));
-    else p1.push(t('s_dry_on', {s}) + (nowRs && pr >= 50 ? t('s_but', {p: pr}) : '') + '.');
+    if (wet) p1.push(a.endsIn != null && a.endsIn <= 60 ? t('s_wet_end', {l, t: clock(now + a.endsIn * 60000)}) : t('s_wet_on', {l}));
+    else if (a.nextIn != null && a.nextIn <= 60) p1.push(t('s_rain_at', {t: clock(now + a.nextIn * 60000), l: a.nextMax || names[1]}));
+    else p1.push(t('s_dry_on') + (nowRs && pr >= 50 ? t('s_but', {p: pr}) : '') + '.');
   }
   p1.push(t('s_temp', {temp: tmp, lt: lt ? lt.word : lc(wmo(c.weather_code, c.is_day).txt)}) + (Math.abs(tmp - fl) >= 2 ? t(fl < tmp && ws >= 10 ? 's_feels_wind' : 's_feels', {f: fl}) : '') + (t1 !== tmp ? t('s_t1', {t: t1}) : '') + '.');
   const gust = Math.round(Math.max(h0.gust, h1.gust));
