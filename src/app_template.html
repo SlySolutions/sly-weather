@@ -15,9 +15,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>Sly Weather</title>
 <meta name="application-name" content="Sly Weather">
-<meta name="version" content="1.9.2">
+<meta name="version" content="1.9.3">
 <!--
-  Sly Weather v1.9.2: weather and rain for your own spot in the Netherlands, without sharing your location.
+  Sly Weather v1.9.3: weather and rain for your own spot in the Netherlands, without sharing your location.
   A Sly Solutions project · https://slysolutions.nl
   Live app      https://slysolutions.nl/weather/
   Source, issues and ideas: https://github.com/SlySolutions/sly-weather
@@ -56,7 +56,7 @@
   --rain-1:#BFE3FF; --rain-2:#5FB4F2; --rain-3:#1F6FEB; --rain-4:#8B3FD9; --rain-5:#D23B6B;
   --temp:#E0702A; --temp-cold:#2F7FD6;
   --map-land:#E3E6EA; --map-line:#C9CFD6; --map-prov:#8A939E; --map-sea:#F4F5F7; --map-water:#9CC4E8; --map-road:#C9A27A; --map-place:#5A6470; --map-urban:#D5D9DE; --map-rail:#9AA3AD; --map-hw:#D98B2B; --map-place2:#8C96A2;
-  --ok:#2E8B57; --night:rgba(34,40,47,.17); --day:rgba(246,135,18,.06); --veil:#FFFFFF;
+  --ok:#2E8B57; --night:rgba(34,40,47,.17); --day:rgba(246,135,18,.06);
   --radius:14px;
   --font-body:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --font-mono:"Space Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
@@ -73,7 +73,7 @@
     --rain-1:#3B7DB8; --rain-2:#5FB4F2; --rain-3:#9CD3FF; --rain-4:#C79BFF; --rain-5:#FF7AA2;
     --temp:#FFB066; --temp-cold:#7FB6FF;
     --map-land:#2A3038; --map-line:#3A424C; --map-prov:#6B7684; --map-sea:#14171B; --map-water:#3D6A94; --map-road:#6E5A44; --map-place:#A6AEB8; --map-urban:#363D47; --map-rail:#6F7984; --map-hw:#B9772A; --map-place2:#737E8B;
-    --ok:#5BD08A; --night:rgba(0,0,0,.5); --day:rgba(255,255,255,.05); --veil:#3A4250;
+    --ok:#5BD08A; --night:rgba(0,0,0,.5); --day:rgba(255,255,255,.05);
     --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7);
     color-scheme:dark;
   }
@@ -86,7 +86,7 @@
   --rain-1:#3B7DB8; --rain-2:#5FB4F2; --rain-3:#9CD3FF; --rain-4:#C79BFF; --rain-5:#FF7AA2;
   --temp:#FFB066; --temp-cold:#7FB6FF;
   --map-land:#2A3038; --map-line:#3A424C; --map-prov:#6B7684; --map-sea:#14171B; --map-water:#3D6A94; --map-road:#6E5A44; --map-place:#A6AEB8; --map-urban:#363D47; --map-rail:#6F7984; --map-hw:#B9772A; --map-place2:#737E8B;
-  --ok:#5BD08A; --night:rgba(0,0,0,.5); --day:rgba(255,255,255,.05); --veil:#3A4250;
+  --ok:#5BD08A; --night:rgba(0,0,0,.5); --day:rgba(255,255,255,.05);
   --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px -18px rgba(0,0,0,.7);
   color-scheme:dark;
 }
@@ -98,7 +98,7 @@
   --rain-1:#2F6B4A; --rain-2:#3FA66A; --rain-3:#5BF07A; --rain-4:#C8FF5B; --rain-5:#F68712;
   --temp:#F68712; --temp-cold:#5FB4F2;
   --map-land:#101A14; --map-line:#1F3A27; --map-prov:#5FAA6A; --map-sea:#0A0E0C; --map-water:#2A6B5A; --map-road:#4A5A2A; --map-place:#9FE8A8; --map-urban:#15241B; --map-rail:#3E7A4A; --map-hw:#5FA86C; --map-place2:#4F8A5C;
-  --ok:#5BF07A; --night:rgba(0,0,0,.55); --day:rgba(159,232,168,.06); --veil:#1F4A2C;
+  --ok:#5BF07A; --night:rgba(0,0,0,.55); --day:rgba(159,232,168,.06);
   --font-body:var(--font-mono); --font-head:var(--font-mono);
   --radius:2px; --shadow:none;
   color-scheme:dark;
@@ -333,7 +333,7 @@ footer a{color:inherit}
 .tl .sum{margin-top:12px;border-left:3px solid var(--accent);background:var(--accent-soft);padding:10px 14px;border-radius:0 var(--radius) var(--radius) 0;font-size:.9rem}
 .tl .sum .eyebrow{display:block;margin-bottom:4px}.tl .sum p{margin:0 0 6px}.tl .sum p:last-child{margin:0}
 .tl .legend .ln.prob{border-top:2px dotted var(--rain-3)}
-.tl .legend .veil{display:inline-block;width:16px;height:10px;vertical-align:-1px;margin-right:4px;background:color-mix(in srgb,var(--veil) 68%,var(--bg-3));border-radius:2px}
+.tl .legend .veil{display:inline-block;width:16px;height:10px;vertical-align:-1px;margin-right:4px;background:color-mix(in srgb,var(--accent) 22%,var(--bg-2));border-radius:2px}
 .tl .legend .arrow{color:var(--ok);font-weight:800;margin-right:4px}
 .tl .legend .ln{display:inline-block;width:16px;height:0;border-top:2px solid var(--temp);vertical-align:middle;margin-right:4px}
 .tl .legend .ln.wind{border-top:2px dashed var(--ok)}
@@ -342,7 +342,6 @@ footer a{color:inherit}
 .tl .legend .nowm{display:inline-block;width:2px;height:12px;vertical-align:-2px;margin-right:4px;background:#D23B6B}
 .tl .legend .dot{display:inline-block;width:8px;height:8px;border-radius:999px;vertical-align:0;margin-right:4px;background:var(--temp)}
 .tl .legend .dot.lo{background:var(--temp-cold)}
-.tl .story{margin-top:10px;font-size:.9rem}.tl .story p{margin:0 0 6px}.tl .story p:last-child{margin:0}
 /* Klein kaartje onder de tijdlijn: volgt de cursor; 0,54x tot 8x, slepen, ⌖ terug naar je plek */
 .tl .mapwrap{position:relative;margin-top:12px}
 .tl canvas.tlmap{display:block;width:100%;height:auto;border-radius:10px;background:var(--map-sea);touch-action:pan-y}
@@ -373,7 +372,6 @@ footer a{color:inherit}
 .chips button{appearance:none;border:1px solid var(--line);background:var(--bg-2);color:var(--text-2);font:inherit;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:999px;cursor:pointer}
 .chips button[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
 .chips button.solo{box-shadow:0 0 0 2px var(--accent)}
-.chips.units{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}.chips.units span{margin-right:2px}
 :root[data-theme="nerd"] .menu{border-color:var(--text-2)}:root[data-theme="nerd"] .chips button{border-radius:2px}
 /* Tegelmodus (?tile=strip,now): alleen de gekozen tegels met de plaatsnaam, voor een snelkoppeling op het beginscherm */
 :root.widget header.top,:root.widget .locbar,:root.widget #welcome,:root.widget .nerd,:root.widget .privacy,:root.widget footer,:root.widget .totop,:root.widget .cardctl{display:none!important}
@@ -453,7 +451,7 @@ footer a{color:inherit}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
       </button>
     </div>
-    <div class="menu" id="menu" hidden><div class="chips" id="chips"></div><p class="hint2" id="chiphint"></p><div class="chips units" id="wunits" role="group"></div><p class="hint2" id="bfthint"></p></div>
+    <div class="menu" id="menu" hidden><div class="chips" id="chips"></div><p class="hint2" id="chiphint"></p></div>
   </header>
 
   <!-- Locatie -->
@@ -522,8 +520,7 @@ footer a{color:inherit}
         <div class="legend" id="tllegend"></div>
         <div class="mapwrap"><canvas class="tlmap" id="tlmap" role="img" aria-label="Neerslagkaart"></canvas><div class="mapwx" id="tlwx" aria-live="polite"></div><div class="maplbl" id="tlmaplbl"></div><div class="mapzoom"><button type="button" id="mzin" aria-label="+">+</button><button type="button" id="mzout" aria-label="-">−</button><button type="button" id="mzhome" data-i18n-title="home_title">⌖</button><button type="button" id="mzfree" aria-pressed="false">🔒</button></div></div>
         <div class="legend" id="tlmaplegend"></div>
-        <div class="sum" id="tlsum" hidden><div class="eyebrow" data-i18n="sum_title">Nu en het komende uur</div><div id="tlsumt"></div></div>
-        <div class="story" id="tlstory"></div>
+        <div class="sum" id="tlsum" hidden><div class="eyebrow" id="tlsumh"></div><div id="tlsumt"></div></div>
       </div>
     </section>
 
@@ -601,7 +598,7 @@ footer a{color:inherit}
 <script>{{LEAFLET_JS}}</script>
 <script>
 /* ============ Data ============ */
-const APP_VERSION = '1.9.2';
+const APP_VERSION = '1.9.3';
 const GEMEENTEN = {{GEMEENTEN}};
 const PROVINCIES = {{PROVINCIES}};
 const LIJNEN = {{LIJNEN}};
@@ -657,24 +654,29 @@ const I18N = {
     dirs: ['N', 'NO', 'O', 'ZO', 'Z', 'ZW', 'W', 'NW'], dirsL: ['noorden', 'noordoosten', 'oosten', 'zuidoosten', 'zuiden', 'zuidwesten', 'westen', 'noordwesten'],
     tl_title: 'Tijdlijn', tl_sub: 'sleep het oranje bolletje', tomorrow: 'morgen', yesterday: 'gisteren', radar: 'radar', model: 'model',
     r_rain: 'neerslag', gust: 'stoten', cloud: 'bewolking', mmh: 'mm/u',
-    moment: '{d} om {t}: {w}, {temp}°, voelt als {feels}°. Wind uit het {dir}, {ws}, stoten tot {gust}. Bewolking {cloud}%.',
-    rain_none: 'In dit uur geen neerslag verwacht (kans {p}%).', rain_some: 'In dit uur {mm} mm neerslag, kans {p}%.',
-    radar_dry: 'Radar om {t}: droog boven {p}.', radar_wet: 'Radar om {t}: {l} boven {p}.', radar_exp: 'Radar voor {t} (verwacht): {l} boven {p}.', radar_exp_dry: 'Radar voor {t} (verwacht): droog boven {p}.',
-    day_sum: '{d}: {min}° tot {max}°, {mm} mm neerslag, {w}. Zon op {a}, onder {b}.',
     tl_temp: 'temp', tl_wind: 'wind (Bft rechts: Beaufort 0 tot 12)', tl_prob: 'kans %', tl_past: 'verleden', tl_cloud: 'bewolking', tl_rain: 'neerslag', tl_now: 'nu', tl_hi: 'max', tl_lo: 'min', legend: 'Legenda',
     model_lbl: 'model', map_model_sub: '±40 km', map_radar_lbl: 'Radar {t}', map_radar_fut: 'Radar {t}, verwacht', map_model_lbl: 'Model {d} {t} · ±40 km',
     leg_radar: 'radar', leg_model: 'model mm/u 0,2 · 0,5 · 1 · 2,5 · 5+', leg_place: 'je plek', leg_wind: 'wind: de pijl komt uit de windrichting naar je plek, langer is harder', leg_wx: 'weer en temperatuur op je plek', bigmap_lock: 'Kaart vast: alleen + en −, je plek blijft in beeld en de pagina scrolt gewoon. Tik om slepen en knijpen aan te zetten.', upd_ready: 'Nieuwe versie klaar · tik om te laden',
-    light: 'licht', light_s: 'Licht: {w}.', measured_in: 'gemeten in {st} ({km} km, {t})', lt_model: 'modelschatting', kv_obs: 'meetstation (dichtstbij)',
+    light: 'licht', measured_in: 'gemeten in {st} ({km} km, {t})', lt_model: 'modelschatting', kv_obs: 'meetstation (dichtstbij)',
     lt_sun: 'zonnig', lt_mixed: 'half zonnig', lt_grey: 'grijs', lt_dull: 'grauw', lt_dark: 'erg grauw en donker', lt_dusk: 'schemerig', lt_night: 'donker',
-    sum_title: 'Nu en het komende uur', sum_now_dry: 'Nu ({t}): {lt}, droog, {temp}°.', sum_now_wet: 'Nu ({t}): regen ({l}), {lt}, {temp}°.', sum_feels_wind: 'Voelt als {f}°.', sum_feels: 'Voelt als {f}°.',
-    sum_wind: 'Wind {dir} {bft} Bft{ws}{g}{tr}.', sum_gust: ', stoten {g}', sum_up: ', loopt op naar {b} Bft', sum_down: ', zakt naar {b} Bft',
-    sum_meas: 'Gemeten in {st} ({km} km, {t}): {ta}°, {bft} Bft{r}.', sum_meas_r: '; het afgelopen uur viel daar {mm} mm', sum_src_radar: 'Radar', sum_src_model: 'Model',
-    sum_dry_at: '{s}: droog rond {t}.', sum_wet_on: '{s}: blijft nat.', sum_rain_at: '{s}: regen rond {t} ({l}).', sum_dry_on: '{s}: blijft droog.',
-    sum_chance: '{p}% kans op neerslag{mm}.', sum_mm: ', ±{mm} mm', sum_t_up: 'Temperatuur stijgt naar {t}°.', sum_t_down: 'Temperatuur zakt naar {t}°.', sum_t_flat: 'Temperatuur blijft rond {t}°.', sum_set: 'Zon onder om {t}.', sum_rise: 'Zon op om {t}.',
     map_hide: 'Kaartje verbergen', map_show: 'Kaartje tonen', map_lock: 'Kaart vast: alleen + en −, je plek in het midden. Tik om slepen en pinch aan te zetten.', map_free: 'Kaart vrij: slepen en pinch. Tik om weer vast te zetten.', m_menu: 'Delen', chip_hint: 'Tik: aan of uit (bewaard). Lang indrukken: even alleen dit deel, tot je het menu sluit.', all: 'Alles',
-    wunit: 'Wind in', u_kmh: 'km/u', u_ms: 'm/s', u_kn: 'knopen', u_bft: 'Bft', bft_hint: 'Bft = Beaufort: windkracht van 0 (windstil) tot 12 (orkaan).',
+    bft_hint: 'Bft = Beaufort: windkracht van 0 (windstil) tot 12 (orkaan).',
     bft_names: ['windstil', 'zwak', 'zwak', 'matig', 'matig', 'vrij krachtig', 'krachtig', 'hard', 'stormachtig', 'storm', 'zware storm', 'zeer zware storm', 'orkaan'],
     k_chance: 'kans {p}%', k_peak: 'piek {v} mm/u · {t}', k_dry: 'droog', next12h_s: '12 uur',
+    s_title_now: 'Nu en straks', s_title_at: 'Rond dit moment', s_src_radar: 'de radar', s_src_model: 'het model',
+    s_now_dry: 'Het is {t}, {lt} en droog, {temp}°', s_now_wet: 'Het is {t} en het regent ({l}), {temp}°', s_feels_wind: '; door de wind voelt het als {f}°', s_feels: '; het voelt als {f}°',
+    s_wind: 'Wind uit het {dir}, {bft} Bft ({bn}, {ws} km/u)', s_up: ', die het komende uur aantrekt naar {b} Bft', s_down: ', die het komende uur afneemt naar {b} Bft', s_gust: ', met stoten tot {g} km/u',
+    s_meas: 'Het weerstation in {st} ({km} km) mat om {t} {ta}°', s_meas_r: ' en het afgelopen uur {mm} mm regen',
+    s_dry_at: 'Volgens {s} is het rond {t} droog.', s_wet_on: 'Volgens {s} blijft het het komende uur nat.', s_rain_at: 'Volgens {s} begint het rond {t} te regenen ({l}).', s_dry_on: 'Volgens {s} blijft het het komende uur droog', s_but: ', al geeft het model {p}% kans op wat neerslag',
+    s_t1: 'Over een uur is het {t}°.', s_rise: 'De zon komt op om {t}.', s_set: 'De zon gaat onder om {t}.',
+    s_tmax: 'Later vandaag wordt het maximaal {t}°, rond {at}.', s_tfall: 'Later vandaag zakt de temperatuur naar {t}°.', s_tflat: 'Later vandaag blijft het rond {t}°.',
+    s_dry: 'Het blijft droog.', s_dry_p: 'Het blijft waarschijnlijk droog, al is er tot {p}% kans op een bui.', s_rain: 'Regen tussen {a} en {b}, samen ±{mm} mm', s_rain_off: 'Af en toe regen tussen {a} en {b}, samen ±{mm} mm', s_peak: ', het hardst rond {t} ({v} mm/u)',
+    s_gusts: 'Stoten tot {g} km/u rond {at}.', s_night: 'Vannacht koelt het af tot {t}°', s_night_rain: ', met regen (±{mm} mm).', s_night_dry: ' en blijft het droog.',
+    s_tom: 'Morgen: {w}, {min} tot {max}°{r}.', s_tom_mm: ', ±{mm} mm', s_tom_dry: ', droog',
+    s_at: '{d} om {t}: {w}, {temp}°{f}.', s_at_f: ' (voelt als {f}°)', s_at_wind: 'Wind uit het {dir}, {bft} Bft ({bn}, {ws} km/u){g}.', s_at_gust: ', stoten tot {g} km/u',
+    s_at_mm: 'In dat uur valt ±{mm} mm (kans {p}%).', s_at_dry: 'Droog in dat uur.', s_at_dryp: 'Waarschijnlijk droog, al is de kans op neerslag {p}%.',
+    s_at_rw: 'De radar zag toen regen ({l}).', s_at_rd: 'De radar zag toen geen regen.', s_at_rwf: 'De radar verwacht dan regen ({l}).', s_at_rdf: 'De radar verwacht dan geen regen.', s_at_lt: 'Het is {lt}, bewolking {c}%.',
+    s_day: '{d}: {w}, {min} tot {max}°.', s_sun: 'Zon op {a}, onder {b}.',
     sec_now: 'Nu', sec_strip: 'Buien', sec_tl: 'Tijdlijn', sec_chart: 'Grafiek', sec_map: 'Kaart', sec_days: 'Dagen'
   },
   en: {
@@ -715,24 +717,29 @@ const I18N = {
     dirs: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'], dirsL: ['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest'],
     tl_title: 'Timeline', tl_sub: 'drag the orange handle', tomorrow: 'tomorrow', yesterday: 'yesterday', radar: 'radar', model: 'model',
     r_rain: 'rain', gust: 'gusts', cloud: 'cloud', mmh: 'mm/h',
-    moment: '{d} at {t}: {w}, {temp}°, feels like {feels}°. Wind from the {dir}, {ws}, gusts to {gust}. Cloud cover {cloud}%.',
-    rain_none: 'No precipitation expected in this hour ({p}% chance).', rain_some: '{mm} mm of precipitation in this hour, {p}% chance.',
-    radar_dry: 'Radar at {t}: dry over {p}.', radar_wet: 'Radar at {t}: {l} over {p}.', radar_exp: 'Radar for {t} (expected): {l} over {p}.', radar_exp_dry: 'Radar for {t} (expected): dry over {p}.',
-    day_sum: '{d}: {min}° to {max}°, {mm} mm of precipitation, {w}. Sunrise {a}, sunset {b}.',
     tl_temp: 'temp', tl_wind: 'wind (Bft right: Beaufort 0 to 12)', tl_prob: 'chance %', tl_past: 'past', tl_cloud: 'cloud', tl_rain: 'rain', tl_now: 'now', tl_hi: 'high', tl_lo: 'low', legend: 'Legend',
     model_lbl: 'model', map_model_sub: '±40 km', map_radar_lbl: 'Radar {t}', map_radar_fut: 'Radar {t}, expected', map_model_lbl: 'Model {d} {t} · ±40 km',
     leg_radar: 'radar', leg_model: 'model mm/h 0.2 · 0.5 · 1 · 2.5 · 5+', leg_place: 'your place', leg_wind: 'wind: the arrow comes from the wind direction towards your place, longer is stronger', leg_wx: 'weather and temperature at your place', bigmap_lock: 'Map locked: + and − only, your place stays in view and the page scrolls normally. Tap to allow drag and pinch.', upd_ready: 'New version ready · tap to load',
-    light: 'light', light_s: 'Light: {w}.', measured_in: 'measured at {st} ({km} km, {t})', lt_model: 'model estimate', kv_obs: 'weather station (nearest)',
+    light: 'light', measured_in: 'measured at {st} ({km} km, {t})', lt_model: 'model estimate', kv_obs: 'weather station (nearest)',
     lt_sun: 'sunny', lt_mixed: 'partly sunny', lt_grey: 'grey', lt_dull: 'dull', lt_dark: 'very dull and dark', lt_dusk: 'dusky', lt_night: 'dark',
-    sum_title: 'Now and the next hour', sum_now_dry: 'Now ({t}): {lt}, dry, {temp}°.', sum_now_wet: 'Now ({t}): rain ({l}), {lt}, {temp}°.', sum_feels_wind: 'Feels like {f}°.', sum_feels: 'Feels like {f}°.',
-    sum_wind: 'Wind {dir} {bft} Bft{ws}{g}{tr}.', sum_gust: ', gusts {g}', sum_up: ', rising to {b} Bft', sum_down: ', easing to {b} Bft',
-    sum_meas: 'Measured at {st} ({km} km, {t}): {ta}°, {bft} Bft{r}.', sum_meas_r: '; {mm} mm fell there in the past hour', sum_src_radar: 'Radar', sum_src_model: 'Model',
-    sum_dry_at: '{s}: dry around {t}.', sum_wet_on: '{s}: stays wet.', sum_rain_at: '{s}: rain around {t} ({l}).', sum_dry_on: '{s}: stays dry.',
-    sum_chance: '{p}% chance of precipitation{mm}.', sum_mm: ', ±{mm} mm', sum_t_up: 'Temperature rising to {t}°.', sum_t_down: 'Temperature dropping to {t}°.', sum_t_flat: 'Temperature around {t}°.', sum_set: 'Sunset {t}.', sum_rise: 'Sunrise {t}.',
     map_hide: 'Hide map', map_show: 'Show map', map_lock: 'Map locked: + and − only, your place in the centre. Tap to allow drag and pinch.', map_free: 'Map free: drag and pinch. Tap to lock again.', m_menu: 'Sections', chip_hint: 'Tap: on or off (saved). Press and hold: only this section for now, until you close the menu.', all: 'All',
-    wunit: 'Wind in', u_kmh: 'km/h', u_ms: 'm/s', u_kn: 'knots', u_bft: 'Bft', bft_hint: 'Bft = Beaufort: wind force from 0 (calm) to 12 (hurricane).',
+    bft_hint: 'Bft = Beaufort: wind force from 0 (calm) to 12 (hurricane).',
     bft_names: ['calm', 'light air', 'light breeze', 'gentle breeze', 'moderate breeze', 'fresh breeze', 'strong breeze', 'near gale', 'gale', 'strong gale', 'storm', 'violent storm', 'hurricane'],
     k_chance: 'chance {p}%', k_peak: 'peak {v} mm/h · {t}', k_dry: 'dry', next12h_s: '12 hours',
+    s_title_now: 'Now and later', s_title_at: 'Around this time', s_src_radar: 'the radar', s_src_model: 'the model',
+    s_now_dry: 'It is {t}, {lt} and dry, {temp}°', s_now_wet: 'It is {t} and raining ({l}), {temp}°', s_feels_wind: '; the wind makes it feel like {f}°', s_feels: '; it feels like {f}°',
+    s_wind: 'Wind from the {dir}, {bft} Bft ({bn}, {ws} km/h)', s_up: ', picking up to {b} Bft in the next hour', s_down: ', easing to {b} Bft in the next hour', s_gust: ', with gusts up to {g} km/h',
+    s_meas: 'The weather station at {st} ({km} km) measured {ta}° at {t}', s_meas_r: ' and {mm} mm of rain in the past hour',
+    s_dry_at: 'According to {s} it will be dry around {t}.', s_wet_on: 'According to {s} it stays wet for the next hour.', s_rain_at: 'According to {s} rain starts around {t} ({l}).', s_dry_on: 'According to {s} it stays dry for the next hour', s_but: ', though the model gives a {p}% chance of some precipitation',
+    s_t1: 'In an hour it will be {t}°.', s_rise: 'The sun rises at {t}.', s_set: 'The sun sets at {t}.',
+    s_tmax: 'Later today it reaches {t}°, around {at}.', s_tfall: 'Later today the temperature drops to {t}°.', s_tflat: 'Later today it stays around {t}°.',
+    s_dry: 'It stays dry.', s_dry_p: 'It probably stays dry, though there is up to a {p}% chance of a shower.', s_rain: 'Rain between {a} and {b}, about {mm} mm in total', s_rain_off: 'Rain on and off between {a} and {b}, about {mm} mm in total', s_peak: ', heaviest around {t} ({v} mm/h)',
+    s_gusts: 'Gusts up to {g} km/h around {at}.', s_night: 'Tonight it cools to {t}°', s_night_rain: ', with rain (about {mm} mm).', s_night_dry: ' and stays dry.',
+    s_tom: 'Tomorrow: {w}, {min} to {max}°{r}.', s_tom_mm: ', about {mm} mm', s_tom_dry: ', dry',
+    s_at: '{d} at {t}: {w}, {temp}°{f}.', s_at_f: ' (feels like {f}°)', s_at_wind: 'Wind from the {dir}, {bft} Bft ({bn}, {ws} km/h){g}.', s_at_gust: ', gusts up to {g} km/h',
+    s_at_mm: 'About {mm} mm falls in that hour ({p}% chance).', s_at_dry: 'Dry in that hour.', s_at_dryp: 'Probably dry, though the chance of precipitation is {p}%.',
+    s_at_rw: 'The radar saw rain ({l}) then.', s_at_rd: 'The radar saw no rain then.', s_at_rwf: 'The radar expects rain ({l}) then.', s_at_rdf: 'The radar expects no rain then.', s_at_lt: 'It is {lt}, cloud cover {c}%.',
+    s_day: '{d}: {w}, {min} to {max}°.', s_sun: 'Sunrise {a}, sunset {b}.',
     sec_now: 'Now', sec_strip: 'Showers', sec_tl: 'Timeline', sec_chart: 'Chart', sec_map: 'Map', sec_days: 'Days'
   }
 };
@@ -768,11 +775,9 @@ const clock = ms => { const d = new Date(ms); return pad(d.getUTCHours()) + ':' 
 const minsText = m => m < 60 ? `${m} ${t('min')}` : (m % 60 === 0 ? `${m / 60} ${t(m === 60 ? 'hour' : 'hours')}` : `${Math.floor(m / 60)} ${t('h')} ${m % 60} ${t('min')}`);
 const wmo = (c, day = 1) => { const w = WMO[c] || ['Onbekend', 'Unknown', '•', '•']; return {txt: lang === 'nl' ? w[0] : w[1], ico: day ? w[2] : w[3]}; };
 const windDir = d => t('dirs')[Math.round(d / 45) % 8];
-/* Wind in de eenheid uit het menu. Bft is de windkracht van Beaufort: 0 windstil tot 12 orkaan */
-let wUnit = LS.get('bb_wunit', 'kmh');
-const wTxt = k => (wUnit === 'ms' ? fmt1(k / 3.6) : Math.round(wUnit === 'kn' ? k / 1.852 : k)) + ' ' + t('u_' + wUnit);
-const wAlt = k => wUnit === 'bft' ? '' : wTxt(k), wMain = k => wUnit === 'bft' ? bft(k) + ' Bft' : wTxt(k) + ' (' + bft(k) + ' Bft)', wGust = k => wUnit === 'bft' ? bft(k) + ' Bft' : wTxt(k);
-const wKv = (k, d) => wUnit === 'bft' ? `${d} ${bft(k)} Bft (${t('bft_names')[bft(k)]})` : `${wTxt(k)} ${d} (${bft(k)} Bft, ${t('bft_names')[bft(k)]})`;
+/* Wind: windkracht van Beaufort (0 windstil tot 12 orkaan) voorop, km/u erbij */
+const wTxt = k => Math.round(k) + ' ' + t('km_h'), wMain = k => bft(k) + ' Bft (' + wTxt(k) + ')';
+const wKv = (k, d) => `${d} ${bft(k)} Bft (${t('bft_names')[bft(k)]}, ${wTxt(k)})`;
 const bft = k => { const th = [1, 5, 11, 19, 28, 38, 49, 61, 74, 88, 102, 117]; let b = 0; while (b < 12 && k >= th[b]) b++; return b; };
 
 function applyLang(l) {
@@ -1282,7 +1287,7 @@ function render(lat, lon) {
   const w = wmo(c.weather_code, c.is_day);
   $('temp').innerHTML = Math.round(c.temperature_2m) + '<sup>°C</sup>';
   $('nowico').textContent = w.ico; $('nowdesc').textContent = w.txt;
-  $('nowsub').textContent = `${t('feels')} ${Math.round(c.apparent_temperature)}° · ${t('wind')} ${windDir(c.wind_direction_10m)} ${bft(c.wind_speed_10m)} Bft${wAlt(c.wind_speed_10m) ? ' (' + wAlt(c.wind_speed_10m) + ')' : ''} · ${c.relative_humidity_2m}% ${t('humidity')}`;
+  $('nowsub').textContent = `${t('feels')} ${Math.round(c.apparent_temperature)}° · ${t('wind')} ${windDir(c.wind_direction_10m)} ${bft(c.wind_speed_10m)} Bft (${wTxt(c.wind_speed_10m)}) · ${c.relative_humidity_2m}% ${t('humidity')}`;
   $('nowtime').textContent = clock(parseLocal(c.time)) + ' ' + t('localtime');
 
   const {s, rs} = buildSeries(lat, lon); const a = analyse(s);
@@ -1312,7 +1317,7 @@ function render(lat, lon) {
   buildRadarLayer();
   placePin();
   renderTL(lat, lon);
-  nowA = a; nowRs = rs; renderSummary();
+  nowA = a; nowRs = rs;
   const ln = lightNow(); $('nowlight').hidden = !ln;
   if (ln) $('nowlight').textContent = uc(t('light')) + ': ' + ln.word + ' · ' + (ln.st ? t('measured_in', {st: ln.st.n, km: Math.round(ln.km), t: clock(ln.st.t)}) : t('lt_model'));
   bootDone();
@@ -1415,8 +1420,6 @@ function applyVisible() {
 function renderChips() {
   $('chips').innerHTML = order.map(k => `<button type="button" data-sec="${k}" aria-pressed="${shown.includes(k)}" class="${solo === k ? 'solo' : ''}">${t('sec_' + k)}</button>`).join('') + `<button type="button" data-sec="all" aria-pressed="${shown.length === DEFAULT_ORDER.length}">${t('all')}</button>`;
   $('chiphint').textContent = t('chip_hint');
-  $('wunits').innerHTML = `<span>${t('wunit')}</span>` + ['kmh', 'ms', 'kn', 'bft'].map(u => `<button type="button" data-u="${u}" aria-pressed="${wUnit === u}">${t('u_' + u)}</button>`).join('');
-  $('bfthint').textContent = t('bft_hint');
 }
 function setMenu(open) { $('menu').hidden = !open; $('menubtn').setAttribute('aria-expanded', String(open)); if (!open) solo = null; renderChips(); applyVisible(); }
 $('menubtn').addEventListener('click', () => setMenu($('menu').hidden));
@@ -1425,7 +1428,6 @@ let holdT = 0, held = false;
 $('chips').addEventListener('pointerdown', e => { const b = e.target.closest('button'); if (!b || b.dataset.sec === 'all') return; held = false; clearTimeout(holdT); holdT = setTimeout(() => { held = true; solo = b.dataset.sec; renderChips(); applyVisible(); }, 450); });
 ['pointerup', 'pointercancel', 'pointerleave'].forEach(k => $('chips').addEventListener(k, () => clearTimeout(holdT)));
 $('chips').addEventListener('contextmenu', e => e.preventDefault());
-$('wunits').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; wUnit = b.dataset.u; LS.set('bb_wunit', wUnit); renderChips(); if (meteo && currentPlace()) render(lastLat, lastLon); });
 $('chips').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (held) { held = false; return; } const k = b.dataset.sec;
   setShown(k === 'all' ? DEFAULT_ORDER.slice() : shown.includes(k) ? shown.filter(x => x !== k) : DEFAULT_ORDER.filter(x => shown.includes(x) || x === k)); });
 
@@ -1562,9 +1564,9 @@ function drawTL() {
     g.fillStyle = p.night ? col('--temp-cold') : col('--temp'); g.beginPath(); g.arc(kx, ky, 3, 0, Math.PI * 2); g.fill();
     g.lineWidth = 3; g.strokeStyle = col('--bg-2'); g.lineJoin = 'round'; g.strokeText(txt, lx, ly); g.fillText(txt, lx, ly);
   }
-  /* Verleden: een waas over alles links van nu (per thema een eigen kleur, zodat hij ook op donker opvalt), de toekomst blijft helder */
+  /* Verleden: een oranje waas over alles links van nu (eerst vervagen, dan kleuren; op donker niet te verwarren met de nacht), de toekomst blijft helder */
   const now = nowLocal();
-  if (x(now) > 0) { g.fillStyle = col('--veil'); g.globalAlpha = .68; g.fillRect(0, top - 4, Math.min(W - TLR, x(now)), bottom - top + 6); g.globalAlpha = 1; }
+  if (x(now) > 0) { const vw = Math.min(W - TLR, x(now)); g.fillStyle = col('--bg-2'); g.globalAlpha = .6; g.fillRect(0, top - 4, vw, bottom - top + 6); g.fillStyle = col('--accent'); g.globalAlpha = .16; g.fillRect(0, top - 4, vw, bottom - top + 6); g.globalAlpha = 1; }
   /* Nu en de cursor; het label van de cursor is het oranje bolletje (HTML), dat je kunt slepen */
   g.strokeStyle = '#D23B6B'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(x(now), top - 4); g.lineTo(x(now), bottom + 2); g.stroke();
   const sx = x(sel); g.strokeStyle = col('--accent'); g.lineWidth = 2; g.beginPath(); g.moveTo(sx, top - 4); g.lineTo(sx, H - 12); g.stroke();
@@ -1606,14 +1608,7 @@ function drawReadout() {
   $('r-kv').innerHTML = kv.map(([k, v]) => `<span>${k} <b>${v}</b></span>`).join(''); $('r-kv').title = t('bft_hint');
   $('tlrain').hidden = !nearNow; $('tlkpis').hidden = !nearNow;
   if (nearNow) { $('tlrain').className = 'rainline' + ($('rainline').classList.contains('wet') ? ' wet' : ''); $('tlraint').textContent = $('raintitle').textContent; $('tlrains').textContent = $('rainsub').textContent; $('tlmm1').innerHTML = $('mm1').innerHTML; $('tlmm12').innerHTML = $('mm12').innerHTML; $('tldry').textContent = $('dry').textContent; ['mm1s', 'mm12s', 'drys'].forEach(k => $('tl' + k).textContent = $(k).textContent); }
-  const ps = [];
-  ps.push(t('moment', {d: uc(relDay(sel)), t: clock(sel), w: lc(w.txt), temp: Math.round(hv.temp), feels: Math.round(hv.feels), ws: wMain(hv.ws), dir: t('dirsL')[Math.round(hv.wd / 45) % 8], gust: wGust(hv.gust), cloud: Math.round(hv.cloud)})
-    + ' ' + (hv.mm > 0 ? t('rain_some', {mm: fmt1(hv.mm), p: Math.round(hv.prob)}) : t('rain_none', {p: Math.round(hv.prob)})) + (lt && !nearNow ? ' ' + t('light_s', {w: lt.word}) : ''));
-  const p = currentPlace();
-  if (inRadar && p) { const fut = b.t > radar.base + tzOffset * 1000; ps.push(t(b.l ? (fut ? 'radar_exp' : 'radar_wet') : (fut ? 'radar_exp_dry' : 'radar_dry'), {t: clock(b.t), l: names[b.l], p: p.name})); }
-  const di = dayAt(sel);
-  if (di >= 0) { const d = meteo.daily; ps.push(t('day_sum', {d: uc(dayName(sel)), min: Math.round(d.temperature_2m_min[di]), max: Math.round(d.temperature_2m_max[di]), mm: fmt1(d.precipitation_sum[di] || 0), w: lc(wmo(d.weather_code[di]).txt), a: clock(parseLocal(d.sunrise[di])), b: clock(parseLocal(d.sunset[di]))})); }
-  $('tlstory').innerHTML = ps.map(x => '<p>' + x + '</p>').join('');
+  renderStory(nearNow, hv, b, inRadar, w, lt, names);
 }
 /* ============ Licht en metingen in de buurt ============ */
 function parseObs(j) {
@@ -1655,29 +1650,76 @@ function lightAt(ms) {
   if (el < 2) return {word: t(lightWord(0, el))};
   return {word: t(lightWord(h.shortwave_radiation[i] ?? 0, Math.max(2, elm), h.cloud_cover[i]))};
 }
-/* Nu en het komende uur: een korte samenvatting uit de meest actuele bronnen (meting in de buurt, radar voor de buien, model voor wind, kans en temperatuur) */
+/* ============ Het verhaal: één doorlopende tekst uit alle bronnen (meting in de buurt, radar, model) ============ */
 let nowA = null, nowRs = null;
-function renderSummary() {
-  const p = currentPlace(); if (!p || !meteo) { $('tlsum').hidden = true; return; }
-  const c = meteo.current, now = nowLocal(), h1 = hourAt(now + 3600000), h0 = hourAt(now), a = nowA, names = ['', t('l1'), t('l2'), t('l3'), t('l4')];
-  const lt = lightNow(), wet = a && a.raining, tmp = Math.round(c.temperature_2m), fl = Math.round(c.apparent_temperature);
-  const p1 = [t(wet ? 'sum_now_wet' : 'sum_now_dry', {t: clock(now), lt: lt ? lt.word : lc(wmo(c.weather_code, c.is_day).txt), temp: tmp, l: a && a.max ? a.max : names[1]})];
-  if (tmp - fl >= 2) p1.push(t(c.wind_speed_10m >= 10 ? 'sum_feels_wind' : 'sum_feels', {f: fl})); else if (fl - tmp >= 2) p1.push(t('sum_feels', {f: fl}));
-  const b0 = bft(c.wind_speed_10m), b1 = bft(h1.ws), gust = Math.round(Math.max(h0.gust, h1.gust));
-  p1.push(t('sum_wind', {dir: windDir(c.wind_direction_10m), bft: b0, ws: wAlt(c.wind_speed_10m) ? ' (' + wAlt(c.wind_speed_10m) + ')' : '',
-    g: gust >= Math.max(50, c.wind_speed_10m + 15) ? t('sum_gust', {g: wGust(gust)}) : '', tr: b1 > b0 ? t('sum_up', {b: b1}) : b1 < b0 ? t('sum_down', {b: b1}) : ''}));
-  const o = obsNear('ta'); if (o) p1.push(t('sum_meas', {st: o.st.n, km: Math.round(o.km), t: clock(o.st.t), ta: fmt1(o.st.ta), bft: o.st.ws != null ? bft(o.st.ws) : '?', r: o.st.r1 > 0 ? t('sum_meas_r', {mm: fmt1(o.st.r1)}) : ''}));
-  const src = t(nowRs ? 'sum_src_radar' : 'sum_src_model'), p2 = [];
-  if (a) {
-    if (wet) p2.push(a.endsIn != null && a.endsIn <= 60 ? t('sum_dry_at', {s: src, t: clock(now + a.endsIn * 60000)}) : t('sum_wet_on', {s: src}));
-    else p2.push(a.nextIn != null && a.nextIn <= 60 ? t('sum_rain_at', {s: src, t: clock(now + a.nextIn * 60000), l: a.nextMax || names[1]}) : t('sum_dry_on', {s: src}));
+/* De uren na a tot en met b samengevat; de uurneerslag van het model is de som over het voorafgaande uur */
+function hoursSum(a, b) {
+  const h = meteo.hourly, h0 = parseLocal(h.time[0]), r = {n: 0, mm: 0, p: 0, wa: null, wb: null, wh: 0, pk: 0, pt: 0, g: 0, gt: 0, tx: -99, xt: 0, tn: 99};
+  for (let i = 0; i < h.time.length; i++) {
+    const ts = h0 + i * 3600000; if (ts <= a || ts > b) continue;
+    const mm = h.precipitation[i] || 0, tt = h.temperature_2m[i]; r.n++; r.mm += mm; r.p = Math.max(r.p, h.precipitation_probability[i] || 0);
+    if (mm >= .1) { if (r.wa == null) r.wa = Math.max(Math.floor(a / 3600000) * 3600000, ts - 3600000); r.wb = ts; r.wh++; } if (mm > r.pk) { r.pk = mm; r.pt = ts - 1800000; }
+    if ((h.wind_gusts_10m[i] || 0) > r.g) { r.g = h.wind_gusts_10m[i]; r.gt = ts; } if (tt > r.tx) { r.tx = tt; r.xt = ts; } if (tt < r.tn) r.tn = tt;
   }
-  const mm1 = sumMM(1), pr = Math.round(Math.max(h0.prob, hourAt(now + 1800000).prob));
-  p2.push(t('sum_chance', {p: pr, mm: mm1 >= .1 ? t('sum_mm', {mm: fmt1(mm1)}) : ''}));
-  const t1 = Math.round(h1.temp); p2.push(t(t1 > tmp ? 'sum_t_up' : t1 < tmp ? 'sum_t_down' : 'sum_t_flat', {t: t1}));
-  const di = dayAt(now); if (di >= 0) { const d = meteo.daily, rise = parseLocal(d.sunrise[di]), set = parseLocal(d.sunset[di]);
-    if (set > now && set - now <= 90 * 60000) p2.push(t('sum_set', {t: clock(set)})); else if (rise > now && rise - now <= 90 * 60000) p2.push(t('sum_rise', {t: clock(rise)})); }
-  $('tlsumt').innerHTML = '<p>' + p1.join(' ') + '</p><p>' + p2.join(' ') + '</p>'; $('tlsum').hidden = false;
+  return r;
+}
+/* Regen in gewone woorden: droog, of van wanneer tot wanneer (af en toe als het meer dan de helft droog is), hoeveel en wanneer het hardst */
+const rainPhrase = r => r.mm < .1 ? t(r.p >= 40 ? 's_dry_p' : 's_dry', {p: Math.round(r.p)})
+  : t(r.wh * 3600000 < (r.wb - r.wa) * .6 ? 's_rain_off' : 's_rain', {a: clock(r.wa), b: clock(r.wb), mm: fmt1(r.mm)}) + (r.pk >= 1 ? t('s_peak', {t: clock(r.pt), v: fmt1(r.pk)}) : '') + '.';
+/* Nu: wat je buiten merkt, de wind, de meting in de buurt en het komende uur; daarna de rest van de dag, de nacht en 's avonds ook morgen */
+function storyNow() {
+  const c = meteo.current, now = nowLocal(), h0 = hourAt(now), h1 = hourAt(now + 3600000), a = nowA, names = ['', t('l1'), t('l2'), t('l3'), t('l4')], p1 = [], p2 = [];
+  const lt = lightNow(), wet = a && a.raining, tmp = Math.round(c.temperature_2m), fl = Math.round(c.apparent_temperature), ws = c.wind_speed_10m, b0 = bft(ws), b1 = bft(h1.ws);
+  p1.push(t(wet ? 's_now_wet' : 's_now_dry', {t: clock(now), lt: lt ? lt.word : lc(wmo(c.weather_code, c.is_day).txt), temp: tmp, l: a && a.max ? a.max : names[1]})
+    + (Math.abs(tmp - fl) >= 2 ? t(fl < tmp && ws >= 10 ? 's_feels_wind' : 's_feels', {f: fl}) : '') + '.');
+  const gust = Math.round(Math.max(h0.gust, h1.gust));
+  p1.push(t('s_wind', {dir: t('dirsL')[Math.round(c.wind_direction_10m / 45) % 8], bft: b0, bn: t('bft_names')[b0], ws: Math.round(ws)})
+    + (b1 > b0 ? t('s_up', {b: b1}) : b1 < b0 ? t('s_down', {b: b1}) : '') + (gust >= Math.max(40, ws + 15) ? t('s_gust', {g: gust}) : '') + '.');
+  const o = obsNear('ta'); if (o) p1.push(t('s_meas', {st: o.st.n, km: Math.round(o.km), t: clock(o.st.t), ta: fmt1(o.st.ta)}) + (o.st.r1 > 0 ? t('s_meas_r', {mm: fmt1(o.st.r1)}) : '') + '.');
+  const s = t(nowRs ? 's_src_radar' : 's_src_model'), pr = Math.round(Math.max(h0.prob, hourAt(now + 1800000).prob));
+  if (a) {
+    if (wet) p1.push(a.endsIn != null && a.endsIn <= 60 ? t('s_dry_at', {s, t: clock(now + a.endsIn * 60000)}) : t('s_wet_on', {s}));
+    else if (a.nextIn != null && a.nextIn <= 60) p1.push(t('s_rain_at', {s, t: clock(now + a.nextIn * 60000), l: a.nextMax || names[1]}));
+    else p1.push(t('s_dry_on', {s}) + (nowRs && pr >= 50 ? t('s_but', {p: pr}) : '') + '.');
+  }
+  const t1 = Math.round(h1.temp); if (t1 !== tmp) p1.push(t('s_t1', {t: t1}));
+  const d = meteo.daily, di = dayAt(now); if (di < 0) return [p1, p2];
+  const rise = parseLocal(d.sunrise[di]), set = parseLocal(d.sunset[di]), mid = (dayOf(now) + 1) * 86400000;
+  if (rise > now && rise - now <= 90 * 60000) p1.push(t('s_rise', {t: clock(rise)})); else if (set > now && set - now <= 90 * 60000) p1.push(t('s_set', {t: clock(set)}));
+  if (mid - now >= 3 * 3600000) {
+    const r = hoursSum(now + 3600000, mid);
+    p2.push(r.tx > tmp + .5 ? t('s_tmax', {t: Math.round(r.tx), at: clock(r.xt)}) : r.tn < tmp - .5 ? t('s_tfall', {t: Math.round(r.tn)}) : t('s_tflat', {t: tmp}), rainPhrase(r));
+    if (r.g >= 40) p2.push(t('s_gusts', {g: Math.round(r.g), at: clock(r.gt)}));
+    if (set - now > 90 * 60000) p2.push(t('s_set', {t: clock(set)}));
+  }
+  if (di + 1 < d.time.length) {
+    const n = now < rise ? hoursSum(now, rise) : hoursSum(Math.max(now, set), parseLocal(d.sunrise[di + 1]));
+    if (n.n) p2.push(t('s_night', {t: Math.round(n.tn)}) + (n.mm >= .3 ? t('s_night_rain', {mm: fmt1(n.mm)}) : n.p < 40 ? t('s_night_dry') : '.'));
+    if (mid - now < 8 * 3600000) { const k = di + 1, mm = d.precipitation_sum[k] || 0;
+      p2.push(t('s_tom', {w: lc(wmo(d.weather_code[k]).txt), min: Math.round(d.temperature_2m_min[k]), max: Math.round(d.temperature_2m_max[k]), r: mm >= .1 ? t('s_tom_mm', {mm: fmt1(mm)}) : t('s_tom_dry')})); }
+  }
+  return [p1, p2];
+}
+/* Een ander moment: dat uur (bij de radaruren met wat de radar ziet) en daarna die hele dag */
+function storyAt(ms, hv, b, inRadar, w, lt, names) {
+  const p1 = [], p2 = [], tmp = Math.round(hv.temp), fl = Math.round(hv.feels), bf = bft(hv.ws);
+  p1.push(t('s_at', {d: uc(relDay(ms)), t: clock(ms), w: lc(w.txt), temp: tmp, f: Math.abs(tmp - fl) >= 2 ? t('s_at_f', {f: fl}) : ''}));
+  p1.push(t('s_at_wind', {dir: t('dirsL')[Math.round(hv.wd / 45) % 8], bft: bf, bn: t('bft_names')[bf], ws: Math.round(hv.ws), g: hv.gust >= hv.ws + 15 ? t('s_at_gust', {g: Math.round(hv.gust)}) : ''}));
+  if (inRadar) { const fut = b.t > radar.base + tzOffset * 1000; p1.push(t(b.l ? (fut ? 's_at_rwf' : 's_at_rw') : (fut ? 's_at_rdf' : 's_at_rd'), {l: names[b.l]})); }
+  else p1.push(hv.mm >= .1 ? t('s_at_mm', {mm: fmt1(hv.mm), p: Math.round(hv.prob)}) : t(hv.prob >= 40 ? 's_at_dryp' : 's_at_dry', {p: Math.round(hv.prob)}));
+  if (lt) p1.push(t('s_at_lt', {lt: lt.word, c: Math.round(hv.cloud)}));
+  const di = dayAt(ms); if (di < 0) return [p1, p2];
+  const d = meteo.daily, r = hoursSum(dayOf(ms) * 86400000, (dayOf(ms) + 1) * 86400000);
+  p2.push(t('s_day', {d: uc(relDay(ms)), w: lc(wmo(d.weather_code[di]).txt), min: Math.round(d.temperature_2m_min[di]), max: Math.round(d.temperature_2m_max[di])}), rainPhrase(r));
+  if (r.g >= 40) p2.push(t('s_gusts', {g: Math.round(r.g), at: clock(r.gt)}));
+  p2.push(t('s_sun', {a: clock(parseLocal(d.sunrise[di])), b: clock(parseLocal(d.sunset[di]))}));
+  return [p1, p2];
+}
+function renderStory(nearNow, ...at) {
+  if (!currentPlace() || !meteo) { $('tlsum').hidden = true; return; }
+  const ps = nearNow ? storyNow() : storyAt(sel, ...at);
+  $('tlsumh').textContent = t(nearNow ? 's_title_now' : 's_title_at');
+  $('tlsumt').innerHTML = ps.filter(x => x.length).map(x => '<p>' + x.join(' ') + '</p>').join(''); $('tlsum').hidden = false;
 }
 /* De kaart volgt de cursor: binnen de radaruren het radarbeeld van dat moment, daarna het modelraster als laag over de kaart */
 let modelOverlay = null, modelCache = {};
@@ -1757,7 +1799,7 @@ function drawTLMap() {
   if (p) {
     const d = roundDigits(), ppx = mpx(+p.lon.toFixed(d), W), ppy = mpy(+p.lat.toFixed(d), H), wx = wxAt(sel);
     /* Weer, temperatuur en wind van dat moment linksboven; de pijl wijst waar de wind heen waait */
-    $('tlwx').innerHTML = `<span class="ico" aria-hidden="true">${wx.ico}</span><span class="tmp">${Math.round(wx.temp)}°</span><span class="wd"><svg viewBox="0 0 24 24" aria-hidden="true" style="transform:rotate(${Math.round(wx.wd)}deg)"><path d="M12 3v15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M6 13l6 8 6-8z" fill="currentColor"/></svg><span><b>${windDir(wx.wd)} ${bft(wx.ws)} Bft</b>${wAlt(wx.ws) || t('bft_names')[bft(wx.ws)]}</span></span>`;
+    $('tlwx').innerHTML = `<span class="ico" aria-hidden="true">${wx.ico}</span><span class="tmp">${Math.round(wx.temp)}°</span><span class="wd"><svg viewBox="0 0 24 24" aria-hidden="true" style="transform:rotate(${Math.round(wx.wd)}deg)"><path d="M12 3v15" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M6 13l6 8 6-8z" fill="currentColor"/></svg><span><b>${windDir(wx.wd)} ${bft(wx.ws)} Bft</b>${wTxt(wx.ws)}</span></span>`;
     g.fillStyle = col('--accent'); g.strokeStyle = col('--bg-2'); g.lineWidth = 2; g.beginPath(); g.arc(ppx, ppy, 6, 0, Math.PI * 2); g.fill(); g.stroke();
   }
   $('tlmaplbl').textContent = lbl;
