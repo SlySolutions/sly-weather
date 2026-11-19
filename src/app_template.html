@@ -15,9 +15,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>Sly Weather</title>
 <meta name="application-name" content="Sly Weather">
-<meta name="version" content="1.9.4">
+<meta name="version" content="1.9.5">
 <!--
-  Sly Weather v1.9.4: weather and rain for your own spot in the Netherlands, without sharing your location.
+  Sly Weather v1.9.5: weather and rain for your own spot in the Netherlands, without sharing your location.
   A Sly Solutions project · https://slysolutions.nl
   Live app      https://slysolutions.nl/weather/
   Source, issues and ideas: https://github.com/SlySolutions/sly-weather
@@ -598,7 +598,7 @@ footer a{color:inherit}
 <script>{{LEAFLET_JS}}</script>
 <script>
 /* ============ Data ============ */
-const APP_VERSION = '1.9.4';
+const APP_VERSION = '1.9.5';
 const GEMEENTEN = {{GEMEENTEN}};
 const PROVINCIES = {{PROVINCIES}};
 const LIJNEN = {{LIJNEN}};
@@ -666,12 +666,12 @@ const I18N = {
     s_title: 'Vandaag', s_title_tom: 'Vandaag en morgen', s_src_radar: 'de radar', s_src_model: 'het model',
     s_wet_end: 'Het regent nu ({l}); volgens {s} is het rond {t} droog.', s_wet_on: 'Het regent nu ({l}) en volgens {s} blijft dat het komende uur zo.', s_rain_at: 'Het is nu droog, maar volgens {s} begint het rond {t} te regenen ({l}).', s_dry_on: 'Het komende uur blijft het volgens {s} droog', s_but: ', al geeft het model {p}% kans op wat neerslag',
     s_temp: 'Het is {temp}° en {lt}', s_feels_wind: ', maar door de wind voelt het als {f}°', s_feels: ', het voelt als {f}°', s_t1: '; over een uur {t}°',
-    s_wind: 'Wind uit het {dir}, {bft} Bft ({bn}, {ws} km/u)', s_up: ', die het komende uur aantrekt naar {b} Bft', s_down: ', die het komende uur afneemt naar {b} Bft', s_gust: ', met stoten tot {g} km/u',
+    s_wind: 'Wind uit het {dir}, {bft} Bft ({bn}, {ws} km/u)', s_up: ', die het komende uur aantrekt naar {b} Bft', s_down: ', die het komende uur afneemt naar {b} Bft', s_gust: ', met stoten tot {g}',
     s_wet_lot: 'Sinds {t} is er flink wat regen gevallen (±{mm} mm), dus buiten is het nog nat.', s_wet_bit: 'Sinds {t} viel er wat regen (±{mm} mm); buiten kan het nog nat zijn.', s_slip: 'Met temperaturen rond het vriespunt kan het glad zijn.',
     s_meas: 'Het weerstation in {st} ({km} km) meet {ta}° ({t}).', s_rise: 'De zon komt op om {t}.', s_set: 'De zon gaat onder om {t}.',
     s_tmax: 'Later vandaag wordt het maximaal {t}°, rond {at}.', s_tfall: 'Later vandaag zakt de temperatuur naar {t}°.', s_tflat: 'Later vandaag blijft het rond {t}°.',
     s_dry: 'Het blijft droog.', s_dry_p: 'Het blijft waarschijnlijk droog, al is er tot {p}% kans op een bui.', s_rain: 'Regen tussen {a} en {b}, samen ±{mm} mm', s_rain_off: 'Af en toe regen tussen {a} en {b}, samen ±{mm} mm', s_peak: ', het hardst rond {t} ({v} mm/u)',
-    s_gusts: 'Stoten tot {g} km/u rond {at}.', s_night: 'Vannacht koelt het af tot {t}°', s_night_rain: ', met regen (±{mm} mm).', s_night_dry: ' en blijft het droog.',
+    s_gusts: 'Stoten tot {g} rond {at}.', s_night: 'Vannacht koelt het af tot {t}°', s_night_rain: ', met regen (±{mm} mm).', s_night_dry: ' en blijft het droog.',
     s_tom: 'Morgen: {w}, {min} tot {max}°{r}.', s_tom_mm: ', ±{mm} mm', s_tom_dry: ', droog',
     sec_now: 'Nu', sec_strip: 'Buien', sec_tl: 'Tijdlijn', sec_chart: 'Grafiek', sec_map: 'Kaart', sec_days: 'Dagen'
   },
@@ -725,12 +725,12 @@ const I18N = {
     s_title: 'Today', s_title_tom: 'Today and tomorrow', s_src_radar: 'the radar', s_src_model: 'the model',
     s_wet_end: 'It is raining now ({l}); according to {s} it will be dry around {t}.', s_wet_on: 'It is raining now ({l}) and according to {s} it keeps raining for the next hour.', s_rain_at: 'It is dry now, but according to {s} rain starts around {t} ({l}).', s_dry_on: 'According to {s} the next hour stays dry', s_but: ', though the model gives a {p}% chance of some precipitation',
     s_temp: 'It is {temp}° and {lt}', s_feels_wind: ', but the wind makes it feel like {f}°', s_feels: ', it feels like {f}°', s_t1: '; {t}° in an hour',
-    s_wind: 'Wind from the {dir}, {bft} Bft ({bn}, {ws} km/h)', s_up: ', picking up to {b} Bft in the next hour', s_down: ', easing to {b} Bft in the next hour', s_gust: ', with gusts up to {g} km/h',
+    s_wind: 'Wind from the {dir}, {bft} Bft ({bn}, {ws} km/h)', s_up: ', picking up to {b} Bft in the next hour', s_down: ', easing to {b} Bft in the next hour', s_gust: ', with gusts up to {g}',
     s_wet_lot: 'Quite a lot of rain has fallen since {t} (about {mm} mm), so it is still wet outside.', s_wet_bit: 'Some rain fell since {t} (about {mm} mm); it may still be wet outside.', s_slip: 'With temperatures around freezing it may be slippery.',
     s_meas: 'The weather station at {st} ({km} km) measures {ta}° ({t}).', s_rise: 'The sun rises at {t}.', s_set: 'The sun sets at {t}.',
     s_tmax: 'Later today it reaches {t}°, around {at}.', s_tfall: 'Later today the temperature drops to {t}°.', s_tflat: 'Later today it stays around {t}°.',
     s_dry: 'It stays dry.', s_dry_p: 'It probably stays dry, though there is up to a {p}% chance of a shower.', s_rain: 'Rain between {a} and {b}, about {mm} mm in total', s_rain_off: 'Rain on and off between {a} and {b}, about {mm} mm in total', s_peak: ', heaviest around {t} ({v} mm/h)',
-    s_gusts: 'Gusts up to {g} km/h around {at}.', s_night: 'Tonight it cools to {t}°', s_night_rain: ', with rain (about {mm} mm).', s_night_dry: ' and stays dry.',
+    s_gusts: 'Gusts up to {g} around {at}.', s_night: 'Tonight it cools to {t}°', s_night_rain: ', with rain (about {mm} mm).', s_night_dry: ' and stays dry.',
     s_tom: 'Tomorrow: {w}, {min} to {max}°{r}.', s_tom_mm: ', about {mm} mm', s_tom_dry: ', dry',
     sec_now: 'Now', sec_strip: 'Showers', sec_tl: 'Timeline', sec_chart: 'Chart', sec_map: 'Map', sec_days: 'Days'
   }
@@ -1671,7 +1671,7 @@ function renderStory() {
   p1.push(t('s_temp', {temp: tmp, lt: lt ? lt.word : lc(wmo(c.weather_code, c.is_day).txt)}) + (Math.abs(tmp - fl) >= 2 ? t(fl < tmp && ws >= 10 ? 's_feels_wind' : 's_feels', {f: fl}) : '') + (t1 !== tmp ? t('s_t1', {t: t1}) : '') + '.');
   const gust = Math.round(Math.max(h0.gust, h1.gust));
   p1.push(t('s_wind', {dir: t('dirsL')[Math.round(c.wind_direction_10m / 45) % 8], bft: b0, bn: t('bft_names')[b0], ws: Math.round(ws)})
-    + (b1 > b0 ? t('s_up', {b: b1}) : b1 < b0 ? t('s_down', {b: b1}) : '') + (gust >= Math.max(40, ws + 15) ? t('s_gust', {g: gust}) : '') + '.');
+    + (b1 > b0 ? t('s_up', {b: b1}) : b1 < b0 ? t('s_down', {b: b1}) : '') + (gust >= Math.max(40, ws + 15) ? t('s_gust', {g: wMain(gust)}) : '') + '.');
   /* Nat buiten: regen van de afgelopen uren (model vanaf middernacht, plus wat het station het laatste uur mat); bij vorst erbij dat het glad kan zijn */
   const o = obsNear('ta'), past = hoursSum(Math.max(dayOf(now) * 86400000, now - 8 * 3600000), now), r1 = o && o.st.r1 > 0 ? o.st.r1 : 0, pmm = Math.max(past.mm, r1);
   if (!wet && pmm >= .3) p1.push(t(pmm >= 2 ? 's_wet_lot' : 's_wet_bit', {mm: fmt1(pmm), t: past.wa != null ? clock(past.wa) : clock(now - 3600000)}));
@@ -1684,7 +1684,7 @@ function renderStory() {
     if (mid - now >= 3 * 3600000) {
       const r = hoursSum(now + 3600000, mid);
       p2.push(r.tx > tmp + .5 ? t('s_tmax', {t: Math.round(r.tx), at: clock(r.xt)}) : r.tn < tmp - .5 ? t('s_tfall', {t: Math.round(r.tn)}) : t('s_tflat', {t: tmp}), rainPhrase(r));
-      if (r.g >= 40) p2.push(t('s_gusts', {g: Math.round(r.g), at: clock(r.gt)}));
+      if (r.g >= 40) p2.push(t('s_gusts', {g: wMain(r.g), at: clock(r.gt)}));
       if (set - now > 90 * 60000) p2.push(t('s_set', {t: clock(set)}));
     }
     if (di + 1 < d.time.length) {
