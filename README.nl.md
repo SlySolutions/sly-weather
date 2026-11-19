@@ -10,6 +10,8 @@ Zodra er een plek is bewaard staat naast "Nieuwe plek" de knop "Mijn locatie" (a
 
 Tegel Tijdlijn: uren en week in één (3 u tot 7 d) met neerslagstaven, temperatuur (hoogste van de dag in rood, laagste van de nacht in blauw), wind en bewolking; sleep erover en een kaartje direct eronder (pinch of muiswiel om te zoomen, slepen, in te klappen) plus een uitgeschreven verwachting volgen dat moment (de grote kaart volgt ook). Staat de cursor op nu, dan staan ook de buienregel en de kerngetallen van de tegel Nu erbij. Binnen de radaruren toont de kaart het radarbeeld, daarna een grof modelraster over Nederland (±40 km). Menu Delen (≡): tik om een deel aan of uit te zetten (bewaard), lang indrukken om even alleen dat deel te zien.
 
+Wind: kies in het menu (☰) km/u, m/s, knopen of Bft. Bft is de windkracht van Beaufort (0 windstil tot 12 orkaan) en staat er altijd bij, met de naam (zwak, matig, krachtig...). De tijdlijn heeft rechts een smalle Bft-as over de hele hoogte.
+
 Tegelmodus: zet `?tile=strip` achter het adres (of `?tile=now,strip`; ook `map`, `chart`, `days`) en je ziet alleen die tegel(s) met de plaatsnaam erbij, als link naar de hele app. Handig als snelkoppeling op het beginscherm: open die URL in de browser en kies "Toevoegen aan startscherm"; is de app geïnstalleerd, dan opent hij daarin. Lang indrukken van het app-icoon geeft kant-en-klare snelkoppelingen (Buien, Nu, Radar). Een echte Android-widget is vanuit een webapp niet mogelijk; dat zou een app-schil vragen.
 
 Taal: NL/EN-knop rechtsboven (standaard volgt de browsertaal). Tegels: met ▲▼ verplaats je ze, met de pijl (of een tik op de titel) klap je ze in; volgorde en inklapstand worden onthouden. In nerd mode kun je de volgorde herstellen.
