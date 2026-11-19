@@ -12,7 +12,7 @@ Tegel Tijdlijn: uren en week in één (3 u tot 7 d) met neerslagstaven, temperat
 
 Wind: windkracht van Beaufort voorop (Bft, 0 windstil tot 12 orkaan, met de naam zoals "matig") en km/u erbij. De tijdlijn heeft rechts een smalle Bft-as over de hele hoogte.
 
-Verhaal: onder het kaartje één doorlopende tekst uit alle opgehaalde gegevens voor jouw plek: op nu hoe het buiten is, de wind, het weerstation in de buurt, de radar voor het komende uur, de rest van de dag, de nacht en 's avonds ook morgen; op een ander moment dat uur en die hele dag.
+Verhaal: onder het kaartje één doorlopende tekst over vandaag uit alle opgehaalde gegevens voor jouw plek, los van de cursor: eerst het komende uur (radar, temperatuur, wind, of het buiten nog nat is van eerdere regen, gladheid rond het vriespunt, het weerstation in de buurt), dan de rest van de dag, de nacht en 's avonds ook morgen.
 
 Tegelmodus: zet `?tile=strip` achter het adres (of `?tile=now,strip`; ook `map`, `chart`, `days`) en je ziet alleen die tegel(s) met de plaatsnaam erbij, als link naar de hele app. Handig als snelkoppeling op het beginscherm: open die URL in de browser en kies "Toevoegen aan startscherm"; is de app geïnstalleerd, dan opent hij daarin. Lang indrukken van het app-icoon geeft kant-en-klare snelkoppelingen (Buien, Nu, Radar). Een echte Android-widget is vanuit een webapp niet mogelijk; dat zou een app-schil vragen.
 
