@@ -345,7 +345,7 @@ footer a{color:inherit}
 .tl .legend .band{display:inline-block;width:16px;height:7px;vertical-align:middle;margin-right:4px;background:linear-gradient(90deg,color-mix(in srgb,var(--text-2) 10%,transparent),color-mix(in srgb,var(--text-2) 70%,transparent))}
 .tl .legend .bar{display:inline-block;width:6px;height:12px;vertical-align:-2px;margin-right:4px;background:var(--rain-3)}
 /* Dagwissel: zelfde streepjes als de lijn om middernacht */
-.tl .legend .dayln{display:inline-block;width:0;height:12px;vertical-align:-2px;margin-right:5px;border-left:2px dashed var(--accent)}
+.tl .legend .dayln{display:inline-block;width:0;height:12px;vertical-align:-2px;margin-right:5px;border-left:1px dashed var(--accent);opacity:.55}
 .tl .legend .nowm{display:inline-block;width:2px;height:12px;vertical-align:-2px;margin-right:4px;background:#D23B6B}
 .tl .legend .dot{display:inline-block;width:8px;height:8px;border-radius:999px;vertical-align:0;margin-right:4px;background:var(--temp)}
 .tl .legend .dot.lo{background:var(--temp-cold)}
@@ -615,7 +615,7 @@ footer a{color:inherit}
 <script>{{LEAFLET_JS}}</script>
 <script>
 /* ============ Data ============ */
-const APP_VERSION = '1.10.0';
+const APP_VERSION = '1.10.1';
 const GEMEENTEN = {{GEMEENTEN}};
 const PROVINCIES = {{PROVINCIES}};
 const LIJNEN = {{LIJNEN}};
@@ -1516,8 +1516,8 @@ function drawTL() {
   }
   const vis = periods.map(p => ({a: Math.max(p.a, tStart), b: Math.min(p.b, tEnd), night: p.night})).filter(p => p.b > p.a);
   vis.forEach(p => { g.fillStyle = col(p.night ? '--night' : '--day'); g.fillRect(x(p.a), top, x(p.b) - x(p.a), bottom - top); });
-  /* Dagen: oranje streepjeslijn om middernacht (de schuiflijn is doorgetrokken), naam onderaan */
-  g.strokeStyle = col('--accent'); g.lineWidth = 1.5; g.globalAlpha = .8; g.setLineDash([5, 4]); g.fillStyle = col('--text-2'); g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+  /* Dagen: dunne, lichte oranje streepjeslijn om middernacht (de schuiflijn is doorgetrokken en fel), naam onderaan */
+  g.strokeStyle = col('--accent'); g.lineWidth = 1; g.globalAlpha = .4; g.setLineDash([4, 5]); g.fillStyle = col('--text-2'); g.textAlign = 'left'; g.textBaseline = 'alphabetic';
   const firstMid = (dayOf(tStart) + 1) * 86400000, dayLbl = [];
   for (let m = firstMid; m < tEnd; m += 86400000) { g.beginPath(); g.moveTo(x(m) + .5, top); g.lineTo(x(m) + .5, bottom + 4); g.stroke(); }
   g.setLineDash([]); g.globalAlpha = 1; g.lineWidth = 1;
