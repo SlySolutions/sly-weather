@@ -168,12 +168,14 @@ input[type=search]::-webkit-search-decoration{-webkit-appearance:none}
 [hidden]{display:none!important}
 
 /* ---- Locatiebalk ---- */
-.locbar{display:flex;align-items:center;justify-content:space-between;gap:10px 12px;flex-wrap:wrap;margin-top:16px}
-.locbar .place{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap}
-.locbar .place .n{font-weight:800;font-size:1.2rem;font-family:var(--font-head);letter-spacing:-.01em}
-.locbar select{font:inherit;color:var(--text);background:var(--bg-2);border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-weight:700;max-width:11rem}
+.locbar{display:flex;align-items:center;justify-content:space-between;gap:6px 12px;flex-wrap:wrap;margin-top:16px}
+/* Eén rij: plekkiezer, verwijderen, nieuwe plek, mijn locatie; op een telefoon vullen ze de rij en staat de status eronder */
+.locbar .place{display:flex;align-items:center;gap:6px;min-width:0}
+.locbar select{font:inherit;color:var(--text);background:var(--bg-2);border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-weight:700;min-width:0;max-width:15rem;text-overflow:ellipsis}
+.locbar .place .btn{flex:none;white-space:nowrap;gap:6px}.locbar .place .btn svg{width:14px;height:14px}
+.locbar .place .btn[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent)}
+@media (max-width:560px){.locbar .place{flex:1 1 100%}.locbar select{flex:1 1 0;max-width:none}.locbar #pickbtn span,.locbar #geobtn span{display:none}.locbar .place .btn{padding:7px 10px}}
 :root[data-theme="nerd"] select{border-radius:2px}
-.locbar .actions{display:flex;gap:6px;align-items:center}
 .status{font-size:.8rem;color:var(--text-2)}
 .status .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:6px;vertical-align:1px}
 .status.err .dot{background:var(--rain-5)}
@@ -297,7 +299,10 @@ footer .sly u{text-decoration-color:var(--accent);text-underline-offset:3px}.sly
 footer .sly svg{height:22px;width:26px}
 footer a{color:inherit}
 .privacy{font-size:.8rem;color:var(--text-2);margin-top:4px;line-height:1.55}
-.privacy b{color:var(--text)}
+.privacy b{color:var(--text)}.privacy summary{cursor:pointer}.privacy p{margin:6px 0 0}
+.help{margin:16px 0 0;scroll-margin-top:130px}.help ul{margin:0;padding-left:1.15em;display:grid;gap:6px;font-size:.9rem;color:var(--text-2);line-height:1.5}.help li b{color:var(--text)}
+@media (min-width:900px){.help ul{grid-template-columns:1fr 1fr;gap:6px 44px}}
+.privacy{scroll-margin-top:130px}
 
 /* ---- Eerste keer ---- */
 .welcome h1{font-family:var(--font-head);font-weight:800;font-size:clamp(1.5rem,5vw,2.1rem);letter-spacing:-.02em;margin:0 0 6px;text-wrap:balance;line-height:1.15}
@@ -339,6 +344,8 @@ footer a{color:inherit}
 .tl .legend .ln.wind{border-top:2px dashed var(--ok)}
 .tl .legend .band{display:inline-block;width:16px;height:7px;vertical-align:middle;margin-right:4px;background:linear-gradient(90deg,color-mix(in srgb,var(--text-2) 10%,transparent),color-mix(in srgb,var(--text-2) 70%,transparent))}
 .tl .legend .bar{display:inline-block;width:6px;height:12px;vertical-align:-2px;margin-right:4px;background:var(--rain-3)}
+/* Dagwissel: zelfde streepjes als de lijn om middernacht */
+.tl .legend .dayln{display:inline-block;width:0;height:12px;vertical-align:-2px;margin-right:5px;border-left:2px dashed var(--accent)}
 .tl .legend .nowm{display:inline-block;width:2px;height:12px;vertical-align:-2px;margin-right:4px;background:#D23B6B}
 .tl .legend .dot{display:inline-block;width:8px;height:8px;border-radius:999px;vertical-align:0;margin-right:4px;background:var(--temp)}
 .tl .legend .dot.lo{background:var(--temp-cold)}
@@ -368,19 +375,19 @@ footer a{color:inherit}
 /* ---- Menu met delen: tik is aan of uit (bewaard), lang indrukken toont even alleen dat deel zolang het menu open staat ---- */
 .menu{position:absolute;right:0;top:calc(100% + 6px);max-width:min(440px,100%);background:var(--bg-2);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px 12px;z-index:31}
 .menu .hint2{font-size:.72rem;color:var(--text-2);margin:8px 0 0}
+.menurow{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0;font-size:.78rem;color:var(--text-2);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .chips button{appearance:none;border:1px solid var(--line);background:var(--bg-2);color:var(--text-2);font:inherit;font-size:.78rem;font-weight:700;padding:3px 10px;border-radius:999px;cursor:pointer}
 .chips button[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
 .chips button.solo{box-shadow:0 0 0 2px var(--accent)}
 :root[data-theme="nerd"] .menu{border-color:var(--text-2)}:root[data-theme="nerd"] .chips button{border-radius:2px}
 /* Tegelmodus (?tile=strip,now): alleen de gekozen tegels met de plaatsnaam, voor een snelkoppeling op het beginscherm */
-:root.widget header.top,:root.widget .locbar,:root.widget #welcome,:root.widget .nerd,:root.widget .privacy,:root.widget footer,:root.widget .totop,:root.widget .cardctl{display:none!important}
+:root.widget header.top,:root.widget .locbar,:root.widget #welcome,:root.widget .nerd,:root.widget .privacy,:root.widget .help,:root.widget footer,:root.widget .totop,:root.widget .cardctl{display:none!important}
 :root.widget .app{padding-top:10px}:root.widget .cards{margin-top:0;columns:auto}
 /* Met een bewaarde plek: welkomstblok meteen weg en de plekbalk alvast met zijn hoogte (onzichtbaar) tot de app hem vult */
 :root.haspl #welcome{display:none}:root.haspl:not(.widget) #locbar[hidden]{display:flex!important;visibility:hidden}
 .wplace{display:none}:root.widget .wplace{display:inline-flex;align-items:center;gap:4px;margin-right:auto;font-weight:700;font-size:.9rem;color:var(--accent-ink);text-decoration:none;white-space:nowrap}
 :root.widget .card .head h2{margin-right:0}
-.locbar .actions .btn svg{width:14px;height:14px}
 
 /* ---- Laadscherm: zolang de app nog binnenkomt (trage verbinding) alleen dit, daarna in één keer de hele pagina.
    Zelfde beeldtaal als het procesblok op slysolutions.nl: grijze rail, oranje lijn die loopt, knooppunten die oplichten ---- */
@@ -443,7 +450,7 @@ footer a{color:inherit}
         <button type="button" data-theme-set="dark" aria-pressed="false" data-i18n-title="th_dark">☾</button>
         <button type="button" data-theme-set="nerd" aria-pressed="false" data-i18n-title="th_nerd">⌨</button>
       </div>
-      <button class="iconbtn" id="menubtn" type="button" data-i18n-title="m_menu" aria-label="Delen" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <button class="iconbtn" id="menubtn" type="button" data-i18n-title="m_menu" aria-label="Menu" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <button class="iconbtn ghost" id="totophdr" type="button" data-i18n-title="totop" aria-label="Naar boven">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
       </button>
@@ -451,18 +458,26 @@ footer a{color:inherit}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
       </button>
     </div>
-    <div class="menu" id="menu" hidden><div class="chips" id="chips"></div><p class="hint2" id="chiphint"></p></div>
+    <div class="menu" id="menu" hidden><div class="chips" id="chips"></div><p class="hint2" id="chiphint"></p><div class="menurow"><button class="btn small" id="helpbtn" type="button" data-i18n="help_btn">Uitleg</button><button class="btn small" id="privbtn" type="button" data-i18n="priv_btn">Privacy</button></div></div>
   </header>
 
   <!-- Locatie -->
   <div class="locbar" id="locbar" hidden>
     <div class="place">
-      <span class="n" id="placename">–</span>
-      <select id="placesel" aria-label="Plek" hidden></select>
-      <span class="actions"><button class="btn small" id="pickbtn" type="button" data-i18n="newplace">Nieuwe plek</button><button class="btn small" id="geobtn" type="button" data-i18n-title="geo_title" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg><span data-i18n="geo">Mijn locatie</span></button><button class="btn small primary" id="geosave" type="button" data-i18n="geo_save" hidden>Bewaar als plek</button><button class="btn small" id="delbtn" type="button" data-i18n-title="delplace">✕</button></span>
+      <select id="placesel" aria-label="Plek"></select>
+      <button class="btn small" id="delbtn" type="button" data-i18n-title="delplace">✕</button>
+      <button class="btn small primary" id="geosave" type="button" data-i18n="geo_save" data-i18n-title="geo_save_t" hidden>Bewaar</button>
+      <button class="btn small" id="pickbtn" type="button" data-i18n-title="newplace"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span data-i18n="newplace">Nieuwe plek</span></button>
+      <button class="btn small" id="geobtn" type="button" data-i18n-title="geo_title" aria-pressed="false" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg><span data-i18n="geo">Mijn locatie</span></button>
     </div>
     <div class="status" id="status"><span class="dot"></span><span id="statustext"></span></div>
   </div>
+
+  <!-- Uitleg: open via de knop op het eerste scherm of in het menu -->
+  <section class="card help" id="help" hidden>
+    <div class="head"><h2 data-i18n="help_title">Uitleg</h2><button class="btn small" id="helpclose" type="button" data-i18n="help_close">Sluiten</button></div>
+    <ul data-i18n-html="help_html"></ul>
+  </section>
 
   <div class="cards" id="cards">
     <!-- Eerste keer -->
@@ -470,7 +485,8 @@ footer a{color:inherit}
       <div><span class="eyebrow" data-i18n="w_eyebrow">Eerste keer</span>
       <h1 data-i18n="w_h1">Kies je plek op de kaart. Verder hoef je niets te delen.</h1></div>
       <div><p data-i18n="w_p1">Zoom in en tik op de kaart. De app rondt je keuze af op ongeveer een kilometer, bewaart hem alleen op dit toestel en vraagt daarna de verwachting op. Geen account, geen cookies.</p>
-      <p class="muted" style="font-size:.85rem" data-i18n="w_p2">Wat je toestel verlaat: één verzoek met een afgerond coördinaat naar Open-Meteo, en één verzoek om het landelijke radarbeeld van Buienradar dat voor iedereen gelijk is.</p></div>
+      <p class="muted" style="font-size:.85rem" data-i18n="w_p2">Wat je toestel verlaat: één verzoek met een afgerond coördinaat naar Open-Meteo, en één verzoek om het landelijke radarbeeld van Buienradar dat voor iedereen gelijk is.</p>
+      <p><button class="btn small" id="helpbtn0" type="button" data-i18n="help_btn">Uitleg</button></p></div>
     </section>
 
     <!-- Nu -->
@@ -580,7 +596,8 @@ footer a{color:inherit}
     </div>
   </section>
 
-  <p class="privacy" id="privacy"></p>
+  <!-- Privacy: altijd onderaan, standaard ingeklapt tot de eerste zin -->
+  <details class="privacy" id="privbox"><summary data-i18n-html="priv_sum"></summary><p id="privacy"></p></details>
 
   <footer>
     <a class="sly" href="https://slysolutions.nl" rel="noopener" target="_blank" title="Sly Solutions">{{BRAND_SVG_SMALL}}<span data-i18n-html="footer_by">Een <b>Sly Solutions</b>-project · <u>slysolutions.nl</u> ↗</span></a>
@@ -598,7 +615,7 @@ footer a{color:inherit}
 <script>{{LEAFLET_JS}}</script>
 <script>
 /* ============ Data ============ */
-const APP_VERSION = '1.9.6';
+const APP_VERSION = '1.10.0';
 const GEMEENTEN = {{GEMEENTEN}};
 const PROVINCIES = {{PROVINCIES}};
 const LIJNEN = {{LIJNEN}};
@@ -619,7 +636,7 @@ const I18N = {
   nl: {
     th_auto: 'Volg systeem', th_light: 'Licht', th_dark: 'Donker', th_nerd: 'Nerd', refresh: 'Vernieuwen',
     newplace: 'Nieuwe plek', delplace: 'Deze plek verwijderen', sure: 'Zeker? ✕',
-    geo: 'Mijn locatie', geo_title: 'Weer voor waar ik nu ben (afgerond, blijft op het toestel)', geo_save: 'Bewaar als plek', geo_temp: 'Mijn locatie', geo_unsaved: 'tijdelijk, niet bewaard',
+    geo: 'Mijn locatie', geo_title: 'Mijn locatie: het weer voor waar je nu bent, bij elke verversing opnieuw (afgerond, blijft op het toestel)', geo_save: 'Bewaar', geo_save_t: 'Bewaar als plek', geo_temp: 'Mijn locatie', geo_unsaved: 'volgt je locatie, niet bewaard',
     geo_abroad: 'buiten Nederland: kaart en radar dekken alleen Nederland, de verwachting werkt wel', totop: 'Naar boven', open_app: 'Open de hele app',
     w_eyebrow: 'Eerste keer', w_h1: 'Kies je plek op de kaart. Verder hoef je niets te delen.',
     w_p1: 'Zoom in en tik op de kaart. De app rondt je keuze af op ongeveer een kilometer, bewaart hem alleen op dit toestel en vraagt daarna de verwachting op. Geen account, geen cookies. Je kunt ook zoeken op plaatsnaam of postcode; die lijst zit in de app zelf.',
@@ -645,7 +662,7 @@ const I18N = {
     days_title: 'Komende dagen', days_sub: 'KNMI-model via Open-Meteo', today: 'vandaag', dry: 'droog',
     nerd_title: 'Nerd mode: wat verlaat je toestel', nerd_sub: 'verzoeklog · ruwe waarden', nolog: 'Nog geen verzoeken.', n_round: 'Afronding', n_model: 'Model', n_fetch: 'ophalen', n_manual: 'Handmatig', n_saveplace: 'Bewaar als plek', n_resetlayout: 'Tegelvolgorde herstellen', n_wipe: 'Wis alle lokale gegevens',
     st_cache: 'Uit cache, {t}', st_upd: 'Bijgewerkt {t}', st_off: 'Geen verbinding, oude data van {t}', st_fail: 'Ophalen mislukt: {e}', st_none: 'Nog niet opgehaald',
-    privacy: '<b>Privacy.</b> Deze app heeft geen server, account, cookies of statistieken. Je plek staat alleen in de lokale opslag van deze browser. Per verversing verlaten precies vier verzoeken je toestel: een afgerond coördinaat (≈1 km) naar <b>Open-Meteo</b> voor de verwachting, een verzoek aan Open-Meteo om een <b>vast raster van 10 x 10 modelpunten over heel Nederland</b> voor het kaartje na de radaruren (voor iedereen identiek, zegt niets over jou), een verzoek om het <b>landelijke radarbeeld van Buienradar</b> en een om de <b>landelijke metingen van de ruim 40 KNMI-weerstations</b> via Buienradar, beide ook voor iedereen identiek. De buienverwachting voor jouw plek wordt uit dat beeld op je eigen toestel afgelezen, en het dichtstbijzijnde station kies je toestel zelf. De knop <b>Mijn locatie</b> vraagt de positie aan je toestel, rondt die meteen af en gebruikt alleen dat afgeronde punt; de ruwe positie wordt niet bewaard en verlaat het toestel niet. Deze beperkingen worden afgedwongen door een Content-Security-Policy in de pagina. Elke server ziet onvermijdelijk je IP-adres.',
+    priv_sum: '<b>Privacy.</b> Deze app heeft geen server, account, cookies of statistieken.', privacy: 'Je plek staat alleen in de lokale opslag van deze browser. Per verversing verlaten precies vier verzoeken je toestel: een afgerond coördinaat (≈1 km) naar <b>Open-Meteo</b> voor de verwachting, een verzoek aan Open-Meteo om een <b>vast raster van 10 x 10 modelpunten over heel Nederland</b> voor het kaartje na de radaruren (voor iedereen identiek, zegt niets over jou), een verzoek om het <b>landelijke radarbeeld van Buienradar</b> en een om de <b>landelijke metingen van de ruim 40 KNMI-weerstations</b> via Buienradar, beide ook voor iedereen identiek. De buienverwachting voor jouw plek wordt uit dat beeld op je eigen toestel afgelezen, en het dichtstbijzijnde station kies je toestel zelf. De knop <b>Mijn locatie</b> vraagt de positie aan je toestel, rondt die meteen af en gebruikt alleen dat afgeronde punt; de ruwe positie wordt niet bewaard en verlaat het toestel niet. Staat Mijn locatie aan, dan onthoudt de app alleen dát, niet waar je bent, en vraagt hij de positie bij elke verversing opnieuw. Deze beperkingen worden afgedwongen door een Content-Security-Policy in de pagina. Elke server ziet onvermijdelijk je IP-adres.',
     footer_by: 'Een <b>Sly Solutions</b>-project · <u>slysolutions.nl</u> ↗ · v' + APP_VERSION, footer_data: 'Data: Open-Meteo (CC BY 4.0, KNMI-model) · Buienradar · CBS/Kadaster · © OpenStreetMap-bijdragers (ODbL) · GeoNames · 4pp · geen cookies, geen trackers · <a href="https://github.com/SlySolutions/sly-weather" rel="noopener" target="_blank">broncode op GitHub</a> · <a href="https://github.com/SlySolutions/sly-weather/issues" rel="noopener" target="_blank">fout of idee melden</a>',
     kv_coord: 'coördinaat verzonden', kv_round: 'afgerond op {n} decimalen', kv_model: 'model', kv_tz: 'tijdzone', kv_px: 'radar pixel', kv_px_v: 'x={x} y={y} van {w}×{h}, {n} beelden, 3×3 max', kv_na: 'niet beschikbaar', kv_bounds: 'radar hoekpunten', kv_levels: 'radar niveaus (−60…+55 min)', kv_q: 'kwartieren mm (komende 6 u)', kv_cache: 'cache', kv_cache_v: 'localStorage bb_cache, 10 min geldig', kv_places: 'opgeslagen plekken',
     mv_up: 'Omhoog', mv_down: 'Omlaag', fold: 'In- of uitklappen',
@@ -659,7 +676,8 @@ const I18N = {
     leg_radar: 'radar', leg_model: 'model mm/u 0,2 · 0,5 · 1 · 2,5 · 5+', leg_place: 'je plek', leg_wind: 'wind: de pijl komt uit de windrichting naar je plek, langer is harder', leg_wx: 'weer en temperatuur op je plek', bigmap_lock: 'Kaart vast: alleen + en −, je plek blijft in beeld en de pagina scrolt gewoon. Tik om slepen en knijpen aan te zetten.', upd_ready: 'Nieuwe versie klaar · tik om te laden',
     light: 'licht', measured_in: 'gemeten in {st} ({km} km, {t})', lt_model: 'modelschatting', kv_obs: 'meetstation (dichtstbij)',
     lt_sun: 'zonnig', lt_mixed: 'half zonnig', lt_grey: 'grijs', lt_dull: 'grauw', lt_dark: 'erg grauw en donker', lt_dusk: 'schemerig', lt_night: 'donker',
-    map_hide: 'Kaartje verbergen', map_show: 'Kaartje tonen', map_lock: 'Kaart vast: alleen + en −, je plek in het midden. Tik om slepen en pinch aan te zetten.', map_free: 'Kaart vrij: slepen en pinch. Tik om weer vast te zetten.', m_menu: 'Delen', chip_hint: 'Tik: aan of uit (bewaard). Lang indrukken: even alleen dit deel, tot je het menu sluit.', all: 'Alles',
+    map_hide: 'Kaartje verbergen', map_show: 'Kaartje tonen', map_lock: 'Kaart vast: alleen + en −, je plek in het midden. Tik om slepen en pinch aan te zetten.', map_free: 'Kaart vrij: slepen en pinch. Tik om weer vast te zetten.', m_menu: 'Menu', help_btn: 'Uitleg', help_title: 'Uitleg', help_close: 'Sluiten', priv_btn: 'Privacy', tl_day: 'dagwissel (00:00)',
+    help_html: '<li><b>Plek.</b> Kies je plek op de kaart of zoek op plaatsnaam of postcode. Bovenaan wissel je tussen bewaarde plekken. <b>✕</b> haalt de gekozen plek weg, <b>+</b> voegt een plek toe en <b>⌖</b> toont het weer voor waar je nu bent.</li><li><b>Tijdlijn.</b> Sleep het oranje bolletje door de komende uren en dagen. De cijfers en het kaartje volgen mee. Het verhaal eronder gaat altijd over vandaag.</li><li><b>Regen.</b> Het komende uur komt van de regenradar, alles daarna van het KNMI-weermodel. Hoe verder vooruit, hoe onzekerder.</li><li><b>Wind.</b> Windkracht staat in Beaufort (Bft): van 0 windstil tot 12 orkaan, met km/u erbij.</li><li><b>Tegels.</b> Met ▲ en ▼ zet je een tegel hoger of lager, met het pijltje ernaast klap je hem in. Onder <b>≡</b> kies je welke tegels je ziet.</li><li><b>Uiterlijk.</b> ◐ volgt je toestel, ☀ is licht, ☾ is donker en ⌨ is nerd. Met NL en EN wissel je van taal.</li><li><b>Als app.</b> Kies in het menu van je browser "Toevoegen aan beginscherm". De app opent dan net als een gewone app.</li><li><b>Privacy.</b> Geen account en geen cookies. Je plek blijft op dit toestel. Onderaan de pagina staat precies wat er wordt opgevraagd.</li>', chip_hint: 'Tik: aan of uit (bewaard). Lang indrukken: even alleen dit deel, tot je het menu sluit.', all: 'Alles',
     bft_hint: 'Bft = Beaufort: windkracht van 0 (windstil) tot 12 (orkaan).',
     bft_names: ['windstil', 'zwak', 'zwak', 'matig', 'matig', 'vrij krachtig', 'krachtig', 'hard', 'stormachtig', 'storm', 'zware storm', 'zeer zware storm', 'orkaan'],
     k_chance: 'kans {p}%', k_peak: 'piek {v} mm/u · {t}', k_dry: 'droog', next12h_s: '12 uur',
@@ -678,7 +696,7 @@ const I18N = {
   en: {
     th_auto: 'Follow system', th_light: 'Light', th_dark: 'Dark', th_nerd: 'Nerd', refresh: 'Refresh',
     newplace: 'New place', delplace: 'Remove this place', sure: 'Sure? ✕',
-    geo: 'My location', geo_title: 'Weather for where I am now (rounded, stays on the device)', geo_save: 'Save as place', geo_temp: 'My location', geo_unsaved: 'temporary, not saved',
+    geo: 'My location', geo_title: 'My location: the weather for where you are now, again on every refresh (rounded, stays on the device)', geo_save: 'Save', geo_save_t: 'Save as place', geo_temp: 'My location', geo_unsaved: 'follows your location, not saved',
     geo_abroad: 'outside the Netherlands: the map and radar cover NL only, the forecast still works', totop: 'Back to top', open_app: 'Open the full app',
     w_eyebrow: 'First time', w_h1: 'Pick your spot on the map. Nothing else needs sharing.',
     w_p1: 'Zoom in and tap the map. The app rounds your choice to about a kilometre, keeps it only on this device and then fetches the forecast. No account, no cookies. You can also search by place name or postcode; that list is built into the app.',
@@ -704,7 +722,7 @@ const I18N = {
     days_title: 'Coming days', days_sub: 'KNMI model via Open-Meteo', today: 'today', dry: 'dry',
     nerd_title: 'Nerd mode: what leaves your device', nerd_sub: 'request log · raw values', nolog: 'No requests yet.', n_round: 'Rounding', n_model: 'Model', n_fetch: 'fetch', n_manual: 'Manual', n_saveplace: 'Save as place', n_resetlayout: 'Reset tile order', n_wipe: 'Wipe all local data',
     st_cache: 'From cache, {t}', st_upd: 'Updated {t}', st_off: 'Offline, data from {t}', st_fail: 'Fetch failed: {e}', st_none: 'Not fetched yet',
-    privacy: '<b>Privacy.</b> This app has no server, account, cookies or analytics. Your place lives only in this browser\'s local storage. Each refresh sends exactly four requests: a rounded coordinate (≈1 km) to <b>Open-Meteo</b> for the forecast, a request to Open-Meteo for a <b>fixed grid of 10 x 10 model points over the whole Netherlands</b> for the map beyond the radar hours (identical for everyone, says nothing about you), a request for the <b>national Buienradar radar image</b> and one for the <b>national readings of the 40-odd KNMI weather stations</b> via Buienradar, both also identical for everyone. The shower forecast for your spot is read from that image on your own device, and your device picks the nearest station itself. The <b>My location</b> button asks the device for its position, rounds it at once and uses only that rounded point; the raw position is never stored and never leaves the device. These limits are enforced by a Content-Security-Policy in the page. Any server inevitably sees your IP address.',
+    priv_sum: '<b>Privacy.</b> This app has no server, account, cookies or analytics.', privacy: 'Your place lives only in this browser\'s local storage. Each refresh sends exactly four requests: a rounded coordinate (≈1 km) to <b>Open-Meteo</b> for the forecast, a request to Open-Meteo for a <b>fixed grid of 10 x 10 model points over the whole Netherlands</b> for the map beyond the radar hours (identical for everyone, says nothing about you), a request for the <b>national Buienradar radar image</b> and one for the <b>national readings of the 40-odd KNMI weather stations</b> via Buienradar, both also identical for everyone. The shower forecast for your spot is read from that image on your own device, and your device picks the nearest station itself. The <b>My location</b> button asks the device for its position, rounds it at once and uses only that rounded point; the raw position is never stored and never leaves the device. While My location is on, the app remembers only that it is on, not where you are, and asks for the position again on every refresh. These limits are enforced by a Content-Security-Policy in the page. Any server inevitably sees your IP address.',
     footer_by: 'A <b>Sly Solutions</b> project · <u>slysolutions.nl</u> ↗ · v' + APP_VERSION, footer_data: 'Data: Open-Meteo (CC BY 4.0, KNMI model) · Buienradar · CBS/Kadaster · © OpenStreetMap contributors (ODbL) · GeoNames · 4pp · no cookies, no trackers · <a href="https://github.com/SlySolutions/sly-weather" rel="noopener" target="_blank">source on GitHub</a> · <a href="https://github.com/SlySolutions/sly-weather/issues" rel="noopener" target="_blank">report a bug or idea</a>',
     kv_coord: 'coordinate sent', kv_round: 'rounded to {n} decimals', kv_model: 'model', kv_tz: 'time zone', kv_px: 'radar pixel', kv_px_v: 'x={x} y={y} of {w}×{h}, {n} frames, 3×3 max', kv_na: 'not available', kv_bounds: 'radar bounds', kv_levels: 'radar levels (−60…+55 min)', kv_q: '15-min mm (next 6 h)', kv_cache: 'cache', kv_cache_v: 'localStorage bb_cache, valid 10 min', kv_places: 'saved places',
     mv_up: 'Move up', mv_down: 'Move down', fold: 'Collapse or expand',
@@ -718,7 +736,8 @@ const I18N = {
     leg_radar: 'radar', leg_model: 'model mm/h 0.2 · 0.5 · 1 · 2.5 · 5+', leg_place: 'your place', leg_wind: 'wind: the arrow comes from the wind direction towards your place, longer is stronger', leg_wx: 'weather and temperature at your place', bigmap_lock: 'Map locked: + and − only, your place stays in view and the page scrolls normally. Tap to allow drag and pinch.', upd_ready: 'New version ready · tap to load',
     light: 'light', measured_in: 'measured at {st} ({km} km, {t})', lt_model: 'model estimate', kv_obs: 'weather station (nearest)',
     lt_sun: 'sunny', lt_mixed: 'partly sunny', lt_grey: 'grey', lt_dull: 'dull', lt_dark: 'very dull and dark', lt_dusk: 'dusky', lt_night: 'dark',
-    map_hide: 'Hide map', map_show: 'Show map', map_lock: 'Map locked: + and − only, your place in the centre. Tap to allow drag and pinch.', map_free: 'Map free: drag and pinch. Tap to lock again.', m_menu: 'Sections', chip_hint: 'Tap: on or off (saved). Press and hold: only this section for now, until you close the menu.', all: 'All',
+    map_hide: 'Hide map', map_show: 'Show map', map_lock: 'Map locked: + and − only, your place in the centre. Tap to allow drag and pinch.', map_free: 'Map free: drag and pinch. Tap to lock again.', m_menu: 'Menu', help_btn: 'How it works', help_title: 'How it works', help_close: 'Close', priv_btn: 'Privacy', tl_day: 'new day (00:00)',
+    help_html: '<li><b>Place.</b> Pick your spot on the map or search by town or postcode. At the top you switch between saved places. <b>✕</b> removes the chosen place, <b>+</b> adds one and <b>⌖</b> shows the weather for where you are now.</li><li><b>Timeline.</b> Drag the orange handle through the coming hours and days. The numbers and the small map follow along. The story below is always about today.</li><li><b>Rain.</b> The next hour comes from the rain radar, everything after that from the KNMI weather model. The further ahead, the less certain.</li><li><b>Wind.</b> Wind force is in Beaufort (Bft): from 0 calm to 12 hurricane, with km/h alongside.</li><li><b>Tiles.</b> ▲ and ▼ move a tile up or down, the arrow next to them folds it. Under <b>≡</b> you choose which tiles you see.</li><li><b>Look.</b> ◐ follows your device, ☀ is light, ☾ is dark and ⌨ is nerd. NL and EN switch the language.</li><li><b>As an app.</b> Choose "Add to home screen" in your browser menu. It then opens like a normal app.</li><li><b>Privacy.</b> No account and no cookies. Your place stays on this device. The bottom of the page lists exactly what is requested.</li>', chip_hint: 'Tap: on or off (saved). Press and hold: only this section for now, until you close the menu.', all: 'All',
     bft_hint: 'Bft = Beaufort: wind force from 0 (calm) to 12 (hurricane).',
     bft_names: ['calm', 'light air', 'light breeze', 'gentle breeze', 'moderate breeze', 'fresh breeze', 'strong breeze', 'near gale', 'gale', 'strong gale', 'storm', 'violent storm', 'hurricane'],
     k_chance: 'chance {p}%', k_peak: 'peak {v} mm/h · {t}', k_dry: 'dry', next12h_s: '12 hours',
@@ -829,13 +848,15 @@ function startRain() {
 }
 
 /* ============ Tegels: volgorde en inklappen ============ */
-const DEFAULT_ORDER = ['now', 'strip', 'tl', 'chart', 'map', 'days'];
+const DEFAULT_ORDER = ['tl', 'now', 'strip', 'chart', 'map', 'days'];
 /* Tegelmodus: ?tile=strip (of meerdere, met komma's) toont alleen die tegels met de plaatsnaam erbij; zonder bewaarde plek of tijdens het kiezen gewoon de hele app */
 const widgetTiles = (new URLSearchParams(location.search).get('tile') || '').split(',').filter(k => DEFAULT_ORDER.includes(k));
 const widgetOn = () => widgetTiles.length > 0 && !!currentPlace() && !picking;
 function applyWidget() { document.documentElement.classList.toggle('widget', widgetOn()); }
 let order = LS.get('bb_order', DEFAULT_ORDER).filter(k => DEFAULT_ORDER.includes(k));
 DEFAULT_ORDER.forEach(k => { if (!order.includes(k)) order.push(k); });
+/* Sinds 1.10 staat de tijdlijn standaard bovenaan (hij vat alles samen); wie de oude standaardvolgorde nog had krijgt de nieuwe, een eigen volgorde blijft */
+if (LS.get('bb_ordv', 1) < 2) { if (order.join() === 'now,strip,tl,chart,map,days') order = DEFAULT_ORDER.slice(); LS.set('bb_ordv', 2); }
 let folded = LS.get('bb_folded', {});
 const cardEl = k => document.querySelector(`.card[data-card="${k}"]`);
 function layoutCards() {
@@ -872,10 +893,10 @@ $('radaron').checked = LS.get('bb_radar', true);
 $('rounding').addEventListener('change', e => { LS.set('bb_round', +e.target.value); refreshAll(true); });
 $('model').addEventListener('change', e => { LS.set('bb_model', e.target.value); refreshAll(true); });
 $('radaron').addEventListener('change', e => { LS.set('bb_radar', e.target.checked); refreshAll(true); });
-$('wipe').addEventListener('click', () => { ['bb_places', 'bb_cur', 'bb_cache', 'bb_theme', 'bb_round', 'bb_model', 'bb_radar', 'bb_lang', 'bb_order', 'bb_folded', 'bb_detail', 'bb_mapfree', 'bb_bigfree', 'bb_tlmap', 'bb_mapzoom', 'bb_zoom', 'bb_tiles', 'bb_legend', 'bb_wunit'].forEach(LS.del); location.reload(); });
+$('wipe').addEventListener('click', () => { ['bb_places', 'bb_cur', 'bb_cache', 'bb_theme', 'bb_round', 'bb_model', 'bb_radar', 'bb_lang', 'bb_order', 'bb_folded', 'bb_detail', 'bb_mapfree', 'bb_bigfree', 'bb_tlmap', 'bb_mapzoom', 'bb_zoom', 'bb_tiles', 'bb_legend', 'bb_wunit', 'bb_geo', 'bb_ordv'].forEach(LS.del); location.reload(); });
 $('msave').addEventListener('click', () => { const la = +$('mlat').value, lo = +$('mlon').value; if (!la || !lo) return; savePlace(la.toFixed(2) + ', ' + lo.toFixed(2), la, lo); });
 
-/* Tijdelijke plek via "Mijn locatie": leeft alleen in het geheugen tot de gebruiker hem bewaart; na herladen toont de app weer de laatste bewaarde plek */
+/* Plek via "Mijn locatie": de positie leeft alleen in het geheugen tot de gebruiker hem bewaart. bb_geo onthoudt alleen dát Mijn locatie aan staat, zodat de app er na herladen weer mee begint */
 let tempPlace = null;
 const geoAvail = window.isSecureContext && 'geolocation' in navigator;
 function currentPlace() { return tempPlace || places[cur] || null; }
@@ -884,14 +905,13 @@ function renderPlaces() {
   $('locbar').hidden = !p; $('welcome').hidden = !!p; $('cards').classList.toggle('first', !p); document.documentElement.classList.toggle('haspl', !!p);
   applyWidget();
   if (!p) return;
-  $('placename').textContent = p.name; document.querySelectorAll('.wplace').forEach(a => a.textContent = '\u2316 ' + p.name);
+  document.querySelectorAll('.wplace').forEach(a => a.textContent = '\u2316 ' + p.name);
   const sel = $('placesel'); sel.innerHTML = '';
   places.forEach((q, i) => { const o = document.createElement('option'); o.value = i; o.textContent = q.name; o.selected = !tempPlace && i === cur; sel.appendChild(o); });
-  if (tempPlace) { const o = document.createElement('option'); o.value = 'tmp'; o.textContent = tempPlace.name; o.selected = true; sel.appendChild(o); }
-  sel.hidden = places.length + (tempPlace ? 1 : 0) < 2;
-  $('delbtn').hidden = !!tempPlace; $('geosave').hidden = !tempPlace; $('geobtn').hidden = !!tempPlace || !geoAvail || !places.length;
+  if (tempPlace) { const o = document.createElement('option'), near = nearestPlace(tempPlace.lat, tempPlace.lon, 0, 8); o.value = 'tmp'; o.textContent = tempPlace.name + (near ? ' · ' + near : ''); o.selected = true; sel.appendChild(o); }
+  $('delbtn').hidden = !!tempPlace; $('geosave').hidden = !tempPlace; $('geobtn').hidden = !geoAvail || !places.length; $('geobtn').setAttribute('aria-pressed', String(!!tempPlace));
 }
-$('placesel').addEventListener('change', e => { if (e.target.value === 'tmp') return; tempPlace = null; cur = +e.target.value; LS.set('bb_cur', cur); renderPlaces(); refreshAll(); });
+$('placesel').addEventListener('change', e => { if (e.target.value === 'tmp') return; tempPlace = null; LS.del('bb_geo'); cur = +e.target.value; LS.set('bb_cur', cur); renderPlaces(); refreshAll(); });
 let delArmed = null;
 $('delbtn').addEventListener('click', () => {
   const b = $('delbtn');
@@ -901,7 +921,7 @@ $('delbtn').addEventListener('click', () => {
   if (places.length) refreshAll(); else { showEmpty(); if (pin) { pin.remove(); pin = null; } startPick(); }
 });
 function savePlace(name, lat, lon) {
-  tempPlace = null;
+  tempPlace = null; LS.del('bb_geo');
   places.push({name, lat: +lat.toFixed(4), lon: +lon.toFixed(4)}); cur = places.length - 1;
   LS.set('bb_places', places); LS.set('bb_cur', cur); renderPlaces(); stopPick(); refreshAll(true);
 }
@@ -1045,24 +1065,33 @@ $('gpsbtn').addEventListener('click', () => {
     addLog('gps', 'mislukt: ' + err.message, null, Math.round(performance.now() - t0), 'code ' + err.code);
   }, {enableHighAccuracy: true, timeout: 20000, maximumAge: 300000});
 });
-/* Mijn locatie: één positie-opvraag, direct afgerond zoals een tik op de kaart; de ruwe positie wordt niet bewaard en verlaat het toestel niet */
-$('geobtn').addEventListener('click', () => {
-  if (busy || !geoAvail) return;
-  setStatus(t('gps_busy')); const t0 = performance.now();
+/* Mijn locatie: één positie-opvraag, direct afgerond zoals een tik op de kaart; de ruwe positie wordt niet bewaard en verlaat het toestel niet.
+   Zolang Mijn locatie aan staat vraagt elke verversing de positie opnieuw, zodat het weer met je meegaat */
+let geoTs = 0, geoBusy = false;
+function locateMe(force, start) {
+  if (busy || geoBusy || !geoAvail) return;
+  geoBusy = true; setStatus(t('gps_busy')); const t0 = performance.now();
+  /* Bij het openen: duurt de positie langer (bijvoorbeeld een toestemmingsvraag), dan het laadscherm alvast weg */
+  if (start) setTimeout(() => { if (geoBusy) bootDone(); }, 1500);
   navigator.geolocation.getCurrentPosition(pos => {
+    geoBusy = false; geoTs = Date.now();
     const d = roundDigits(), f = Math.pow(10, d);
     const lat = Math.round(pos.coords.latitude * f) / f, lon = Math.round(pos.coords.longitude * f) / f;
     addLog('gps', 'positie van het toestel, afgerond op ' + d + ' decimalen, niet bewaard en niet verzonden (±' + Math.round(pos.coords.accuracy) + ' m)', null, Math.round(performance.now() - t0), '');
-    tempPlace = {name: t('geo_temp'), lat, lon};
+    tempPlace = {name: t('geo_temp'), lat, lon}; LS.set('bb_geo', true);
     if (picking) stopPick();
-    renderPlaces(); refreshAll(true);
+    renderPlaces(); refreshAll(force);
   }, err => {
+    geoBusy = false;
     const k = err.code === 1 ? 'gps_denied' : err.code === 3 ? 'gps_timeout' : 'gps_unavail';
     const ff = /Firefox|Focus|FxiOS/i.test(navigator.userAgent) ? t('gps_ff') : '';
-    setStatus(t(k) + ff, true);
     addLog('gps', 'mislukt: ' + err.message, null, Math.round(performance.now() - t0), 'code ' + err.code);
-  }, {enableHighAccuracy: false, timeout: 15000, maximumAge: 600000});
-});
+    if (err.code === 1) LS.del('bb_geo');
+    /* Geen positie: bij het openen of tijdens het volgen toch het weer voor de laatst bekende plek, met de reden erbij */
+    if (start || tempPlace) refreshAll(force).then(() => setStatus(t(k) + ff, true)); else setStatus(t(k) + ff, true);
+  }, {enableHighAccuracy: false, timeout: start ? 8000 : 15000, maximumAge: start ? 600000 : 60000});
+}
+$('geobtn').addEventListener('click', () => locateMe(true));
 /* Bewaar als plek: dezelfde kiesmodus als een tik op de kaart, met de stip al op de afgeronde positie */
 $('geosave').addEventListener('click', () => {
   const p = tempPlace; if (!p) return;
@@ -1154,7 +1183,7 @@ async function refreshAll(force) {
   render(lat, lon);
   busy = false; $('refresh').classList.remove('spin');
 }
-$('refresh').addEventListener('click', () => refreshAll(true));
+$('refresh').addEventListener('click', () => tempPlace ? locateMe(true) : refreshAll(true));
 
 function loadRadar() {
   return new Promise((resolve, reject) => {
@@ -1487,10 +1516,11 @@ function drawTL() {
   }
   const vis = periods.map(p => ({a: Math.max(p.a, tStart), b: Math.min(p.b, tEnd), night: p.night})).filter(p => p.b > p.a);
   vis.forEach(p => { g.fillStyle = col(p.night ? '--night' : '--day'); g.fillRect(x(p.a), top, x(p.b) - x(p.a), bottom - top); });
-  /* Dagen: scheidslijn om middernacht, naam onderaan */
-  g.strokeStyle = col('--line'); g.lineWidth = 1; g.fillStyle = col('--text-2'); g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+  /* Dagen: oranje streepjeslijn om middernacht (de schuiflijn is doorgetrokken), naam onderaan */
+  g.strokeStyle = col('--accent'); g.lineWidth = 1.5; g.globalAlpha = .8; g.setLineDash([5, 4]); g.fillStyle = col('--text-2'); g.textAlign = 'left'; g.textBaseline = 'alphabetic';
   const firstMid = (dayOf(tStart) + 1) * 86400000, dayLbl = [];
   for (let m = firstMid; m < tEnd; m += 86400000) { g.beginPath(); g.moveTo(x(m) + .5, top); g.lineTo(x(m) + .5, bottom + 4); g.stroke(); }
+  g.setLineDash([]); g.globalAlpha = 1; g.lineWidth = 1;
   for (let d = dayOf(tStart); d <= dayOf(tEnd); d++) {
     const a = Math.max(d * 86400000, tStart), b = Math.min((d + 1) * 86400000, tEnd); if (b - a < (tEnd - tStart) * .04) continue;
     g.fillText(dayName(a, true), x(a) + 4, lblY); dayLbl.push(x(a) + 12);
@@ -1881,7 +1911,7 @@ function renderTL(lat, lon) {
   if (sel == null || sel < nowLocal() - 3600000) sel = nowLocal();
   tlReady = true; applyZoom(); setRange(); if (sel > tEnd) sel = nowLocal();
   $('tlmaplegend').innerHTML = `<span><i style="background:${col('--rain-1')}"></i><i style="background:${col('--rain-3')}"></i><i style="background:${col('--rain-4')}"></i>${t('leg_radar')}</span><span><i style="background:${col('--rain-1')}"></i><i style="background:${col('--rain-2')}"></i><i style="background:${col('--rain-3')}"></i><i style="background:${col('--rain-4')}"></i><i style="background:${col('--rain-5')}"></i>${t('leg_model')}</span><span><i style="background:${col('--accent')};border-radius:999px"></i>${t('leg_place')}</span>`;
-  $('tllegend').innerHTML = `<span><i class="ln"></i>${t('tl_temp')}</span><span><i class="dot"></i>${t('tl_hi')}</span><span><i class="dot lo"></i>${t('tl_lo')}</span><span><i class="ln wind"></i>${t('tl_wind')}</span><span><i class="ln prob"></i>${t('tl_prob')}</span><span><i class="band"></i>${t('tl_cloud')}</span><span><i class="bar"></i>${t('tl_rain')}</span><span><i class="nowm"></i>${t('tl_now')}</span><span><i class="veil"></i>${t('tl_past')}</span>`;
+  $('tllegend').innerHTML = `<span><i class="ln"></i>${t('tl_temp')}</span><span><i class="dot"></i>${t('tl_hi')}</span><span><i class="dot lo"></i>${t('tl_lo')}</span><span><i class="ln wind"></i>${t('tl_wind')}</span><span><i class="ln prob"></i>${t('tl_prob')}</span><span><i class="band"></i>${t('tl_cloud')}</span><span><i class="bar"></i>${t('tl_rain')}</span><span><i class="nowm"></i>${t('tl_now')}</span><span><i class="dayln"></i>${t('tl_day')}</span><span><i class="veil"></i>${t('tl_past')}</span>`;
   drawAll();
 }
 addEventListener('resize', () => { if (tlReady) { drawTL(); drawTLMap(); } });
@@ -1900,9 +1930,15 @@ initMap();
 layoutCards();
 applyLang(lang);
 renderPlaces();
-if (currentPlace()) { refreshAll(); } else { startPick(); }
-document.addEventListener('visibilitychange', () => { if (!document.hidden && currentPlace()) { const c = LS.get('bb_cache', null); if (!c || Date.now() - c.ts > 10 * 60000) refreshAll(); } });
+if (LS.get('bb_geo', false) && geoAvail && places.length) locateMe(false, true); else if (currentPlace()) { refreshAll(); } else { startPick(); }
+document.addEventListener('visibilitychange', () => { if (!document.hidden && tempPlace) { if (Date.now() - geoTs > 10 * 60000) locateMe(); return; } if (!document.hidden && currentPlace()) { const c = LS.get('bb_cache', null); if (!c || Date.now() - c.ts > 10 * 60000) refreshAll(); } });
 const noMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* Uitleg klapt open boven de tegels (knop op het eerste scherm en in het menu); de privacytekst blijft onderaan en klapt daar open */
+function setHelp(open) { $('help').hidden = !open; if (open) { setMenu(false); $('help').scrollIntoView({behavior: noMotion() ? 'auto' : 'smooth', block: 'start'}); } }
+$('helpbtn0').addEventListener('click', () => setHelp($('help').hidden));
+$('helpbtn').addEventListener('click', () => setHelp(true));
+$('helpclose').addEventListener('click', () => setHelp(false));
+$('privbtn').addEventListener('click', () => { setMenu(false); $('privbox').open = true; $('privbox').scrollIntoView({behavior: noMotion() ? 'auto' : 'smooth', block: 'start'}); });
 $('brandlink').addEventListener('click', e => { e.preventDefault(); scrollTo({top: 0, behavior: noMotion() ? 'auto' : 'smooth'}); });
 const onScroll = () => { const far = scrollY > 100; $('totop').classList.toggle('show', far); $('totophdr').classList.toggle('ghost', !far); };
 addEventListener('scroll', onScroll, {passive: true}); onScroll();
